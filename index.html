@@ -48,9 +48,9 @@ button.row{width:100%;background:none;border-left:0;border-right:0;border-top:0;
 .chips{display:flex;gap:8px;margin:10px 0 4px;flex-wrap:wrap}.chips button{border:1px solid var(--ln);background:none;color:var(--tx);border-radius:16px;padding:6px 12px;font-size:12.5px;cursor:pointer}
 .chips button.on{background:var(--or);border-color:var(--or);color:#fff}
 .prog{height:8px;background:var(--ln);border-radius:4px;overflow:hidden;margin:8px 0 4px}.prog div{height:100%;background:linear-gradient(90deg,var(--or),var(--or2))}
-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--card);border-top:1px solid var(--ln);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
-nav button{flex:1;background:none;border:0;color:var(--mu);padding:9px 0 8px;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
-nav button i{font-style:normal;font-size:20px}nav button.on{color:var(--or);font-weight:600}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--or);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:none;border:0;color:#fff;opacity:.72;padding:8px 0 7px;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button i{display:flex;align-items:center;justify-content:center;width:44px;height:26px;border-radius:13px}nav button i svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}nav button.on{opacity:1;font-weight:600}nav button.on i{background:rgba(255,255,255,.22)}nav button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
 .mk{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:9}
 .sh{background:var(--card);width:100%;max-width:430px;border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:90vh;overflow-y:auto}
 .sh h3{font-size:16px}.sh>p{color:var(--mu);font-size:12.5px;margin:2px 0 8px}
@@ -144,7 +144,7 @@ var bars=F2.M.map(function(m,i){return '<div class="bc"><div class="bp"><i class
 return '<div class="hd"><h1>Koperasi Kosfa</h1><p>Pantau peminjam dan arus kas pinjaman</p></div>'+
 '<div class="wal"><small>Total piutang beredar</small><b class="big">'+rp(sum(ak,'sisa'))+'</b><small style="display:block;margin-top:4px">Tunggakan '+rp(sum(tl,'sisa'))+'</small>'+
 '<div class="grid"><button class="st" onclick="go(\'deb\',\'Semua\')"><b>'+l.length+'</b>Semua</button><button class="st" onclick="go(\'deb\',\'Lancar\')"><b style="color:var(--ok)">'+cnt('Lancar')+'</b>Lancar</button><button class="st" onclick="go(\'deb\',\'Telat\')"><b style="color:var(--no)">'+tl.length+'</b>Telat</button><button class="st" onclick="go(\'deb\',\'Lunas\')"><b style="color:var(--or)">'+cnt('Lunas')+'</b>Lunas</button></div></div>'+
-rqBar()+'<div class="sec"><h2>Cash flow 6 bulan terakhir</h2><div class="bars">'+bars+'</div><div class="lg"><span><i style="background:var(--or)"></i>Kas masuk</span><span><i style="background:var(--kb)"></i>Kas keluar</span></div></div>'+
+'<div class="sec"><h2>Cash flow 6 bulan terakhir</h2><div class="bars">'+bars+'</div><div class="lg"><span><i style="background:var(--or)"></i>Kas masuk</span><span><i style="background:var(--kb)"></i>Kas keluar</span></div></div>'+
 '<div class="sec"><h2>Perlu ditagih</h2>'+(tl.map(item).join('')||'<p style="color:var(--mu)">'+(l.length?'Tidak ada yang telat.':'Belum ada debitur.')+'</p>')+'</div>'}
 function debitur(){var ch=['Semua','Lancar','Telat','Lunas'].map(function(c){return '<button class="'+(S.f===c?'on':'')+'" onclick="S.f=\''+c+'\';draw()">'+c+'</button>'}).join('');
 return '<div class="hd"><h1>Daftar debitur</h1><p>Siapa saja yang meminjam</p></div><div class="wal"><div class="sw"><span class="si">🔍</span><input class="srch" id="q" placeholder="Cari nama atau usaha" autocomplete="off" value="'+esc(S.q)+'" oninput="S.q=this.value;sug();lst()"><div id="sg" hidden></div></div><div class="chips">'+ch+'</div><div id="lst"></div></div>'}
@@ -294,11 +294,13 @@ if(new Date().getHours()<7)return;var td=today(),l=dueToday();if(!l.length)retur
 if(document.hidden){if(sysN!==td&&window.Notification&&Notification.permission==='granted'){sysN=td;try{var n=new Notification('Koperasi Kosfa: '+l.length+' tagihan jatuh tempo hari ini',{body:l.map(function(d){return d.n}).join(', ')});n.onclick=function(){window.focus()}}catch(e){}}return}
 if(ls(NK)!==td&&!document.querySelector('.mk')){lw(NK,td);listDue(l)}}
 function izinNotif(){if(!window.Notification)return toast('Perangkat ini belum mendukung notifikasi.');try{Notification.requestPermission().then(function(p){toast(p==='granted'?'Notifikasi aktif':'Izin notifikasi ditolak');draw()})}catch(e){toast('Notifikasi belum bisa diaktifkan di sini.')}}
+var IC={home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>',deb:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15.5 5.2a3.2 3.2 0 010 6"/><path d="M17 14.3c2 .6 3.5 2.300 3.5 4.700"/>',cash:'<path d="M5 20V11"/><path d="M12 20V5"/><path d="M19 20v-6"/>',kre:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',dev:'<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><path d="M13.5 5l-3 14"/>'};
+function ico(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(IC[k]||IC.home)+'</svg>'}
 function draw(){if(!AUTH)return loginView();
 if(isNas())S.tab='home';if(S.tab==='dev'&&!isDev())S.tab='home';if(S.tab==='kre'&&!canAdmin())S.tab='home';
 var v=isNas()?nasHome():{home:home,deb:debitur,cash:cash,kre:admin,dev:devTab}[S.tab]();
-var n=isNas()?[['home','🏠','Home']]:[['home','🏠','Home'],['deb','👥','Debitur'],['cash','📊','Cash flow']];if(canAdmin())n.push(['kre','⚙️','Admin']);if(isDev())n.push(['dev','🛠','Developer']);
-document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<button class="'+(S.tab===x[0]?'on':'')+'" onclick="go(\''+x[0]+'\')"><i>'+x[1]+'</i>'+x[2]+'</button>'}).join('')+'</nav>';
+var n=isNas()?[['home','home','Home']]:[['home','home','Home'],['deb','deb','Debitur'],['cash','cash','Cash flow']];if(canAdmin())n.push(['kre','kre','Admin']);if(isDev())n.push(['dev','dev','Developer']);
+document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<button class="'+(S.tab===x[0]?'on':'')+'" onclick="go(\''+x[0]+'\')"><i>'+ico(x[1])+'</i>'+x[2]+'</button>'}).join('')+'</nav>';
 if(S.tab==='home'&&RQ.rows===null&&!RQ.busy)rqLoad();if(S.tab==='deb')lst();if(S.tab==='dev'&&DV.s&&!DV.rows&&!DV.busy)devLoad()}
 
 /* ===== Appwrite: catat login + tab Developer ===== */
