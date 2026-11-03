@@ -74,6 +74,45 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .sw .sd svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .sw .sd{padding:0;gap:3px}
 .pw{position:relative}.pw .fm{padding-right:44px}.eye{position:absolute;right:0;top:4px;bottom:0;width:44px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:var(--mu);cursor:pointer;padding:0}.eye svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Mode PC (layar lebar >= 900px) ===== */
+@media (min-width:900px){
+body{display:block}
+#app{max-width:none;min-height:100vh;padding-bottom:40px;display:grid;grid-template-columns:1fr 1fr;column-gap:16px;row-gap:16px;align-content:start}
+#app:has(nav){margin-left:240px;padding-inline:max(32px,calc((100% - 1100px)/2))}
+#app:not(:has(nav)){display:block;padding:0}
+#app>.hd,#app>.wal,#app>.nt{grid-column:1/-1}
+#app>.sec:last-of-type:nth-of-type(odd){grid-column:1/-1}
+#app>.hd{margin-top:24px;border-radius:16px;padding:28px 28px 76px}
+#app>.hd h1{font-size:22px}#app>.hd p{font-size:13.5px}
+#app>.wal{margin:-52px 24px 0;padding:20px 24px}
+#app>.sec{margin:0;padding:18px 20px}
+#app>.nt{margin:0}
+.wal b.big{font-size:30px}
+.grid{max-width:560px}
+.bars{height:210px}.bp{height:176px}
+#lst{display:grid;grid-template-columns:1fr 1fr;column-gap:32px}
+#lst>p{grid-column:1/-1}
+.row,button.row,.st,.chips button,.btn,.lk,.nm{transition:background .15s,opacity .15s}
+button.row:hover,.row:hover{background:rgba(30,111,217,.06)}
+.btn:hover{opacity:.9}.st:hover{opacity:.75}
+.sec .btn,.wal .btn{max-width:420px}
+nav{top:0;bottom:0;left:0;transform:none;width:240px;max-width:none;flex-direction:column;justify-content:flex-start;gap:4px;padding:24px 12px;background:linear-gradient(180deg,var(--or),var(--or2));box-shadow:2px 0 12px rgba(0,0,0,.12);z-index:8}
+nav::before{content:"Koperasi Kosfa";color:#fff;font-size:17px;font-weight:700;padding:4px 14px 20px}
+nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:11px 14px;font-size:14px;border-radius:10px;opacity:.85;text-align:left}
+nav button i{width:24px;height:24px;border-radius:0;background:none}
+nav button:hover{background:rgba(255,255,255,.14);opacity:1}
+nav button.on{background:rgba(255,255,255,.24);opacity:1}
+nav button.on i{background:none}
+.mk{align-items:center;padding:24px}
+.sh{max-width:520px;border-radius:16px;max-height:88vh;padding:22px 22px 22px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.lgn{margin-bottom:0;align-items:center}
+.lgn .lgh{width:100%}.lgn .lc{width:100%;max-width:420px}
+.toast{top:20px}
+}
+@media (min-width:1500px){
+#app:has(nav){padding-inline:max(32px,calc((100% - 1200px)/2))}
+}
 </style>
 </head>
 <body>
