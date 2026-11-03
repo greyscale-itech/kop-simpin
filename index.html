@@ -140,7 +140,7 @@ var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan l
 var DB={D:[],K:[],T:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
-function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.')}
+function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function pad(n){return(n<10?'0':'')+n}
 function isoOf(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
@@ -241,7 +241,7 @@ return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p>
 '<div class="sec"><h2>Kelola Keuangan</h2><p style="color:var(--mu);font-size:12.5px">Setujui atau tolak pengajuan pinjaman nasabah, dan catat semua dana masuk (angsuran, modal, dan kreditur baru). Debitur yang disetujui otomatis muncul di tab Debitur, Home, dan Cash flow.</p><button class="btn" onclick="rqOpen()">Pengajuan Pinjaman'+(rqPend().length?' ('+rqPend().length+' baru)':'')+'</button><button class="btn gr" onclick="txf()">+ Tambah Dana Masuk</button></div>'+
 '<div class="sec"><h2>Piutang debitur vs kewajiban</h2>'+bar('Piutang beredar (debitur)',pit,'var(--or2)')+bar('Kewajiban (kreditur)',tot,'var(--kb)')+'<small style="color:var(--mu)">Cakupan = kas masuk bulan ini dibagi angsuran ke kreditur.</small></div>'+
 '<div class="sec"><h2>Pengingat jatuh tempo</h2><p style="color:var(--mu);font-size:12.5px">Daftar tagihan muncul otomatis pukul 07.00 pada tanggal jatuh tempo saat aplikasi terbuka. Notifikasi HP hanya jalan selama aplikasi masih berjalan di latar belakang.</p><div class="row"><span>Notifikasi HP</span><b>'+(window.Notification&&Notification.permission==='granted'?'Aktif':'Belum aktif')+'</b></div><button class="btn g" onclick="izinNotif()">Aktifkan notifikasi HP</button><button class="btn g" onclick="cekNotif(true)">Lihat tagihan hari ini</button></div>'+
-'<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data tersimpan otomatis di perangkat ini. Salin cadangan secara berkala agar aman.</p><button class="btn g" onclick="backup()">Buka cadangan data</button></div>'+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar: layar lebar memakai tampilan PC, layar kecil memakai tampilan HP.</p>'+'<div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div>'+'<div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+akunSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
+'<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data disimpan di perangkat ini dan disinkronkan ke Appwrite. '+syncTxt()+' Salin cadangan secara berkala agar aman.</p><button class="btn g" onclick="syncNow(1,1)">Sinkronkan sekarang</button><button class="btn g" onclick="backup()">Buka cadangan data</button></div>'+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar: layar lebar memakai tampilan PC, layar kecil memakai tampilan HP.</p>'+'<div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div>'+'<div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+akunSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
 
 /* ===== Debitur ===== */
 function waNum(h){var x=String(h||'').replace(/\D/g,'');if(x.indexOf('0')===0)x='62'+x.slice(1);else if(x.indexOf('8')===0)x='62'+x;return x}
@@ -372,7 +372,7 @@ document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<bu
 if(S.tab==='home'&&RQ.rows===null&&!RQ.busy)rqLoad();if(S.tab==='deb')lst();if(S.tab==='dev'&&DV.s&&!DV.rows&&!DV.busy)devLoad()}
 
 /* ===== Appwrite: catat login + tab Developer ===== */
-var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f',rq:'6ae9f69c00342165316b'},DEVMAIL='greyscale.itech@gmail.com';
+var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f',rq:'6ae9f69c00342165316b',st:'kosfa_data'},DEVMAIL='greyscale.itech@gmail.com';
 var VK='kosfa-view';
 function viewMode(){var v=ls(VK);return v==='pc'||v==='hp'?v:'auto'}
 function applyView(){var m=viewMode(),a=document.getElementById('pcs'),b=document.getElementById('pcs2'),vp=document.querySelector('meta[name=viewport]');
@@ -389,7 +389,8 @@ function awUrl(p){return awUrlT(AW.tb,p)}
 var RK='kosfa-role';
 function myRole(){if(isDev())return 'dev';try{var r=JSON.parse(ls(RK)||'null');return r&&A&&r.e===A.email&&r.r==='admin'?'admin':'nasabah'}catch(e){return 'nasabah'}}
 function canAdmin(){var r=myRole();return r==='dev'||r==='admin'}
-async function fetchRole(){try{if(!A||isDev())return;var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'limit',values:[500]}));
+async function fetchRole(){try{await fetchRole0()}finally{syncNow(1)}}
+async function fetchRole0(){try{if(!A||isDev())return;var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'limit',values:[500]}));
 var r=await fetch(awUrlT(AW.rt,'?'+q.toString()),{headers:{'X-Appwrite-Project':AW.pj}});if(!r.ok)return;var j=await r.json(),rows=j.rows||[];
 var me=rows.filter(function(x){return String(x.email||'').toLowerCase()===A.email&&x.role==='admin'})[0],nr=me?'admin':'nasabah',old=myRole();
 lw(RK,JSON.stringify({e:A.email,r:nr}));if(old!==nr){RQ.rows=null;if(AUTH)draw()}}catch(e){}}
@@ -476,7 +477,7 @@ return '<div class="upw"><div class="upb" role="progressbar" aria-valuemin="0" a
 async function devUpdate(){if(!DV.s||(DV.up&&DV.up.run))return;
 var U=DV.up={run:1,p:0,t:8,msg:'Menghubungi server…'};draw();
 function fail(m){if(DV.up===U)DV.up=null;draw();toast(m)}
-function fin(){U.run=0;U.ok=true;U.at='Diperbarui pukul '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});draw();setTimeout(function(){if(DV.up===U){DV.up=null;if(AUTH&&S.tab==='dev')draw()}},4000)}
+function fin(){cling();U.run=0;U.ok=true;U.at='Diperbarui pukul '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});draw();setTimeout(function(){if(DV.up===U){DV.up=null;if(AUTH&&S.tab==='dev')draw()}},4000)}
 var tk=setInterval(function(){if(DV.up!==U){clearInterval(tk);return}
 U.p=Math.min(U.t,U.p+Math.max(.4,(U.t-U.p)*.1));
 var f=document.getElementById('upf');if(f)f.style.width=U.p+'%';var pp=document.getElementById('upp');if(pp)pp.textContent=Math.round(U.p)+'%';var m=document.getElementById('upt');if(m)m.textContent=U.msg;
@@ -517,6 +518,61 @@ capBox()+
 '<div class="sec"><h2>Pengguna dan peran</h2>'+(DV.err?'<div class="err">'+esc(DV.err)+'</div>':'')+(DV.rows?pl:'<p style="color:var(--mu)">Memuat data…</p>')+'</div>'+
 '<div class="sec"><h2>Login terbaru</h2>'+(DV.rows?(list||'<p style="color:var(--mu)">Belum ada login tercatat.</p>'):'<p style="color:var(--mu)">Memuat data…</p>')+
 '<button class="btn g" onclick="devRefresh()">Muat ulang</button><button class="btn g" onclick="devOut()">Keluar Appwrite</button></div>'}
+
+/* ===== Bunyi "cling" saat update server berhasil ===== */
+var AC=null;
+function audUnlock(){try{var C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!AC)AC=new C();if(AC.state!=='running')AC.resume()}catch(e){}}
+['pointerdown','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,audUnlock,{passive:true})});
+function cling(){try{audUnlock();if(!AC)return;var t=AC.currentTime,g=AC.createGain();
+g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+1.2);g.connect(AC.destination);
+[[1568,1],[2349,.55],[3136,.3]].forEach(function(p){var o=AC.createOscillator(),pg=AC.createGain();o.type='sine';o.frequency.value=p[0];pg.gain.value=p[1];o.connect(pg);pg.connect(g);o.start(t);o.stop(t+1.25)})}catch(e){}}
+
+/* ===== Sinkron ke Appwrite (tabel kosfa_data: satu baris per debitur/kreditur/transaksi) ===== */
+var SYK='kosfa-syn',SYN={},SY={on:0,q:0,qf:0,msg:'',tm:0};
+try{SYN=JSON.parse(ls(SYK)||'{}')||{}}catch(e){SYN={}}
+function sOk(id){return /^[A-Za-z0-9][A-Za-z0-9._-]{0,35}$/.test(String(id))}
+function sRecs(){var m={};[['D',DB.D],['K',DB.K],['T',DB.T]].forEach(function(p){p[1].forEach(function(x){if(x&&sOk(x.id))m[x.id]={k:p[0],j:JSON.stringify(x)}})});return m}
+function sHd(){return{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'}}
+function sMsg(c){return c===404?'Tabel "'+AW.st+'" belum dibuat di Appwrite.':(c===401||c===403)?'Izin tabel "'+AW.st+'" belum diatur.':'Tidak bisa terhubung ke server.'}
+function syncTxt(){return SY.msg||'Belum tersinkron.'}
+function syncSoon(){if(!window.SY)return;clearTimeout(SY.tm);SY.tm=setTimeout(function(){syncNow()},700)}
+async function sFetch(){var out={},cur=null;for(;;){var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'limit',values:[100]}));if(cur)q.append('queries[]',JSON.stringify({method:'cursorAfter',values:[cur]}));
+var r=await fetch(awUrlT(AW.st,'?'+q.toString()),{headers:{'X-Appwrite-Project':AW.pj}});if(!r.ok)throw r.status;var p=(await r.json()).rows||[];
+p.forEach(function(x){out[x.$id]={k:x.kind,j:x.body}});if(p.length<100)return out;cur=p[p.length-1].$id}}
+async function sOp(o){var id=o[1],v=o[2],r;
+if(o[0]==='x'){r=await fetch(awUrlT(AW.st,'/'+id),{method:'DELETE',headers:sHd()});return(r.ok||r.status===404)?true:r.status}
+var d={kind:v.k,body:v.j};
+if(o[0]==='u'){r=await fetch(awUrlT(AW.st,'/'+id),{method:'PATCH',headers:sHd(),body:JSON.stringify({data:d})});if(r.ok)return true;if(r.status!==404)return r.status}
+r=await fetch(awUrlT(AW.st),{method:'POST',headers:sHd(),body:JSON.stringify({rowId:id,data:d})});if(r.ok)return true;
+if(r.status===409){r=await fetch(awUrlT(AW.st,'/'+id),{method:'PATCH',headers:sHd(),body:JSON.stringify({data:d})});return r.ok?true:r.status}return r.status}
+/* full=true: ambil data server lalu gabungkan. Tanpa full: hanya kirim perubahan lokal. */
+async function syncNow(full,man){if(!AUTH||!A||!canAdmin())return;
+if(SY.on){SY.q=1;if(full)SY.qf=1;return}
+SY.on=1;var bad=0,code=0,chg=false;
+try{var srv=full?await sFetch():SYN;
+if(full&&!Object.keys(srv).length&&Object.keys(SYN).length)SYN={};
+var loc=sRecs(),ids={},ops=[],res=[];
+[loc,srv,SYN].forEach(function(m){Object.keys(m).forEach(function(i){ids[i]=1})});
+Object.keys(ids).forEach(function(id){var l=loc[id],s=srv[id],o=SYN[id],t=null,op=null;
+if(l&&s){if(o&&l.j!==o.j){t=l;if(s.j!==l.j)op=['u',id,l]}else t=s}
+else if(l){if(!o||l.j!==o.j){t=l;op=['c',id,l]}}
+else if(s){if(o&&s.j===o.j)op=['x',id];else t=s}
+if(t){res.push(t);if(s&&t.j===s.j)SYN[id]=s}else if(!op)delete SYN[id];
+if(op)ops.push(op)});
+if(full){var nd={D:[],K:[],T:[]};['D','K','T'].forEach(function(k){DB[k].forEach(function(x){if(!(x&&sOk(x.id)))nd[k].push(x)})});
+res.forEach(function(t){nd[t.k].push(JSON.parse(t.j))});var ns=JSON.stringify(nd);
+if(ns!==JSON.stringify({D:DB.D,K:DB.K,T:DB.T})){DB=nd;lw(KEY,ns);chg=true}}
+for(var i=0;i<ops.length;i++){var o2=ops[i],r2=await sOp(o2);
+if(r2===true){if(o2[0]==='x')delete SYN[o2[1]];else SYN[o2[1]]=o2[2]}else{bad++;code=r2}}
+SY.msg=bad?(code===404||code===401||code===403?sMsg(code):'Sebagian perubahan belum terkirim, akan dicoba lagi.'):'Tersinkron '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'.';
+if(!bad&&(ops.length||man))cling();
+if(chg&&!document.querySelector('.mk'))draw()}
+catch(e){SY.msg=sMsg(e)}
+lw(SYK,JSON.stringify(SYN));SY.on=0;
+if(man){toast(SY.msg);if(!document.querySelector('.mk'))draw()}
+if(SY.q){var f=SY.qf;SY.q=SY.qf=0;syncNow(f)}}
+setInterval(function(){if(!document.hidden)syncNow(1)},60000);
+window.addEventListener('online',function(){syncNow(1)});
 
 var ts=ls(TK);if(ts&&['home','deb','cash','kre','dev'].indexOf(ts)>-1)S.tab=ts;
 try{A=JSON.parse(ls(AK))}catch(e){}
