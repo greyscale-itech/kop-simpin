@@ -144,7 +144,7 @@ var bars=F2.M.map(function(m,i){return '<div class="bc"><div class="bp"><i class
 return '<div class="hd"><h1>Koperasi Kosfa</h1><p>Pantau peminjam dan arus kas pinjaman</p></div>'+
 '<div class="wal"><small>Total piutang beredar</small><b class="big">'+rp(sum(ak,'sisa'))+'</b><small style="display:block;margin-top:4px">Tunggakan '+rp(sum(tl,'sisa'))+'</small>'+
 '<div class="grid"><button class="st" onclick="go(\'deb\',\'Semua\')"><b>'+l.length+'</b>Semua</button><button class="st" onclick="go(\'deb\',\'Lancar\')"><b style="color:var(--ok)">'+cnt('Lancar')+'</b>Lancar</button><button class="st" onclick="go(\'deb\',\'Telat\')"><b style="color:var(--no)">'+tl.length+'</b>Telat</button><button class="st" onclick="go(\'deb\',\'Lunas\')"><b style="color:var(--or)">'+cnt('Lunas')+'</b>Lunas</button></div></div>'+
-'<div class="sec"><h2>Cash flow 6 bulan terakhir</h2><div class="bars">'+bars+'</div><div class="lg"><span><i style="background:var(--or)"></i>Kas masuk</span><span><i style="background:var(--kb)"></i>Kas keluar</span></div></div>'+
+rqBar()+'<div class="sec"><h2>Cash flow 6 bulan terakhir</h2><div class="bars">'+bars+'</div><div class="lg"><span><i style="background:var(--or)"></i>Kas masuk</span><span><i style="background:var(--kb)"></i>Kas keluar</span></div></div>'+
 '<div class="sec"><h2>Perlu ditagih</h2>'+(tl.map(item).join('')||'<p style="color:var(--mu)">'+(l.length?'Tidak ada yang telat.':'Belum ada debitur.')+'</p>')+'</div>'}
 function debitur(){var ch=['Semua','Lancar','Telat','Lunas'].map(function(c){return '<button class="'+(S.f===c?'on':'')+'" onclick="S.f=\''+c+'\';draw()">'+c+'</button>'}).join('');
 return '<div class="hd"><h1>Daftar debitur</h1><p>Siapa saja yang meminjam</p></div><div class="wal"><div class="sw"><span class="si">🔍</span><input class="srch" id="q" placeholder="Cari nama atau usaha" autocomplete="off" value="'+esc(S.q)+'" oninput="S.q=this.value;sug();lst()"><div id="sg" hidden></div></div><div class="chips">'+ch+'</div><div id="lst"></div></div>'}
@@ -191,7 +191,7 @@ sheet('<div class="who"><span class="av">'+esc(ini(d.n))+'</span><div><h3>'+esc(
 [['Pokok pinjaman',rp(d.pk)],['Bunga',d.bg+'% ('+rp(d.tot-d.pk)+')'],['Total pinjaman',rp(d.tot)],['Tanggal cair',fd(d.cair)],['Tenor',tlb(d.tn)],['Jatuh tempo',fd(d.due)],['Sisa tagihan',rp(d.sisa)],['Terlambat',d.late>0?d.late+' hari':'Tidak ada']].map(function(r){return '<div class="row"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join('')+(d.al?'<div class="row"><span>Alamat</span><b style="text-align:right">'+esc(d.al)+'</b></div>':'')+(d.hp?'<div class="row"><span>No HP</span><a class="wa" style="font-size:14px;font-weight:600;margin:0" href="https://wa.me/'+waNum(d.hp)+'" target="_blank" rel="noopener">'+esc(d.hp)+'</a></div>':'')+
 (pay?'<h3 style="margin-top:14px;font-size:14px">Riwayat angsuran</h3>'+pay:'')+
 (d.sisa>0?'<button class="btn" onclick="txf(\'\',\''+id+'\')">+ Catat angsuran</button>':'')+'<button class="btn g" onclick="dform(\''+id+'\')">Ubah data</button><button class="btn d" onclick="hapusD(\''+id+'\')">Hapus debitur</button><button class="btn g" onclick="cls()">Tutup</button>')}
-function dform(id){var d=id?DB.D.filter(function(x){return x.id===id})[0]:null,v=d||{n:'',u:'',pk:'',bg:'',tn:30,cair:today()};var mo=v.tn%30===0&&v.tn/30<=12?v.tn/30:'',wk=mo?'':(v.tn%7===0&&v.tn/7<=4?v.tn/7:'');
+function dform(id,pre){var d=id?DB.D.filter(function(x){return x.id===id})[0]:null,v=d||pre||{n:'',u:'',pk:'',bg:'',tn:30,cair:today()};var mo=v.tn%30===0&&v.tn/30<=12?v.tn/30:'',wk=mo?'':(v.tn%7===0&&v.tn/7<=4?v.tn/7:'');
 sheet('<h3>'+(d?'Ubah':'Tambah')+' debitur</h3><p>'+(d?'Perbaiki data jika ada kesalahan penulisan.':'Pinjaman baru langsung masuk ke daftar debitur dan cash flow.')+'</p>'+
 F('fn','Nama debitur',v.n,'placeholder="Contoh: Budi Santoso"')+F('fa','Alamat',v.al||'','placeholder="Contoh: Jl. Melati No. 5, Bandung" autocomplete="street-address"')+F('fh','No HP (WhatsApp)',v.hp||'','type="tel" inputmode="tel" autocomplete="off" placeholder="Contoh: 081234567890" oninput="this.value=this.value.replace(/[^\\d+]/g,\'\')"')+'<button type="button" class="lk" style="text-align:left;margin-top:6px" onclick="waOpen(val(\'fh\'))">Buka WhatsApp</button>'+F('fu','Jenis usaha',v.u,'placeholder="Contoh: Warung sembako"')+
 F('fp','Pokok pinjaman (Rp)',v.pk?fmt(v.pk):'',MONEY+' placeholder="5,000,000"')+
@@ -264,7 +264,7 @@ var EYE_ON='<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-
 function pwf(id,ac,ph){return '<div class="pw"><input class="fm" id="'+id+'" type="password" autocomplete="'+ac+'"'+(ph?' placeholder="'+ph+'"':'')+'><button type="button" class="eye" aria-label="Tampilkan kata sandi" onclick="togglePw(this)">'+EYE_ON+'</button></div>'}
 function togglePw(b){var i=b.parentNode.querySelector('input'),h=i.type==='password';i.type=h?'text':'password';b.innerHTML=h?EYE_OFF:EYE_ON;b.setAttribute('aria-label',h?'Sembunyikan kata sandi':'Tampilkan kata sandi')}
 function loginView(){var a=!!A,bio=a&&A.cred&&window.PublicKeyCredential;
-document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh">'+logo(76)+'<h1>Koperasi Kosfa</h1><p>'+(a?'Masuk untuk mengelola pinjaman':'Buat akun admin pertama untuk mulai')+'</p></div><div class="lc"><form novalidate onsubmit="event.preventDefault();'+(a?'masuk()':'daftar()')+'">'+
+document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh">'+logo(76)+'<h1>Koperasi Kosfa</h1><p>'+(a?'Masuk untuk melanjutkan':'Buat akun untuk mulai')+'</p></div><div class="lc"><form novalidate onsubmit="event.preventDefault();'+(a?'masuk()':'daftar()')+'">'+
 '<label class="fl" for="le" style="margin-top:0">Email</label><input class="fm" id="le" type="email" autocomplete="email" placeholder="nama@email.com"'+(a?' value="'+esc(A.email)+'"':'')+'>'+
 '<label class="fl" for="lp">Kata sandi</label>'+pwf('lp',a?'current-password':'new-password','Minimal 8 karakter')+''+
 (a?'':'<label class="fl" for="lq">Ulangi kata sandi</label>'+pwf('lq','new-password')+'')+
@@ -282,39 +282,79 @@ async function bioReg(){if(!window.PublicKeyCredential||!navigator.credentials)r
 try{var c=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'Koperasi Kosfa'},user:{id:rnd(16),name:A.email,displayName:A.email},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});
 A.cred=b64(c.rawId);saveA();toast('Biometrik aktif');draw()}catch(e){toast('Biometrik belum bisa diaktifkan. Buka link langsung di browser HP, bukan di dalam preview.')}}
 async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});setSess('biometrik')}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
-function logout(){AUTH=false;try{localStorage.removeItem(SK)}catch(e){}draw()}
+function logout(){AUTH=false;RQ.rows=null;try{localStorage.removeItem(SK)}catch(e){}draw()}
 function resetAkun(){if(confirm('Hapus akun admin di perangkat ini? Data debitur, kreditur, dan transaksi tidak ikut terhapus.')){try{localStorage.removeItem(AK)}catch(e){}A=null;draw()}}
-function akunSec(){return '<div class="sec"><h2>Akun admin</h2><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><b>'+(A.cred?'Aktif':'Belum aktif')+'</b></div>'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+'<button class="btn g" onclick="logout()">Keluar</button></div>'}
+function akunSec(){return '<div class="sec"><h2>Akun</h2><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><b>'+(A.cred?'Aktif':'Belum aktif')+'</b></div>'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+'<button class="btn g" onclick="logout()">Keluar</button></div>'}
 
 var NK='kosfa-notif',sysN='';
 function dueToday(){var td=today();return L().filter(function(d){return d.st!=='Lunas'&&d.due===td})}
 function listDue(l){sheet('<div style="display:flex;justify-content:space-between;align-items:center"><h3>Jatuh tempo hari ini</h3><span class="tag" style="background:var(--bg);color:var(--wn)">'+l.length+' debitur</span></div><p>'+fd(today())+'</p>'+l.map(function(d){return '<button class="row" onclick="det(\''+d.id+'\')"><div><b>'+esc(d.n)+'</b><small>'+esc(d.u)+'</small></div><div class="rt"><b>'+rp(d.sisa)+'</b><small>Sisa tagihan</small></div></button>'}).join('')+'<button class="btn g" onclick="cls()">Tutup</button>')}
-function cekNotif(manual){if(!AUTH)return;if(manual===true){var m=dueToday();return m.length?listDue(m):toast('Tidak ada tagihan jatuh tempo hari ini')}
+function cekNotif(manual){if(!AUTH||!canAdmin())return;if(manual===true){var m=dueToday();return m.length?listDue(m):toast('Tidak ada tagihan jatuh tempo hari ini')}
 if(new Date().getHours()<7)return;var td=today(),l=dueToday();if(!l.length)return;
 if(document.hidden){if(sysN!==td&&window.Notification&&Notification.permission==='granted'){sysN=td;try{var n=new Notification('Koperasi Kosfa: '+l.length+' tagihan jatuh tempo hari ini',{body:l.map(function(d){return d.n}).join(', ')});n.onclick=function(){window.focus()}}catch(e){}}return}
 if(ls(NK)!==td&&!document.querySelector('.mk')){lw(NK,td);listDue(l)}}
 function izinNotif(){if(!window.Notification)return toast('Perangkat ini belum mendukung notifikasi.');try{Notification.requestPermission().then(function(p){toast(p==='granted'?'Notifikasi aktif':'Izin notifikasi ditolak');draw()})}catch(e){toast('Notifikasi belum bisa diaktifkan di sini.')}}
 function draw(){if(!AUTH)return loginView();
-if(S.tab==='dev'&&!isDev())S.tab='home';if(S.tab==='kre'&&!canAdmin())S.tab='home';
-var v={home:home,deb:debitur,cash:cash,kre:admin,dev:devTab}[S.tab]();
-var n=[['home','🏠','Home'],['deb','👥','Debitur'],['cash','📊','Cash flow']];if(canAdmin())n.push(['kre','⚙️','Admin']);if(isDev())n.push(['dev','🛠','Developer']);
+if(isNas())S.tab='home';if(S.tab==='dev'&&!isDev())S.tab='home';if(S.tab==='kre'&&!canAdmin())S.tab='home';
+var v=isNas()?nasHome():{home:home,deb:debitur,cash:cash,kre:admin,dev:devTab}[S.tab]();
+var n=isNas()?[['home','🏠','Home']]:[['home','🏠','Home'],['deb','👥','Debitur'],['cash','📊','Cash flow']];if(canAdmin())n.push(['kre','⚙️','Admin']);if(isDev())n.push(['dev','🛠','Developer']);
 document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<button class="'+(S.tab===x[0]?'on':'')+'" onclick="go(\''+x[0]+'\')"><i>'+x[1]+'</i>'+x[2]+'</button>'}).join('')+'</nav>';
-if(S.tab==='deb')lst();if(S.tab==='dev'&&DV.s&&!DV.rows&&!DV.busy)devLoad()}
+if(S.tab==='home'&&RQ.rows===null&&!RQ.busy)rqLoad();if(S.tab==='deb')lst();if(S.tab==='dev'&&DV.s&&!DV.rows&&!DV.busy)devLoad()}
 
 /* ===== Appwrite: catat login + tab Developer ===== */
-var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f'},DEVMAIL='greyscale.itech@gmail.com';
+var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f',rq:'pengajuan'},DEVMAIL='greyscale.itech@gmail.com';
 var DV={s:null,rows:null,total:0,busy:false,err:''};
 try{DV.s=sessionStorage.getItem('kosfa-dv')||null}catch(e){}
 function isDev(){return !!A&&A.email===DEVMAIL}
 function awUrlT(t,p){return AW.ep+'/tablesdb/'+AW.db+'/tables/'+t+'/rows'+(p||'')}
 function awUrl(p){return awUrlT(AW.tb,p)}
 var RK='kosfa-role';
-function myRole(){if(isDev())return 'dev';try{var r=JSON.parse(ls(RK)||'null');return r&&A&&r.e===A.email&&r.r==='admin'?'admin':'user'}catch(e){return 'user'}}
+function myRole(){if(isDev())return 'dev';try{var r=JSON.parse(ls(RK)||'null');return r&&A&&r.e===A.email&&r.r==='admin'?'admin':'nasabah'}catch(e){return 'nasabah'}}
 function canAdmin(){var r=myRole();return r==='dev'||r==='admin'}
 async function fetchRole(){try{if(!A||isDev())return;var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'limit',values:[500]}));
 var r=await fetch(awUrlT(AW.rt,'?'+q.toString()),{headers:{'X-Appwrite-Project':AW.pj}});if(!r.ok)return;var j=await r.json(),rows=j.rows||[];
-var me=rows.filter(function(x){return String(x.email||'').toLowerCase()===A.email&&x.role==='admin'})[0],nr=me?'admin':'user',old=myRole();
-lw(RK,JSON.stringify({e:A.email,r:nr}));if(old!==nr&&AUTH)draw()}catch(e){}}
+var me=rows.filter(function(x){return String(x.email||'').toLowerCase()===A.email&&x.role==='admin'})[0],nr=me?'admin':'nasabah',old=myRole();
+lw(RK,JSON.stringify({e:A.email,r:nr}));if(old!==nr){RQ.rows=null;if(AUTH)draw()}}catch(e){}}
+/* ===== Pengajuan pinjaman (nasabah -> admin) ===== */
+var RQ={rows:null,busy:false,err:''};
+function isNas(){return myRole()==='nasabah'}
+function rqH(){return {'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'}}
+function rqTag(s){return s==='disetujui'?'<span class="tag Lancar">Disetujui</span>':s==='ditolak'?'<span class="tag Telat">Ditolak</span>':'<span class="tag Lunas">Menunggu</span>'}
+async function rqLoad(){if(RQ.busy||!A)return;RQ.busy=true;RQ.err='';
+try{var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'limit',values:[200]}));q.append('queries[]',JSON.stringify({method:'orderDesc',attribute:'$createdAt'}));
+if(!canAdmin())q.append('queries[]',JSON.stringify({method:'equal',attribute:'email',values:[A.email]}));
+var r=await fetch(awUrlT(AW.rq,'?'+q.toString()),{headers:{'X-Appwrite-Project':AW.pj}});
+if(!r.ok){RQ.err=r.status===404?'Tabel "'+AW.rq+'" belum dibuat di Appwrite.':'Gagal memuat pengajuan ('+r.status+').';RQ.rows=[]}
+else{var j=await r.json();RQ.rows=j.rows||[]}}
+catch(e){RQ.err='Tidak bisa terhubung ke server.';RQ.rows=[]}
+RQ.busy=false;if(AUTH&&S.tab==='home')draw()}
+function rqRefresh(){RQ.rows=null;draw()}
+function rqPend(){return (RQ.rows||[]).filter(function(x){return x.status==='menunggu'})}
+function rqRow(x,adm){return '<button type="button" class="row" onclick="'+(adm?'rqDet(\''+x.$id+'\')':'rqView(\''+x.$id+'\')')+'"><div style="min-width:0"><b>'+(adm?esc(x.nama):rp(x.jumlah))+'</b><small style="display:block;color:var(--mu)">'+(adm?rp(x.jumlah)+' · ':'')+tlb(x.tenor)+' · '+fd(String(x.$createdAt||'').slice(0,10))+'</small></div>'+rqTag(x.status)+'</button>'}
+function rqBar(){if(!canAdmin())return '';var p=rqPend();
+return '<div class="sec"><h2>Pengajuan pinjaman'+(p.length?' <span class="tag Telat">'+p.length+' baru</span>':'')+'</h2>'+(RQ.err?'<p style="color:var(--no);font-size:12.5px">'+esc(RQ.err)+'</p>':'')+(RQ.rows===null?'<p style="color:var(--mu)">Memuat…</p>':(RQ.rows.slice(0,5).map(function(x){return rqRow(x,true)}).join('')||'<p style="color:var(--mu)">Belum ada pengajuan.</p>'))+(RQ.rows&&RQ.rows.length>5?'<button class="btn g" onclick="rqAll()">Lihat semua ('+RQ.rows.length+')</button>':'')+'<button class="btn g" onclick="rqRefresh()">Muat ulang</button></div>'}
+function rqAll(){sheet('<h3>Semua pengajuan</h3>'+RQ.rows.map(function(x){return rqRow(x,true)}).join('')+'<button class="btn g" onclick="cls()">Tutup</button>')}
+function rqFind(id){return (RQ.rows||[]).filter(function(x){return x.$id===id})[0]}
+function rqView(id){var x=rqFind(id);if(!x)return;sheet('<h3>Pengajuan '+rp(x.jumlah)+'</h3><p>'+rqTag(x.status)+'</p><div class="row"><span>Tenor</span><b>'+tlb(x.tenor)+'</b></div><div class="row"><span>Tujuan</span><b>'+esc(x.tujuan)+'</b></div>'+(x.catatan?'<div class="row"><span>Catatan admin</span><b>'+esc(x.catatan)+'</b></div>':'')+'<button class="btn g" onclick="cls()">Tutup</button>')}
+function rqDet(id){var x=rqFind(id);if(!x)return;var w=x.status==='menunggu';
+sheet('<h3>'+esc(x.nama)+'</h3><p>'+rqTag(x.status)+'</p><div class="row"><span>Email</span><b style="word-break:break-all">'+esc(x.email)+'</b></div><div class="row"><span>No HP</span><b>'+esc(x.hp||'-')+'</b></div><div class="row"><span>Jumlah</span><b>'+rp(x.jumlah)+'</b></div><div class="row"><span>Tenor</span><b>'+tlb(x.tenor)+'</b></div><div class="row"><span>Tujuan</span><b>'+esc(x.tujuan)+'</b></div>'+
+(w?F('rc','Catatan untuk nasabah (opsional)','','maxlength="300"')+'<div class="err" id="err"></div><button class="btn" onclick="rqKeputusan(\''+id+'\',true)">Setujui</button><button class="btn g" onclick="rqKeputusan(\''+id+'\',false)">Tolak</button>':(x.catatan?'<div class="row"><span>Catatan</span><b>'+esc(x.catatan)+'</b></div>':'')+(x.status==='disetujui'?'<button class="btn" onclick="rqCair(\''+id+'\')">Catat sebagai debitur</button>':''))+'<button class="btn g" onclick="cls()">Tutup</button>')}
+async function rqKeputusan(id,ok){if(!canAdmin())return;var x=rqFind(id);if(!x)return;
+try{var r=await fetch(awUrlT(AW.rq,'/'+id),{method:'PATCH',headers:rqH(),body:JSON.stringify({data:{status:ok?'disetujui':'ditolak',catatan:val('rc').trim().slice(0,300)}})});
+if(!r.ok)return emsg('Gagal menyimpan keputusan ('+r.status+'). Cek permission Update pada tabel.');
+x.status=ok?'disetujui':'ditolak';x.catatan=val('rc').trim();toast(ok?'Pengajuan disetujui':'Pengajuan ditolak');
+if(ok)return rqCair(id);cls();draw()}catch(e){emsg('Tidak bisa terhubung ke server.')}}
+function rqCair(id){var x=rqFind(id);if(!x)return;draw();dform(null,{n:x.nama,u:x.tujuan,pk:x.jumlah,bg:'',tn:x.tenor,cair:today(),hp:x.hp,al:''})}
+function rqForm(){sheet('<h3>Ajukan pinjaman</h3><p>Pengajuan akan dikirim ke admin untuk ditinjau.</p>'+F('rn','Nama lengkap','','autocomplete="name"')+F('rh','No HP (WhatsApp)','','type="tel" inputmode="tel" autocomplete="tel"')+F('rj','Jumlah pinjaman (Rp)','',MONEY+' placeholder="5,000,000"')+SEL('rt','Tenor',TEN,30)+F('ru','Tujuan pinjaman','','maxlength="300" placeholder="Contoh: modal usaha warung"')+'<div class="err" id="err"></div><button class="btn" id="rbtn" onclick="kirimP()">Kirim pengajuan</button><button class="btn g" onclick="cls()">Batal</button>')}
+async function kirimP(){var n=val('rn').trim(),hp=val('rh').replace(/[^\d+]/g,''),j=num('rj'),t=+val('rt'),u=val('ru').trim();
+if(!n)return emsg('Nama wajib diisi.');if(waNum(hp).length<10||waNum(hp).length>15)return emsg('No HP tidak valid.');if(j<100000)return emsg('Minimal pinjaman Rp100,000.');if(!u)return emsg('Tujuan pinjaman wajib diisi.');
+var b=document.getElementById('rbtn');if(b)b.disabled=true;
+try{var r=await fetch(awUrlT(AW.rq),{method:'POST',headers:rqH(),body:JSON.stringify({rowId:'unique()',data:{email:A.email,nama:n.slice(0,100),hp:hp.slice(0,20),jumlah:j,tenor:t,tujuan:u.slice(0,300),status:'menunggu',catatan:''}})});
+if(!r.ok){if(b)b.disabled=false;return emsg(r.status===404?'Layanan pengajuan belum siap. Hubungi admin.':'Gagal mengirim ('+r.status+'). Coba lagi.')}
+cls();RQ.rows=null;toast('Pengajuan terkirim');draw()}catch(e){if(b)b.disabled=false;emsg('Tidak bisa terhubung ke server. Cek internet.')}}
+function nasHome(){var L2=RQ.rows||[];
+return '<div class="hd"><h1>Koperasi Kosfa</h1><p>'+esc(A.email)+'</p></div><div class="wal"><small>Butuh dana?</small><b class="big" style="font-size:18px">Ajukan pinjaman</b><button class="btn" onclick="rqForm()">Ajukan pinjaman</button></div>'+
+'<div class="sec"><h2>Pengajuan saya</h2>'+(RQ.err?'<p style="color:var(--no);font-size:12.5px">'+esc(RQ.err)+'</p>':'')+(RQ.rows===null?'<p style="color:var(--mu)">Memuat…</p>':(L2.map(function(x){return rqRow(x,false)}).join('')||'<p style="color:var(--mu)">Belum ada pengajuan.</p>'))+'<button class="btn g" onclick="rqRefresh()">Muat ulang</button></div>'+akunSec()}
 function awH(x){var h={'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'};if(DV.s)h['X-Fallback-Cookies']=DV.s;return Object.assign(h,x||{})}
 function devInfo(){var u=navigator.userAgent||'',o=/Android/i.test(u)?'Android':/iPhone/i.test(u)?'iPhone':/iPad/i.test(u)?'iPad':/Windows/i.test(u)?'Windows':/Mac/i.test(u)?'Mac':/Linux/i.test(u)?'Linux':'Perangkat lain',
 b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Firefox|FxiOS/.test(u)?'Firefox':/Chrome|CriOS/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'Browser';return (o+' · '+b).slice(0,255)}
@@ -341,13 +381,13 @@ function devRefresh(){DV.rows=null;draw()}
 async function devOut(){try{var h=awH();if(DV.s==='cookie')delete h['X-Fallback-Cookies'];await fetch(AW.ep+'/account/sessions/current',{method:'DELETE',headers:h,credentials:'include'})}catch(e){}
 DV.s=null;DV.rows=null;DV.err='';try{sessionStorage.removeItem('kosfa-dv')}catch(e){}draw()}
 async function devRole(i){var em=(DV.ul||[])[i];if(!em||em===DEVMAIL)return;var adm=!!(DV.roles||{})[em];
-if(!confirm(adm?'Ubah '+em+' menjadi User? Akses tab Admin dan edit cash flow dicabut.':'Jadikan '+em+' sebagai Admin? Bisa membuka tab Admin dan mengubah cash flow.'))return;
+if(!confirm(adm?'Ubah '+em+' menjadi Nasabah? Akses tab Admin dan edit cash flow dicabut.':'Jadikan '+em+' sebagai Admin? Bisa membuka tab Admin dan mengubah cash flow.'))return;
 try{var h=awH();if(DV.s==='cookie')delete h['X-Fallback-Cookies'];var r;
 if(adm)r=await fetch(awUrlT(AW.rt,'/'+DV.roles[em]),{method:'DELETE',headers:h,credentials:'include'});
 else r=await fetch(awUrlT(AW.rt),{method:'POST',headers:h,credentials:'include',body:JSON.stringify({rowId:'unique()',data:{email:em,role:'admin'}})});
 if(!r.ok)return toast('Gagal mengubah peran ('+r.status+'). Cek permission table roles.');
 if(adm)delete DV.roles[em];else{var j=await r.json();DV.roles[em]=j.$id}
-draw();toast(adm?em+' kini User':em+' kini Admin')}catch(e){toast('Tidak bisa terhubung ke Appwrite.')}}
+draw();toast(adm?em+' kini Nasabah':em+' kini Admin')}catch(e){toast('Tidak bisa terhubung ke Appwrite.')}}
 function devTab(){var hd='<div class="hd"><h1>Developer</h1><p>Pantau login dan kelola peran pengguna</p></div>',
 bdg='<span class="tag" style="background:#1E6FD9;color:#fff;display:inline-block;margin-top:6px">Developer</span>',
 acc='<small>Akun yang sedang login</small><b style="display:block;font-size:16px;margin-top:2px;word-break:break-all">'+esc(A.email)+'</b>'+bdg;
@@ -358,8 +398,8 @@ Object.keys(RO).forEach(function(e){if(!seen[e]){seen[e]=1;ul.push(e)}});
 var adm=ul.filter(function(e){return e!==DEVMAIL&&RO[e]}),usr=ul.filter(function(e){return e!==DEVMAIL&&!RO[e]});ul=[DEVMAIL].concat(adm,usr);DV.ul=ul;
 var fm=function(x){var d=new Date(x.$createdAt);return isNaN(d)?'':d.toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})};
 var tg=function(m){return m==='biometrik'?'Lunas':m==='password'?'Lancar':''};
-var pl=ul.map(function(e,i){var isd=e===DEVMAIL,b=isd?'<span class="tag" style="background:#1E6FD9;color:#fff">Developer</span>':RO[e]?'<span class="tag Lancar">Admin</span>':'<span class="tag" style="background:var(--bg);color:var(--mu)">User</span>';
-return '<div class="row"><div style="min-width:0"><b style="word-break:break-all">'+esc(e)+'</b><small>'+(last[e]?'Login terakhir '+fm(last[e]):'Belum ada login tercatat')+'</small></div><div style="text-align:right;flex-shrink:0">'+b+(isd?'':'<button type="button" class="lk" style="display:block;width:auto;margin:6px 0 0 auto" onclick="devRole('+i+')">'+(RO[e]?'Jadikan User':'Jadikan Admin')+'</button>')+'</div></div>'}).join('');
+var pl=ul.map(function(e,i){var isd=e===DEVMAIL,b=isd?'<span class="tag" style="background:#1E6FD9;color:#fff">Developer</span>':RO[e]?'<span class="tag Lancar">Admin</span>':'<span class="tag" style="background:var(--bg);color:var(--mu)">Nasabah</span>';
+return '<div class="row"><div style="min-width:0"><b style="word-break:break-all">'+esc(e)+'</b><small>'+(last[e]?'Login terakhir '+fm(last[e]):'Belum ada login tercatat')+'</small></div><div style="text-align:right;flex-shrink:0">'+b+(isd?'':'<button type="button" class="lk" style="display:block;width:auto;margin:6px 0 0 auto" onclick="devRole('+i+')">'+(RO[e]?'Jadikan Nasabah':'Jadikan Admin')+'</button>')+'</div></div>'}).join('');
 var list=R.slice(0,50).map(function(x){return '<div class="row"><div style="min-width:0"><b style="word-break:break-all">'+esc(x.email)+'</b><small>'+esc(x.device||'-')+'</small></div><div style="text-align:right;flex-shrink:0"><span class="tag '+tg(x.method)+'"'+(tg(x.method)?'':' style="background:var(--bg);color:var(--wn)"')+'>'+esc(x.method||'-')+'</span><small>'+fm(x)+'</small></div></div>'}).join('');
 return hd+'<div class="wal">'+acc+'<div class="grid" style="grid-template-columns:1fr 1fr"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?ul.length:'…')+'</b>Pengguna</div></div></div>'+
 '<div class="sec"><h2>Pengguna dan peran</h2>'+(DV.err?'<div class="err">'+esc(DV.err)+'</div>':'')+(DV.rows?pl:'<p style="color:var(--mu)">Memuat data…</p>')+'</div>'+
