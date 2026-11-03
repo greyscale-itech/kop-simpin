@@ -363,7 +363,7 @@ async function devLogin(){var pw=val('dp');if(!pw)return emsg('Isi kata sandi Ap
 var b=document.getElementById('dbtn');if(b)b.disabled=true;
 try{var r=await fetch(AW.ep+'/account/sessions/email',{method:'POST',headers:{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email:DEVMAIL,password:pw})});
 var fc=r.headers.get('X-Fallback-Cookies');
-if(!r.ok){if(b)b.disabled=false;return emsg(r.status===401?'Email atau kata sandi Appwrite salah.':r.status===429?'Terlalu banyak percobaan. Coba lagi sebentar.':'Gagal masuk ke Appwrite ('+r.status+'). Cek hostname di Platforms.')}
+if(!r.ok){if(b)b.disabled=false;var ej={};try{ej=await r.json()}catch(x){}var et=ej.type?' ['+ej.type+']':'';return emsg(r.status===401?'Email atau kata sandi Appwrite salah.'+et:r.status===429?'Terlalu banyak percobaan. Coba lagi sebentar.':'Gagal masuk ke Appwrite ('+r.status+'). Cek hostname di Platforms.')}
 DV.s=fc||'cookie';try{sessionStorage.setItem('kosfa-dv',DV.s)}catch(e){}DV.rows=null;DV.err='';draw()}
 catch(e){if(b)b.disabled=false;emsg('Tidak bisa terhubung ke Appwrite. Cek internet dan hostname di Platforms.')}}
 async function devLoad(){if(DV.busy)return;DV.busy=true;DV.err='';
