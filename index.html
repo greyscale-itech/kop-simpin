@@ -75,8 +75,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .sw .sd{padding:0;gap:3px}
 .pw{position:relative}.pw .fm{padding-right:44px}.eye{position:absolute;right:0;top:4px;bottom:0;width:44px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:var(--mu);cursor:pointer;padding:0}.eye svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-/* ===== Mode PC (layar lebar >= 900px) ===== */
-@media (min-width:900px){
+</style>
+<style id="pcs" media="(min-width:900px)">
+/* ===== Mode PC (layar lebar >= 900px, atau dipaksa lewat tab Admin) ===== */
 body{display:block}
 #app{width:auto;max-width:none;min-height:100vh;padding-bottom:40px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:16px;row-gap:16px;align-content:start}
 #app>*{min-width:0}
@@ -110,10 +111,14 @@ nav button.on i{background:none}
 .lgn{margin-bottom:0;align-items:center}
 .lgn .lgh{width:100%}.lgn .lc{width:100%;max-width:420px}
 .toast{top:20px}
-}
-@media (min-width:1500px){
+/* Daftar transaksi: tombol hapus di kanan, angka bergeser mengikuti ikon (tidak tumpang tindih) */
+.sw{display:flex;align-items:stretch}
+.sw .sd{position:static;order:2;flex:none;width:64px}
+.sw .row{order:1;flex:1;min-width:0;transform:none!important;transition:background .15s}
+.sw .row:hover{background:var(--card)}
+</style>
+<style id="pcs2" media="(min-width:1500px)">
 #app:has(nav){padding-inline:max(24px,calc((100% - 1100px)/2))}
-}
 </style>
 </head>
 <body>
@@ -217,7 +222,7 @@ return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p>
 '<div class="sec"><h2>Kelola Keuangan</h2><p style="color:var(--mu);font-size:12.5px">Setujui atau tolak pengajuan pinjaman nasabah, dan catat dana masuk. Debitur yang disetujui otomatis muncul di tab Debitur, Home, dan Cash flow.</p><button class="btn" onclick="rqOpen()">Pengajuan Pinjaman'+(rqPend().length?' ('+rqPend().length+' baru)':'')+'</button><button class="btn gr" onclick="txf()">+ Tambah Dana Masuk</button></div>'+
 '<div class="sec"><h2>Piutang debitur vs kewajiban</h2>'+bar('Piutang beredar (debitur)',pit,'var(--or2)')+bar('Kewajiban (kreditur)',tot,'var(--kb)')+'<small style="color:var(--mu)">Cakupan = kas masuk bulan ini dibagi angsuran ke kreditur.</small></div>'+
 '<div class="sec"><h2>Pengingat jatuh tempo</h2><p style="color:var(--mu);font-size:12.5px">Daftar tagihan muncul otomatis pukul 07.00 pada tanggal jatuh tempo saat aplikasi terbuka. Notifikasi HP hanya jalan selama aplikasi masih berjalan di latar belakang.</p><div class="row"><span>Notifikasi HP</span><b>'+(window.Notification&&Notification.permission==='granted'?'Aktif':'Belum aktif')+'</b></div><button class="btn g" onclick="izinNotif()">Aktifkan notifikasi HP</button><button class="btn g" onclick="cekNotif(true)">Lihat tagihan hari ini</button></div>'+
-'<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data tersimpan otomatis di perangkat ini. Salin cadangan secara berkala agar aman.</p><button class="btn g" onclick="backup()">Buka cadangan data</button></div>'+akunSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
+'<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data tersimpan otomatis di perangkat ini. Salin cadangan secara berkala agar aman.</p><button class="btn g" onclick="backup()">Buka cadangan data</button></div>'+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar: layar lebar memakai tampilan PC, layar kecil memakai tampilan HP.</p>'+'<div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div>'+'<div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+akunSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
 
 /* ===== Debitur ===== */
 function waNum(h){var x=String(h||'').replace(/\D/g,'');if(x.indexOf('0')===0)x='62'+x.slice(1);else if(x.indexOf('8')===0)x='62'+x;return x}
@@ -343,7 +348,15 @@ document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<bu
 if(S.tab==='home'&&RQ.rows===null&&!RQ.busy)rqLoad();if(S.tab==='deb')lst();if(S.tab==='dev'&&DV.s&&!DV.rows&&!DV.busy)devLoad()}
 
 /* ===== Appwrite: catat login + tab Developer ===== */
-var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f',rq:'pengajuan'},DEVMAIL='greyscale.itech@gmail.com';
+var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f',rq:'6ae9f69c00342165316b'},DEVMAIL='greyscale.itech@gmail.com';
+var VK='kosfa-view';
+function viewMode(){var v=ls(VK);return v==='pc'||v==='hp'?v:'auto'}
+function applyView(){var m=viewMode(),a=document.getElementById('pcs'),b=document.getElementById('pcs2'),vp=document.querySelector('meta[name=viewport]');
+if(a)a.media=m==='pc'?'all':m==='hp'?'not all':'(min-width:900px)';
+if(b)b.media=m==='hp'?'not all':'(min-width:1500px)';
+if(vp)vp.setAttribute('content',m==='pc'?'width=1100, viewport-fit=cover':'width=device-width, initial-scale=1, viewport-fit=cover')}
+function setView(m){if(m==='auto'){try{localStorage.removeItem(VK)}catch(e){}}else lw(VK,m);applyView();draw();toast(m==='pc'?'Mode PC aktif':m==='hp'?'Mode HP aktif':'Mode otomatis aktif')}
+applyView();
 var DV={s:null,rows:null,total:0,busy:false,err:''};
 try{DV.s=sessionStorage.getItem('kosfa-dv')||null}catch(e){}
 function isDev(){return !!A&&A.email===DEVMAIL}
@@ -387,7 +400,11 @@ if(!r.ok)return emsg('Gagal menyimpan keputusan ('+r.status+'). Cek permission U
 x.status=ok?'disetujui':'ditolak';x.catatan=val('rc').trim();toast(ok?'Pengajuan disetujui':'Pengajuan ditolak');
 if(ok)return rqCair(id);cls();draw()}catch(e){emsg('Tidak bisa terhubung ke server.')}}
 function rqCair(id){var x=rqFind(id);if(!x)return;draw();dform(null,{n:x.nama,u:x.tujuan,pk:x.jumlah,bg:'',tn:x.tenor,cair:today(),hp:x.hp,al:''})}
-function rqForm(){sheet('<h3>Ajukan pinjaman</h3><p>Pengajuan akan dikirim ke admin untuk ditinjau.</p>'+F('rn','Nama lengkap','','autocomplete="name"')+F('rh','No HP (WhatsApp)','','type="tel" inputmode="tel" autocomplete="tel"')+F('rj','Jumlah pinjaman (Rp)','',MONEY+' placeholder="5,000,000"')+SEL('rt','Tenor',TEN,30)+F('ru','Tujuan pinjaman','','maxlength="300" placeholder="Contoh: modal usaha warung"')+'<div class="err" id="err"></div><button class="btn" id="rbtn" onclick="kirimP()">Kirim pengajuan</button><button class="btn g" onclick="cls()">Batal</button>')}
+function rqForm(){sheet('<h3>Ajukan pinjaman</h3><p>Pengajuan akan dikirim ke admin untuk ditinjau.</p>'+F('rn','Nama lengkap','','autocomplete="name"')+F('rh','No HP (WhatsApp)','','type="tel" inputmode="tel" autocomplete="tel"')+F('rj','Jumlah pinjaman (Rp)','',MONEY+' placeholder="5,000,000"')+SEL('rt','Tenor',TEN,30)+F('ru','Tujuan pinjaman','','maxlength="300" placeholder="Contoh: modal usaha warung"')+'<div class="err" id="err"></div><button class="btn" id="rbtn" onclick="kirimP()">Kirim pengajuan</button><button class="btn g" onclick="cls()">Batal</button>');rqKeys()}
+function rqKeys(){var sh=document.querySelector('.sh');if(!sh)return;var f=[].slice.call(sh.querySelectorAll('input,select'));
+f.forEach(function(el,k){if(el.tagName==='INPUT')el.setAttribute('enterkeyhint',k<f.length-1?'next':'done')});
+sh.addEventListener('keydown',function(ev){if(ev.key!=='Enter'||ev.isComposing)return;var k=f.indexOf(ev.target);if(k<0)return;ev.preventDefault();
+var n=f[k+1];if(n){n.focus();if(n.tagName==='INPUT'&&n.select)n.select()}else{var b=document.getElementById('rbtn');if(b)b.focus()}})}
 async function kirimP(){var n=val('rn').trim(),hp=val('rh').replace(/[^\d+]/g,''),j=num('rj'),t=+val('rt'),u=val('ru').trim();
 if(!n)return emsg('Nama wajib diisi.');if(waNum(hp).length<10||waNum(hp).length>15)return emsg('No HP tidak valid.');if(j<100000)return emsg('Minimal pinjaman Rp100,000.');if(!u)return emsg('Tujuan pinjaman wajib diisi.');
 var b=document.getElementById('rbtn');if(b)b.disabled=true;
