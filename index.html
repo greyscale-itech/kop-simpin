@@ -257,7 +257,7 @@ function rnd(n){return crypto.getRandomValues(new Uint8Array(n))}
 async function sha(t){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return Array.prototype.map.call(new Uint8Array(b),function(x){return('0'+x.toString(16)).slice(-2)}).join('')}
 async function hp(salt,p){var k=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveBits']);return b64(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:unb64(salt),iterations:150000},k,256))}
 function saveA(){lw(AK,JSON.stringify(A))}
-function setSess(){AUTH=true;lw(SK,'1');draw();cekNotif()}
+function setSess(m){AUTH=true;lw(SK,'1');logLogin(m||'password');draw();cekNotif()}
 function logo(z){return '<svg width="'+z+'" height="'+z+'" viewBox="0 0 64 64" role="img" aria-label="Logo Koperasi Kosfa"><defs><linearGradient id="lgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E6FD9"/><stop offset="1" stop-color="#1FB58A"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="#fff"/><path d="M20 14V50M20 34L40 16M27 29L42 50" stroke="url(#lgg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="48" cy="17" r="5" fill="url(#lgg)"/></svg>'}
 function loginView(){var a=!!A,bio=a&&A.cred&&window.PublicKeyCredential;
 document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh">'+logo(76)+'<h1>Koperasi Kosfa</h1><p>'+(a?'Masuk untuk mengelola pinjaman':'Buat akun admin pertama untuk mulai')+'</p></div><div class="lc"><form novalidate onsubmit="event.preventDefault();'+(a?'masuk()':'daftar()')+'">'+
@@ -270,14 +270,14 @@ document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh">'+lo
 async function daftar(){var em=val('le').trim().toLowerCase(),p=val('lp'),q=val('lq');
 if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return emsg('Format email belum benar.');
 if(p.length<8)return emsg('Kata sandi minimal 8 karakter.');if(p!==q)return emsg('Ulangi kata sandi belum sama.');
-try{var sl=b64(rnd(16));A={v:2,email:em,salt:sl,hash:await hp(sl,p),cred:null};saveA();setSess()}catch(e){emsg('Browser ini belum mendukung penyimpanan kata sandi yang aman.')}}
+try{var sl=b64(rnd(16));A={v:2,email:em,salt:sl,hash:await hp(sl,p),cred:null};saveA();setSess('daftar')}catch(e){emsg('Browser ini belum mendukung penyimpanan kata sandi yang aman.')}}
 async function masuk(){var em=val('le').trim().toLowerCase(),p=val('lp');
-try{if(em===A.email){var ok=A.v===2?await hp(A.salt,p)===A.hash:await sha(A.salt+p)===A.hash;if(ok){if(A.v!==2){A.v=2;A.hash=await hp(A.salt,p);saveA()}return setSess()}}}catch(e){}
+try{if(em===A.email){var ok=A.v===2?await hp(A.salt,p)===A.hash:await sha(A.salt+p)===A.hash;if(ok){if(A.v!==2){A.v=2;A.hash=await hp(A.salt,p);saveA()}return setSess('password')}}}catch(e){}
 emsg('Email atau kata sandi salah.')}
 async function bioReg(){if(!window.PublicKeyCredential||!navigator.credentials)return toast('Perangkat ini belum mendukung biometrik.');
 try{var c=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'Koperasi Kosfa'},user:{id:rnd(16),name:A.email,displayName:A.email},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});
 A.cred=b64(c.rawId);saveA();toast('Biometrik aktif');draw()}catch(e){toast('Biometrik belum bisa diaktifkan. Buka link langsung di browser HP, bukan di dalam preview.')}}
-async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});setSess()}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
+async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});setSess('biometrik')}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
 function logout(){AUTH=false;try{localStorage.removeItem(SK)}catch(e){}draw()}
 function resetAkun(){if(confirm('Hapus akun admin di perangkat ini? Data debitur, kreditur, dan transaksi tidak ikut terhapus.')){try{localStorage.removeItem(AK)}catch(e){}A=null;draw()}}
 function akunSec(){return '<div class="sec"><h2>Akun admin</h2><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><b>'+(A.cred?'Aktif':'Belum aktif')+'</b></div>'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+'<button class="btn g" onclick="logout()">Keluar</button></div>'}
@@ -291,12 +291,52 @@ if(document.hidden){if(sysN!==td&&window.Notification&&Notification.permission==
 if(ls(NK)!==td&&!document.querySelector('.mk')){lw(NK,td);listDue(l)}}
 function izinNotif(){if(!window.Notification)return toast('Perangkat ini belum mendukung notifikasi.');try{Notification.requestPermission().then(function(p){toast(p==='granted'?'Notifikasi aktif':'Izin notifikasi ditolak');draw()})}catch(e){toast('Notifikasi belum bisa diaktifkan di sini.')}}
 function draw(){if(!AUTH)return loginView();
-var v={home:home,deb:debitur,cash:cash,kre:admin}[S.tab]();
-var n=[['home','🏠','Home'],['deb','👥','Debitur'],['cash','📊','Cash flow'],['kre','⚙️','Admin']];
+if(S.tab==='dev'&&!isDev())S.tab='home';
+var v={home:home,deb:debitur,cash:cash,kre:admin,dev:devTab}[S.tab]();
+var n=[['home','🏠','Home'],['deb','👥','Debitur'],['cash','📊','Cash flow'],['kre','⚙️','Admin']];if(isDev())n.push(['dev','🛠','Developer']);
 document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<button class="'+(S.tab===x[0]?'on':'')+'" onclick="go(\''+x[0]+'\')"><i>'+x[1]+'</i>'+x[2]+'</button>'}).join('')+'</nav>';
-if(S.tab==='deb')lst()}
+if(S.tab==='deb')lst();if(S.tab==='dev'&&DV.s&&!DV.rows&&!DV.busy)devLoad()}
 
-var ts=ls(TK);if(ts&&['home','deb','cash','kre'].indexOf(ts)>-1)S.tab=ts;
+/* ===== Appwrite: catat login + tab Developer ===== */
+var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495'},DEVMAIL='greyscale.itech@gmail.com';
+var DV={s:null,rows:null,total:0,busy:false,err:''};
+try{DV.s=sessionStorage.getItem('kosfa-dv')||null}catch(e){}
+function isDev(){return !!A&&A.email===DEVMAIL}
+function awUrl(p){return AW.ep+'/tablesdb/'+AW.db+'/tables/'+AW.tb+'/rows'+(p||'')}
+function awH(x){var h={'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'};if(DV.s)h['X-Fallback-Cookies']=DV.s;return Object.assign(h,x||{})}
+function devInfo(){var u=navigator.userAgent||'',o=/Android/i.test(u)?'Android':/iPhone/i.test(u)?'iPhone':/iPad/i.test(u)?'iPad':/Windows/i.test(u)?'Windows':/Mac/i.test(u)?'Mac':/Linux/i.test(u)?'Linux':'Perangkat lain',
+b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Firefox|FxiOS/.test(u)?'Firefox':/Chrome|CriOS/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'Browser';return (o+' · '+b).slice(0,255)}
+function logLogin(m){try{if(!A||!A.email)return;fetch(awUrl(),{method:'POST',headers:{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'},body:JSON.stringify({rowId:'unique()',data:{email:String(A.email).slice(0,254),device:devInfo(),method:String(m).slice(0,20)}})}).catch(function(){})}catch(e){}}
+async function devLogin(){var pw=val('dp');if(!pw)return emsg('Isi kata sandi Appwrite.');
+var b=document.getElementById('dbtn');if(b)b.disabled=true;
+try{var r=await fetch(AW.ep+'/account/sessions/email',{method:'POST',headers:{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email:DEVMAIL,password:pw})});
+var fc=r.headers.get('X-Fallback-Cookies');
+if(!r.ok){if(b)b.disabled=false;return emsg(r.status===401?'Email atau kata sandi Appwrite salah.':r.status===429?'Terlalu banyak percobaan. Coba lagi sebentar.':'Gagal masuk ke Appwrite ('+r.status+'). Cek hostname di Platforms.')}
+DV.s=fc||'cookie';try{sessionStorage.setItem('kosfa-dv',DV.s)}catch(e){}DV.rows=null;DV.err='';draw()}
+catch(e){if(b)b.disabled=false;emsg('Tidak bisa terhubung ke Appwrite. Cek internet dan hostname di Platforms.')}}
+async function devLoad(){if(DV.busy)return;DV.busy=true;DV.err='';
+try{var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'orderDesc',attribute:'$createdAt'}));q.append('queries[]',JSON.stringify({method:'limit',values:[500]}));
+var h=awH();if(DV.s==='cookie')delete h['X-Fallback-Cookies'];
+var r=await fetch(awUrl('?'+q.toString()),{headers:h,credentials:'include'});
+if(r.status===401||r.status===403){DV.s=null;try{sessionStorage.removeItem('kosfa-dv')}catch(e){}DV.err='Sesi berakhir atau akun belum berlabel dev. Masuk lagi.'}
+else if(!r.ok){DV.err='Gagal memuat data ('+r.status+').'}
+else{var j=await r.json();DV.rows=j.rows||j.documents||[];DV.total=j.total||DV.rows.length}}
+catch(e){DV.err='Tidak bisa terhubung ke Appwrite.'}
+DV.busy=false;if(DV.err&&!DV.rows)DV.rows=[];draw()}
+function devRefresh(){DV.rows=null;draw()}
+async function devOut(){try{var h=awH();if(DV.s==='cookie')delete h['X-Fallback-Cookies'];await fetch(AW.ep+'/account/sessions/current',{method:'DELETE',headers:h,credentials:'include'})}catch(e){}
+DV.s=null;DV.rows=null;DV.err='';try{sessionStorage.removeItem('kosfa-dv')}catch(e){}draw()}
+function devTab(){var hd='<div class="hd"><h1>Developer</h1><p>Pantau semua login aplikasi</p></div>';
+if(!DV.s)return hd+'<div class="wal"><b style="font-size:15px">Masuk ke Appwrite</b><small style="display:block;margin-top:2px">Diperlukan untuk membaca data login.</small><form novalidate onsubmit="event.preventDefault();devLogin()"><label class="fl" for="de">Email</label><input class="fm" id="de" value="'+DEVMAIL+'" readonly><label class="fl" for="dp">Kata sandi Appwrite</label><input class="fm" id="dp" type="password" autocomplete="current-password"><div class="err" id="err">'+esc(DV.err)+'</div><button class="btn" id="dbtn" type="submit">Masuk</button></form></div>';
+var R=DV.rows||[],u={};R.forEach(function(x){u[(x.email||'').toLowerCase()]=1});var nu=Object.keys(u).length,more=DV.total>R.length;
+var tg=function(m){return m==='biometrik'?'Lunas':m==='password'?'Lancar':''};
+var list=R.slice(0,50).map(function(x){var d=new Date(x.$createdAt),w=isNaN(d)?'':d.toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+return '<div class="row"><div style="min-width:0"><b style="word-break:break-all">'+esc(x.email)+'</b><small>'+esc(x.device||'-')+'</small></div><div class="rt" style="text-align:right;flex-shrink:0"><span class="tag '+tg(x.method)+'"'+(tg(x.method)?'':' style="background:var(--bg);color:var(--wn)"')+'>'+esc(x.method||'-')+'</span><small>'+w+'</small></div></div>'}).join('');
+return hd+'<div class="wal"><div class="grid" style="grid-template-columns:1fr 1fr;margin-top:0;padding-top:0;border-top:0"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?nu+(more?'+':''):'…')+'</b>Pengguna unik</div></div></div>'+
+'<div class="sec"><h2>Login terbaru</h2>'+(DV.err?'<div class="err">'+esc(DV.err)+'</div>':'')+(DV.rows?(list||'<p style="color:var(--mu)">Belum ada login tercatat.</p>'):'<p style="color:var(--mu)">Memuat data…</p>')+
+'<button class="btn g" onclick="devRefresh()">Muat ulang</button><button class="btn g" onclick="devOut()">Keluar Appwrite</button></div>'}
+
+var ts=ls(TK);if(ts&&['home','deb','cash','kre','dev'].indexOf(ts)>-1)S.tab=ts;
 try{A=JSON.parse(ls(AK))}catch(e){}
 AUTH=!!A&&ls(SK)==='1';
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
