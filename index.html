@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Koperasi Kosfa</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1E6FD9">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kosfa">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231E6FD9'/%3E%3Cpath d='M20 14V50M20 34L40 16M27 29L42 50' stroke='white' stroke-width='7' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 <style>
 :root{--or:#1E6FD9;--or2:#1FB58A;--bg:#F5F5F5;--card:#fff;--tx:#222;--mu:#757575;--ln:#EAEAEA;--ok:#1B9A7A;--no:#D0011B;--wn:#C77700;--kb:#B8C4D6;
@@ -33,9 +39,10 @@ button.row{width:100%;background:none;border-left:0;border-right:0;border-top:0;
 .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--or),var(--or2));color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
 .who{display:flex;gap:10px;align-items:center;min-width:0}.who div{min-width:0}
 .rt{text-align:right;flex:none}
-.bars{display:flex;align-items:flex-end;gap:10px;height:130px;margin-top:6px}
-.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
-.bp{display:flex;align-items:flex-end;gap:3px;height:100px;width:100%;justify-content:center}
+.ch{--bh:100px;display:flex;gap:6px;margin-top:8px}.ya{position:relative;flex:none;width:38px;height:var(--bh)}.ya span{position:absolute;right:0;transform:translateY(50%);font-size:10px;line-height:1;color:var(--mu);white-space:nowrap}.cw{position:relative;flex:1;min-width:0}.gl{position:absolute;left:0;right:0;top:0;height:var(--bh);pointer-events:none}.gl i{position:absolute;left:0;right:0;height:0;margin-bottom:-1px;border-top:1px dashed var(--ln)}.gl i:first-child{border-top-style:solid}
+.bars{position:relative;display:flex;align-items:flex-start;gap:10px}
+.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-start}
+.bp{display:flex;align-items:flex-end;gap:3px;height:var(--bh);width:100%;justify-content:center}
 .bp i{width:44%;border-radius:3px 3px 0 0;display:block}
 .bp i.m{background:linear-gradient(180deg,var(--or2),var(--or))}.bp i.k{background:var(--kb)}
 .bc small{font-size:11px;color:var(--mu)}
@@ -101,7 +108,7 @@ body{display:block}
 #app>.nt{margin:0}
 .wal b.big{font-size:30px}
 .grid{max-width:560px}
-.bars{height:210px}.bp{height:176px}
+.ch{--bh:176px}
 #lst{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:32px}
 #lst>p{grid-column:1/-1}
 .row,button.row,.st,.chips button,.btn,.lk,.nm{transition:background .15s,opacity .15s}
@@ -138,6 +145,7 @@ var BLN=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"
 var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bulan"]];
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
 var DB={D:[],K:[],T:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
+var IDLE=10*60*1000,ACK='kosfa-act',lastAct=Date.now(),lastW=0;
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -197,18 +205,20 @@ return{M:M,IN:IN,OUT:OUT}}
 /* ===== Tampilan ===== */
 function go(t,f){S.tab=t;if(f)S.f=f;lw(TK,t);draw()}
 function item(d){return '<div class="row"><div class="who"><span class="av">'+esc(ini(d.n))+'</span><div><button type="button" class="nm" onclick="menu(\''+d.id+'\')"><b>'+esc(d.n)+'</b></button><small>'+esc(d.u)+' · '+rp(d.pk)+'</small>'+(d.hp?'<a class="wa" href="https://wa.me/'+waNum(d.hp)+'" target="_blank" rel="noopener">'+esc(d.hp)+'</a>':'')+'</div></div><div class="rt" style="cursor:pointer" onclick="menu(\''+d.id+'\')"><span class="tag '+d.st+'">'+d.st+'</span><small style="display:block;color:var(--mu);font-size:11.5px;margin-top:4px">'+(d.st==='Telat'?'Telat '+d.late+' hari · ':'')+'Sisa '+rp(d.sisa)+'</small></div></div>'}
-function home(){var l=L(),ak=l.filter(function(d){return d.st!=='Lunas'}),tl=l.filter(function(d){return d.st==='Telat'}),F2=flow(),mx=Math.max.apply(null,F2.IN.concat(F2.OUT))||1;
+function niceAxis(mx){if(!(mx>0))mx=4e6;var raw=mx/4,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p,st=1,o=[1,1.5,2,2.5,3,4,5,6,8,10];for(var i=0;i<o.length;i++){if(o[i]>=f-1e-9){st=o[i];break}}st*=p;var n=Math.max(1,Math.ceil(mx/st-1e-9)),t=[];for(var j=0;j<=n;j++)t.push(Math.round(st*j));return{n:n,top:st*n,t:t}}
+function axl(v){if(!v)return '0';var f=function(x){return x.toLocaleString('id-ID',{maximumFractionDigits:1})};if(v>=1e9)return f(v/1e9)+' M';if(v>=1e6)return f(v/1e6)+' jt';if(v>=1e3)return f(v/1e3)+' rb';return String(v)}
+function home(){var l=L(),ak=l.filter(function(d){return d.st!=='Lunas'}),tl=l.filter(function(d){return d.st==='Telat'}),F2=flow(),mx=Math.max.apply(null,F2.IN.concat(F2.OUT)),AX=niceAxis(mx);
 function cnt(s){return l.filter(function(d){return d.st===s}).length}
 function psp(a){var p=0,m=0;a.forEach(function(d){var q=d.tot?d.sisa*d.pk/d.tot:0;p+=q;m+=d.sisa-q});return{p:Math.round(p),m:Math.round(m)}}
 var PA=psp(ak),PT=psp(tl),PS=(PA.p+PA.m)||1,PP=PA.p/PS*100;
-var bars=F2.M.map(function(m,i){return '<div class="bc"><div class="bp"><i class="m" style="height:'+F2.IN[i]/mx*100+'%"></i><i class="k" style="height:'+F2.OUT[i]/mx*100+'%"></i></div><small>'+BLN[m[1]]+'</small></div>'}).join('');
+var bars=F2.M.map(function(m,i){return '<div class="bc" title="'+BLN[m[1]]+' '+m[0]+' · Masuk '+rp(F2.IN[i])+' · Keluar '+rp(F2.OUT[i])+'"><div class="bp"><i class="m" style="height:'+F2.IN[i]/AX.top*100+'%"></i><i class="k" style="height:'+F2.OUT[i]/AX.top*100+'%"></i></div><small>'+BLN[m[1]]+'</small></div>'}).join('');
 return '<div class="hd"><h1>Koperasi Kosfa</h1><p>Pantau peminjam dan arus kas pinjaman</p></div>'+
 '<div class="wal"><small>Total piutang beredar</small><b class="big">'+rp(sum(ak,'sisa'))+'</b>'+
 '<div class="pmb"><i style="width:'+PP+'%;background:var(--or)"></i><i style="width:'+(100-PP)+'%;background:var(--or2)"></i></div>'+
 '<div class="pmg"><div class="pmc"><small><i class="pmd" style="background:var(--or)"></i>Pokok hutang</small><b>'+rp(PA.p)+'</b><small>'+PP.toLocaleString('id-ID',{maximumFractionDigits:1})+'% dari piutang</small></div><div class="pmc"><small><i class="pmd" style="background:var(--or2)"></i>Margin</small><b>'+rp(PA.m)+'</b><small>'+(ak.length?(100-PP).toLocaleString('id-ID',{maximumFractionDigits:1}):'0')+'% dari piutang</small></div></div>'+
 '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--ln)"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--mu)">Tunggakan</span><b style="color:var(--no)">'+rp(sum(tl,'sisa'))+'</b></div><small style="display:block;color:var(--mu);font-size:11px;margin-top:2px;text-align:right">Pokok '+rp(PT.p)+' · Margin '+rp(PT.m)+'</small></div>'+
 '<div class="grid"><button class="st" onclick="go(\'deb\',\'Semua\')"><b>'+l.length+'</b>Semua</button><button class="st" onclick="go(\'deb\',\'Lancar\')"><b style="color:var(--ok)">'+cnt('Lancar')+'</b>Lancar</button><button class="st" onclick="go(\'deb\',\'Telat\')"><b style="color:var(--no)">'+tl.length+'</b>Telat</button><button class="st" onclick="go(\'deb\',\'Lunas\')"><b style="color:var(--or)">'+cnt('Lunas')+'</b>Lunas</button></div></div>'+
-'<div class="sec"><h2>Cash flow 6 bulan terakhir</h2><div class="bars">'+bars+'</div><div class="lg"><span><i style="background:var(--or)"></i>Kas masuk</span><span><i style="background:var(--kb)"></i>Kas keluar</span></div></div>'+
+'<div class="sec"><h2>Cash flow 6 bulan terakhir</h2><div class="ch"><div class="ya">'+AX.t.map(function(v,i){return '<span style="bottom:'+i/AX.n*100+'%">'+axl(v)+'</span>'}).join('')+'</div><div class="cw"><div class="gl">'+AX.t.map(function(v,i){return '<i style="bottom:'+i/AX.n*100+'%"></i>'}).join('')+'</div><div class="bars">'+bars+'</div></div></div><div class="lg"><span><i style="background:var(--or)"></i>Kas masuk</span><span><i style="background:var(--kb)"></i>Kas keluar</span></div></div>'+
 '<div class="sec"><h2>Perlu ditagih</h2>'+(tl.map(item).join('')||'<p style="color:var(--mu)">'+(l.length?'Tidak ada yang telat.':'Belum ada debitur.')+'</p>')+'</div>'}
 function debitur(){var ch=['Semua','Lancar','Telat','Lunas'].map(function(c){return '<button class="'+(S.f===c?'on':'')+'" onclick="S.f=\''+c+'\';draw()">'+c+'</button>'}).join('');
 return '<div class="hd"><h1>Daftar debitur</h1><p>Siapa saja yang meminjam</p></div><div class="wal"><div class="sw"><span class="si">🔍</span><input class="srch" id="q" placeholder="Cari nama atau usaha" autocomplete="off" value="'+esc(S.q)+'" oninput="S.q=this.value;sug();lst()"><div id="sg" hidden></div></div><div class="chips">'+ch+'</div><div id="lst"></div></div>'}
@@ -326,13 +336,13 @@ function rnd(n){return crypto.getRandomValues(new Uint8Array(n))}
 async function sha(t){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return Array.prototype.map.call(new Uint8Array(b),function(x){return('0'+x.toString(16)).slice(-2)}).join('')}
 async function hp(salt,p){var k=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveBits']);return b64(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:unb64(salt),iterations:150000},k,256))}
 function saveA(){lw(AK,JSON.stringify(A))}
-function setSess(m){AUTH=true;lw(SK,'1');logLogin(m||'password');fetchRole();draw();cekNotif()}
+function setSess(m){AUTH=true;S.exp=false;lw(SK,'1');lastAct=Date.now();lastW=lastAct;lw(ACK,String(lastAct));logLogin(m||'password');fetchRole();draw();cekNotif()}
 function logo(z){return '<svg width="'+z+'" height="'+z+'" viewBox="0 0 64 64" role="img" aria-label="Logo Koperasi Kosfa"><defs><linearGradient id="lgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E6FD9"/><stop offset="1" stop-color="#1FB58A"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="#fff"/><path d="M20 14V50M20 34L40 16M27 29L42 50" stroke="url(#lgg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="48" cy="17" r="5" fill="url(#lgg)"/></svg>'}
 var EYE_ON='<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',EYE_OFF='<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
 function pwf(id,ac,ph){return '<div class="pw"><input class="fm" id="'+id+'" type="password" autocomplete="'+ac+'"'+(ph?' placeholder="'+ph+'"':'')+'><button type="button" class="eye" aria-label="Tampilkan kata sandi" onclick="togglePw(this)">'+EYE_ON+'</button></div>'}
 function togglePw(b){var i=b.parentNode.querySelector('input'),h=i.type==='password';i.type=h?'text':'password';b.innerHTML=h?EYE_OFF:EYE_ON;b.setAttribute('aria-label',h?'Sembunyikan kata sandi':'Tampilkan kata sandi')}
 function loginView(){var a=!!A,bio=a&&A.cred&&window.PublicKeyCredential;
-document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh">'+logo(76)+'<h1>Koperasi Kosfa</h1><p>'+(a?'Masuk untuk melanjutkan':'Buat akun untuk mulai')+'</p></div><div class="lc"><form novalidate onsubmit="event.preventDefault();'+(a?'masuk()':'daftar()')+'">'+
+document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh">'+logo(76)+'<h1>Koperasi Kosfa</h1><p>'+(a?'Masuk untuk melanjutkan':'Buat akun untuk mulai')+'</p>'+(S.exp?'<p style="margin-top:8px;color:var(--wn);font-weight:600">Sesi berakhir karena tidak ada aktivitas selama 10 menit.</p>':'')+'</div><div class="lc"><form novalidate onsubmit="event.preventDefault();'+(a?'masuk()':'daftar()')+'">'+
 '<label class="fl" for="le" style="margin-top:0">Email</label><input class="fm" id="le" type="email" autocomplete="email" placeholder="nama@email.com"'+(a?' value="'+esc(A.email)+'"':'')+'>'+
 '<label class="fl" for="lp">Kata sandi</label>'+pwf('lp',a?'current-password':'new-password','Minimal 8 karakter')+''+
 (a?'':'<label class="fl" for="lq">Ulangi kata sandi</label>'+pwf('lq','new-password')+'')+
@@ -352,7 +362,7 @@ A.cred=b64(c.rawId);saveA();toast('Biometrik aktif');draw()}catch(e){toast('Biom
 async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});setSess('biometrik')}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
 function logout(){devClear();AUTH=false;RQ.rows=null;try{localStorage.removeItem(SK)}catch(e){}draw()}
 function resetAkun(){if(confirm('Hapus akun admin di perangkat ini? Data debitur, kreditur, dan transaksi tidak ikut terhapus.')){try{localStorage.removeItem(AK)}catch(e){}A=null;draw()}}
-function akunSec(){return '<div class="sec"><h2>Akun</h2><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><b>'+(A.cred?'Aktif':'Belum aktif')+'</b></div>'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+'<button class="btn g" onclick="logout()">Keluar</button></div>'}
+function akunSec(){return '<div class="sec"><h2>Akun</h2><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><b>'+(A.cred?'Aktif':'Belum aktif')+'</b></div>'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+(DI?'<button class="btn g" onclick="pasang()">Pasang aplikasi</button>':'')+'<button class="btn g" onclick="logout()">Keluar</button></div>'}
 
 var NK='kosfa-notif',sysN='';
 function dueToday(){var td=today();return L().filter(function(d){return d.st!=='Lunas'&&d.due===td})}
@@ -600,9 +610,25 @@ window.addEventListener('online',function(){syncNow(1)});
 var ts=ls(TK);if(ts&&['home','deb','cash','kre','dev'].indexOf(ts)>-1)S.tab=ts;
 try{A=JSON.parse(ls(AK))}catch(e){}
 AUTH=!!A&&ls(SK)==='1';
+if(AUTH){var _t=+ls(ACK);if(_t&&Date.now()-_t>IDLE){AUTH=false;S.exp=true;try{localStorage.removeItem(SK)}catch(e){}}else{lastAct=_t||Date.now()}}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 draw();
 cekNotif();setInterval(function(){cekNotif()},30000);document.addEventListener('visibilitychange',function(){cekNotif();if(!document.hidden&&AUTH)fetchRole()});if(AUTH)fetchRole();
+
+/* ===== Session timeout: keluar otomatis jika 10 menit tanpa aktivitas ===== */
+function idleTouch(){var n=Date.now();lastAct=n;if(AUTH&&n-lastW>3000){lastW=n;lw(ACK,String(n))}}
+['pointerdown','keydown','touchstart','wheel','scroll','input','mousemove'].forEach(function(ev){document.addEventListener(ev,idleTouch,{passive:true,capture:true})});
+function idleCheck(){if(!AUTH)return;var t=Math.max(lastAct,+ls(ACK)||0);if(Date.now()-t>IDLE){cls();S.exp=true;logout();toast('Sesi berakhir karena tidak ada aktivitas selama 10 menit.')}}
+setInterval(idleCheck,15000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)idleCheck()});
+window.addEventListener('focus',idleCheck);window.addEventListener('pageshow',idleCheck);
+
+/* ===== PWA: service worker + tombol pasang aplikasi ===== */
+var DI=null;
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();DI=e;var a=document.activeElement;if(AUTH&&!document.querySelector('.mk')&&(!a||a===document.body))draw()});
+window.addEventListener('appinstalled',function(){DI=null;toast('Aplikasi berhasil dipasang');if(AUTH)draw()});
+function pasang(){if(!DI)return toast('Buka menu Chrome (⋮) lalu pilih Instal aplikasi.');var p=DI;DI=null;p.prompt();p.userChoice.then(function(){draw()},function(){draw()})}
 
 /* ===== Geser untuk hapus (Cash flow) ===== */
 function hapusS(id,k){if(!canAdmin())return toast('Hanya admin yang bisa mengubah data ini.');
