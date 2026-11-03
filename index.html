@@ -73,6 +73,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .sw .sd{position:absolute;right:0;top:0;bottom:0;width:64px;background:var(--no);color:#fff;border:0;font:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .sw .sd svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .sw .sd{padding:0;gap:3px}
+.pw{position:relative}.pw .fm{padding-right:44px}.eye{position:absolute;right:0;top:4px;bottom:0;width:44px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:var(--mu);cursor:pointer;padding:0}.eye svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -259,11 +260,14 @@ async function hp(salt,p){var k=await crypto.subtle.importKey('raw',new TextEnco
 function saveA(){lw(AK,JSON.stringify(A))}
 function setSess(m){AUTH=true;lw(SK,'1');logLogin(m||'password');fetchRole();draw();cekNotif()}
 function logo(z){return '<svg width="'+z+'" height="'+z+'" viewBox="0 0 64 64" role="img" aria-label="Logo Koperasi Kosfa"><defs><linearGradient id="lgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E6FD9"/><stop offset="1" stop-color="#1FB58A"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="#fff"/><path d="M20 14V50M20 34L40 16M27 29L42 50" stroke="url(#lgg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="48" cy="17" r="5" fill="url(#lgg)"/></svg>'}
+var EYE_ON='<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',EYE_OFF='<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+function pwf(id,ac,ph){return '<div class="pw"><input class="fm" id="'+id+'" type="password" autocomplete="'+ac+'"'+(ph?' placeholder="'+ph+'"':'')+'><button type="button" class="eye" aria-label="Tampilkan kata sandi" onclick="togglePw(this)">'+EYE_ON+'</button></div>'}
+function togglePw(b){var i=b.parentNode.querySelector('input'),h=i.type==='password';i.type=h?'text':'password';b.innerHTML=h?EYE_OFF:EYE_ON;b.setAttribute('aria-label',h?'Sembunyikan kata sandi':'Tampilkan kata sandi')}
 function loginView(){var a=!!A,bio=a&&A.cred&&window.PublicKeyCredential;
 document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh">'+logo(76)+'<h1>Koperasi Kosfa</h1><p>'+(a?'Masuk untuk mengelola pinjaman':'Buat akun admin pertama untuk mulai')+'</p></div><div class="lc"><form novalidate onsubmit="event.preventDefault();'+(a?'masuk()':'daftar()')+'">'+
 '<label class="fl" for="le" style="margin-top:0">Email</label><input class="fm" id="le" type="email" autocomplete="email" placeholder="nama@email.com"'+(a?' value="'+esc(A.email)+'"':'')+'>'+
-'<label class="fl" for="lp">Kata sandi</label><input class="fm" id="lp" type="password" autocomplete="'+(a?'current-password':'new-password')+'" placeholder="Minimal 8 karakter">'+
-(a?'':'<label class="fl" for="lq">Ulangi kata sandi</label><input class="fm" id="lq" type="password" autocomplete="new-password">')+
+'<label class="fl" for="lp">Kata sandi</label>'+pwf('lp',a?'current-password':'new-password','Minimal 8 karakter')+''+
+(a?'':'<label class="fl" for="lq">Ulangi kata sandi</label>'+pwf('lq','new-password')+'')+
 '<div class="err" id="err"></div><button class="btn" type="submit">'+(a?'Masuk':'Buat akun dan masuk')+'</button></form>'+
 (bio?'<button class="btn g" type="button" onclick="bioLogin()">Masuk dengan biometrik</button>':'')+
 (a?'<button class="lk" type="button" onclick="resetAkun()">Lupa kata sandi? Reset akun (data pinjaman tetap aman)</button>':'')+'</div></div>'}
@@ -347,7 +351,7 @@ draw();toast(adm?em+' kini User':em+' kini Admin')}catch(e){toast('Tidak bisa te
 function devTab(){var hd='<div class="hd"><h1>Developer</h1><p>Pantau login dan kelola peran pengguna</p></div>',
 bdg='<span class="tag" style="background:#1E6FD9;color:#fff;display:inline-block;margin-top:6px">Developer</span>',
 acc='<small>Akun yang sedang login</small><b style="display:block;font-size:16px;margin-top:2px;word-break:break-all">'+esc(A.email)+'</b>'+bdg;
-if(!DV.s)return hd+'<div class="wal">'+acc+'</div><div class="sec"><h2>Masuk ke Appwrite</h2><small style="color:var(--mu)">Diperlukan untuk membaca data login dan mengubah peran.</small><form novalidate onsubmit="event.preventDefault();devLogin()"><label class="fl" for="de">Email</label><input class="fm" id="de" value="'+DEVMAIL+'" readonly><label class="fl" for="dp">Kata sandi Appwrite</label><input class="fm" id="dp" type="password" autocomplete="current-password"><div class="err" id="err">'+esc(DV.err)+'</div><button class="btn" id="dbtn" type="submit">Masuk</button></form></div>';
+if(!DV.s)return hd+'<div class="wal">'+acc+'</div><div class="sec"><h2>Masuk ke Appwrite</h2><small style="color:var(--mu)">Diperlukan untuk membaca data login dan mengubah peran.</small><form novalidate onsubmit="event.preventDefault();devLogin()"><label class="fl" for="de">Email</label><input class="fm" id="de" value="'+DEVMAIL+'" readonly><label class="fl" for="dp">Kata sandi Appwrite</label>'+pwf('dp','current-password')+'<div class="err" id="err">'+esc(DV.err)+'</div><button class="btn" id="dbtn" type="submit">Masuk</button></form></div>';
 var R=DV.rows||[],RO=DV.roles||{},seen={},last={},ul=[DEVMAIL];seen[DEVMAIL]=1;
 R.forEach(function(x){var e=String(x.email||'').toLowerCase();if(!e)return;if(!last[e])last[e]=x;if(!seen[e]){seen[e]=1;ul.push(e)}});
 Object.keys(RO).forEach(function(e){if(!seen[e]){seen[e]=1;ul.push(e)}});
