@@ -342,15 +342,15 @@ document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh">'+lo
 async function daftar(){var em=val('le').trim().toLowerCase(),p=val('lp'),q=val('lq');
 if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return emsg('Format email belum benar.');
 if(p.length<8)return emsg('Kata sandi minimal 8 karakter.');if(p!==q)return emsg('Ulangi kata sandi belum sama.');
-try{var sl=b64(rnd(16));A={v:2,email:em,salt:sl,hash:await hp(sl,p),cred:null};saveA();setSess('daftar')}catch(e){emsg('Browser ini belum mendukung penyimpanan kata sandi yang aman.')}}
+try{var sl=b64(rnd(16));A={v:2,email:em,salt:sl,hash:await hp(sl,p),cred:null};saveA();if(em===DEVMAIL)devAuto(p);setSess('daftar')}catch(e){emsg('Browser ini belum mendukung penyimpanan kata sandi yang aman.')}}
 async function masuk(){var em=val('le').trim().toLowerCase(),p=val('lp');
-try{if(em===A.email){var ok=A.v===2?await hp(A.salt,p)===A.hash:await sha(A.salt+p)===A.hash;if(ok){if(A.v!==2){A.v=2;A.hash=await hp(A.salt,p);saveA()}return setSess('password')}}}catch(e){}
+try{if(em===A.email){var ok=A.v===2?await hp(A.salt,p)===A.hash:await sha(A.salt+p)===A.hash;if(ok){if(A.v!==2){A.v=2;A.hash=await hp(A.salt,p);saveA()}if(em===DEVMAIL)devAuto(p);return setSess('password')}}}catch(e){}
 emsg('Email atau kata sandi salah.')}
 async function bioReg(){if(!window.PublicKeyCredential||!navigator.credentials)return toast('Perangkat ini belum mendukung biometrik.');
 try{var c=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'Koperasi Kosfa'},user:{id:rnd(16),name:A.email,displayName:A.email},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});
 A.cred=b64(c.rawId);saveA();toast('Biometrik aktif');draw()}catch(e){toast('Biometrik belum bisa diaktifkan. Buka link langsung di browser HP, bukan di dalam preview.')}}
 async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});setSess('biometrik')}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
-function logout(){AUTH=false;RQ.rows=null;try{localStorage.removeItem(SK)}catch(e){}draw()}
+function logout(){devClear();AUTH=false;RQ.rows=null;try{localStorage.removeItem(SK)}catch(e){}draw()}
 function resetAkun(){if(confirm('Hapus akun admin di perangkat ini? Data debitur, kreditur, dan transaksi tidak ikut terhapus.')){try{localStorage.removeItem(AK)}catch(e){}A=null;draw()}}
 function akunSec(){return '<div class="sec"><h2>Akun</h2><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><b>'+(A.cred?'Aktif':'Belum aktif')+'</b></div>'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+'<button class="btn g" onclick="logout()">Keluar</button></div>'}
 
@@ -382,7 +382,7 @@ if(vp)vp.setAttribute('content',m==='pc'?'width=1100, viewport-fit=cover':'width
 function setView(m){if(m==='auto'){try{localStorage.removeItem(VK)}catch(e){}}else lw(VK,m);applyView();draw();toast(m==='pc'?'Mode PC aktif':m==='hp'?'Mode HP aktif':'Mode otomatis aktif')}
 applyView();
 var DV={s:null,rows:null,total:0,busy:false,err:''};
-try{DV.s=sessionStorage.getItem('kosfa-dv')||null}catch(e){}
+DV.s=ls('kosfa-dv')||null;
 function isDev(){return !!A&&A.email===DEVMAIL}
 function awUrlT(t,p){return AW.ep+'/tablesdb/'+AW.db+'/tables/'+t+'/rows'+(p||'')}
 function awUrl(p){return awUrlT(AW.tb,p)}
@@ -439,19 +439,32 @@ function awH(x){var h={'X-Appwrite-Project':AW.pj,'Content-Type':'application/js
 function devInfo(){var u=navigator.userAgent||'',o=/Android/i.test(u)?'Android':/iPhone/i.test(u)?'iPhone':/iPad/i.test(u)?'iPad':/Windows/i.test(u)?'Windows':/Mac/i.test(u)?'Mac':/Linux/i.test(u)?'Linux':'Perangkat lain',
 b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Firefox|FxiOS/.test(u)?'Firefox':/Chrome|CriOS/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'Browser';return (o+' · '+b).slice(0,255)}
 function logLogin(m){try{if(!A||!A.email)return;fetch(awUrl(),{method:'POST',headers:{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'},body:JSON.stringify({rowId:'unique()',data:{email:String(A.email).slice(0,254),device:devInfo(),method:String(m).slice(0,20)}})}).catch(function(){})}catch(e){}}
+function dvSave(v){lw('kosfa-dv',v);try{sessionStorage.removeItem('kosfa-dv')}catch(e){}}
+function dvDrop(){try{localStorage.removeItem('kosfa-dv')}catch(e){}try{sessionStorage.removeItem('kosfa-dv')}catch(e){}}
+/* Login developer: kata sandi di halaman login dipakai juga untuk membuat sesi Appwrite secara otomatis */
+async function devAuto(pw){try{if(DV.s||!pw)return;var mk=function(){return fetch(AW.ep+'/account/sessions/email',{method:'POST',headers:{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email:DEVMAIL,password:pw})})};
+var r=await mk();
+if(!r.ok){var e1={};try{e1=await r.clone().json()}catch(x){}
+if(e1.type&&/session.*(exist|active)|(exist|active).*session/i.test(e1.type)){try{await fetch(AW.ep+'/account/sessions/current',{method:'DELETE',headers:{'X-Appwrite-Project':AW.pj},credentials:'include'})}catch(x){}r=await mk()}}
+if(!r.ok)return;var fc=r.headers.get('X-Fallback-Cookies');DV.s=fc||'cookie';dvSave(DV.s);DV.rows=null;DV.err='';if(AUTH&&S.tab==='dev')draw()}catch(e){}}
+function devClear(){try{if(DV.s){var h=awH();if(DV.s==='cookie')delete h['X-Fallback-Cookies'];fetch(AW.ep+'/account/sessions/current',{method:'DELETE',headers:h,credentials:'include'}).catch(function(){})}}catch(e){}DV.s=null;DV.rows=null;dvDrop()}
 async function devLogin(){var pw=val('dp');if(!pw)return emsg('Isi kata sandi Appwrite.');
 var b=document.getElementById('dbtn');if(b)b.disabled=true;
-try{var r=await fetch(AW.ep+'/account/sessions/email',{method:'POST',headers:{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email:DEVMAIL,password:pw})});
+try{var mk=function(){return fetch(AW.ep+'/account/sessions/email',{method:'POST',headers:{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email:DEVMAIL,password:pw})})};
+var r=await mk();
+/* Browser ini masih menyimpan sesi lama (mis. tab baru): hapus sesi lama di browser ini saja, lalu coba lagi. Sesi di perangkat lain tidak tersentuh. */
+if(!r.ok){var e1={};try{e1=await r.clone().json()}catch(x){}
+if(e1.type&&/session.*(exist|active)|(exist|active).*session/i.test(e1.type)){try{await fetch(AW.ep+'/account/sessions/current',{method:'DELETE',headers:{'X-Appwrite-Project':AW.pj},credentials:'include'})}catch(x){}r=await mk()}}
 var fc=r.headers.get('X-Fallback-Cookies');
 if(!r.ok){if(b)b.disabled=false;var ej={};try{ej=await r.json()}catch(x){}var et=ej.type?' ['+ej.type+']':'';return emsg(r.status===401?'Email atau kata sandi Appwrite salah.'+et:r.status===429?'Terlalu banyak percobaan. Coba lagi sebentar.':'Gagal masuk ke Appwrite ('+r.status+'). Cek hostname di Platforms.')}
-DV.s=fc||'cookie';try{sessionStorage.setItem('kosfa-dv',DV.s)}catch(e){}DV.rows=null;DV.err='';draw()}
+DV.s=fc||'cookie';dvSave(DV.s);DV.rows=null;DV.err='';draw()}
 catch(e){if(b)b.disabled=false;emsg('Tidak bisa terhubung ke Appwrite. Cek internet dan hostname di Platforms.')}}
 async function devLoad(){if(DV.busy)return;DV.busy=true;DV.err='';
 try{var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'orderDesc',attribute:'$createdAt'}));q.append('queries[]',JSON.stringify({method:'limit',values:[500]}));
 var q2=new URLSearchParams();q2.append('queries[]',JSON.stringify({method:'limit',values:[500]}));
 var h=awH();if(DV.s==='cookie')delete h['X-Fallback-Cookies'];
 var rs=await Promise.all([fetch(awUrl('?'+q.toString()),{headers:h,credentials:'include'}),fetch(awUrlT(AW.rt,'?'+q2.toString()),{headers:h,credentials:'include'})]),r=rs[0];
-if(r.status===401||r.status===403){DV.s=null;try{sessionStorage.removeItem('kosfa-dv')}catch(e){}DV.err='Sesi berakhir atau akun belum berlabel dev. Masuk lagi.'}
+if(r.status===401||r.status===403){DV.s=null;dvDrop();DV.err='Sesi berakhir atau akun belum berlabel dev. Masuk lagi.'}
 else if(!r.ok){DV.err='Gagal memuat data ('+r.status+').'}
 else{var j=await r.json();DV.rows=j.rows||j.documents||[];DV.total=j.total||DV.rows.length;DV.bL=JSON.stringify(DV.rows).length;DV.roles={};
 if(rs[1].ok){var k=await rs[1].json();DV.nR=k.total||(k.rows||[]).length;DV.bR=JSON.stringify(k.rows||[]).length;(k.rows||[]).forEach(function(x){if(x.role==='admin')DV.roles[String(x.email).toLowerCase()]=x.$id})}else DV.err='Tabel roles belum bisa dibaca ('+rs[1].status+'). Cek Table ID dan permission.'}}
@@ -490,7 +503,7 @@ await rqLoad();
 if(DV.up!==U)return;if(RQ.err){clearInterval(tk);return fail(RQ.err)}
 U.t=100;U.msg='Menyelesaikan…'}
 async function devOut(){try{var h=awH();if(DV.s==='cookie')delete h['X-Fallback-Cookies'];await fetch(AW.ep+'/account/sessions/current',{method:'DELETE',headers:h,credentials:'include'})}catch(e){}
-DV.s=null;DV.rows=null;DV.err='';try{sessionStorage.removeItem('kosfa-dv')}catch(e){}draw()}
+DV.s=null;DV.rows=null;DV.err='';dvDrop();draw()}
 async function devRole(i){var em=(DV.ul||[])[i];if(!em||em===DEVMAIL)return;var adm=!!(DV.roles||{})[em];
 if(!confirm(adm?'Ubah '+em+' menjadi Nasabah? Akses tab Admin dan edit cash flow dicabut.':'Jadikan '+em+' sebagai Admin? Bisa membuka tab Admin dan mengubah cash flow.'))return;
 try{var h=awH();if(DV.s==='cookie')delete h['X-Fallback-Cookies'];var r;
