@@ -298,7 +298,7 @@ document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<bu
 if(S.tab==='deb')lst();if(S.tab==='dev'&&DV.s&&!DV.rows&&!DV.busy)devLoad()}
 
 /* ===== Appwrite: catat login + tab Developer ===== */
-var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad5400039cfdf154f'},DEVMAIL='greyscale.itech@gmail.com';
+var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f'},DEVMAIL='greyscale.itech@gmail.com';
 var DV={s:null,rows:null,total:0,busy:false,err:''};
 try{DV.s=sessionStorage.getItem('kosfa-dv')||null}catch(e){}
 function isDev(){return !!A&&A.email===DEVMAIL}
