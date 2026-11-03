@@ -157,7 +157,12 @@ function F(id,l,v,a){return '<label class="fl" for="'+id+'">'+l+'</label><input 
 function SEL(id,l,o,v,a){return '<label class="fl" for="'+id+'">'+l+'</label><select class="fm" id="'+id+'" '+(a||'')+'>'+o.map(function(x){return '<option value="'+esc(x[0])+'"'+(String(x[0])===String(v)?' selected':'')+'>'+esc(x[1])+'</option>'}).join('')+'</select>'}
 function DT(id,l,v,oc){return '<label class="fl" for="'+id+'">'+l+'</label><div class="dt"><input class="fm" id="'+id+'" type="date" value="'+esc(v)+'" onchange="dtc(this);'+(oc||'')+'" oninput="dtc(this);'+(oc||'')+'"><span class="dv" id="'+id+'v">'+(v?fd(v):'Pilih tanggal')+'</span></div>'}
 function dtc(el){document.getElementById(el.id+'v').textContent=el.value?fd(el.value):'Pilih tanggal'}
-function sheet(h){cls();document.body.insertAdjacentHTML('beforeend','<div class="mk" onclick="if(event.target===this)cls()"><div class="sh">'+h+'</div></div>')}
+function sheet(h){cls();document.body.insertAdjacentHTML('beforeend','<div class="mk" onclick="if(event.target===this)cls()"><div class="sh">'+h+'</div></div>');sheetKeys()}
+function sheetKeys(){var sh=document.querySelector('.mk .sh');if(!sh)return;
+function fl(){return [].slice.call(sh.querySelectorAll('input,select')).filter(function(e){return e.type!=='hidden'&&!e.disabled&&e.offsetParent!==null})}
+fl().forEach(function(el,k,a){if(el.tagName==='INPUT')el.setAttribute('enterkeyhint',k<a.length-1?'next':'done')});
+sh.addEventListener('keydown',function(ev){if(ev.key!=='Enter'||ev.isComposing||ev.shiftKey)return;var t=ev.target;if(t.tagName!=='INPUT'&&t.tagName!=='SELECT')return;var f=fl(),k=f.indexOf(t);if(k<0)return;ev.preventDefault();
+var n=f[k+1];if(n){n.focus();if(n.tagName==='INPUT'&&n.select&&n.type!=='date')try{n.select()}catch(e){}}else{var b=sh.querySelector('button.btn:not(.g):not(.d)');if(b)b.focus()}})}
 function cls(){document.querySelectorAll('.mk').forEach(function(m){m.remove()})}
 
 /* ===== Data: muat dan migrasi dari versi lama ===== */
@@ -404,11 +409,7 @@ if(!r.ok)return emsg('Gagal menyimpan keputusan ('+r.status+'). Cek permission U
 x.status=ok?'disetujui':'ditolak';x.catatan=val('rc').trim();toast(ok?'Pengajuan disetujui':'Pengajuan ditolak');
 if(ok)return rqCair(id);cls();draw()}catch(e){emsg('Tidak bisa terhubung ke server.')}}
 function rqCair(id){var x=rqFind(id);if(!x)return;draw();dform(null,{n:x.nama,u:x.tujuan,pk:x.jumlah,bg:'',tn:x.tenor,cair:today(),hp:x.hp,al:''})}
-function rqForm(){sheet('<h3>Ajukan pinjaman</h3><p>Pengajuan akan dikirim ke admin untuk ditinjau.</p>'+F('rn','Nama lengkap','','autocomplete="name"')+F('rh','No HP (WhatsApp)','','type="tel" inputmode="tel" autocomplete="tel"')+F('rj','Jumlah pinjaman (Rp)','',MONEY+' placeholder="5,000,000"')+SEL('rt','Tenor',TEN,30)+F('ru','Tujuan pinjaman','','maxlength="300" placeholder="Contoh: modal usaha warung"')+'<div class="err" id="err"></div><button class="btn" id="rbtn" onclick="kirimP()">Kirim pengajuan</button><button class="btn g" onclick="cls()">Batal</button>');rqKeys()}
-function rqKeys(){var sh=document.querySelector('.sh');if(!sh)return;var f=[].slice.call(sh.querySelectorAll('input,select'));
-f.forEach(function(el,k){if(el.tagName==='INPUT')el.setAttribute('enterkeyhint',k<f.length-1?'next':'done')});
-sh.addEventListener('keydown',function(ev){if(ev.key!=='Enter'||ev.isComposing)return;var k=f.indexOf(ev.target);if(k<0)return;ev.preventDefault();
-var n=f[k+1];if(n){n.focus();if(n.tagName==='INPUT'&&n.select)n.select()}else{var b=document.getElementById('rbtn');if(b)b.focus()}})}
+function rqForm(){sheet('<h3>Ajukan pinjaman</h3><p>Pengajuan akan dikirim ke admin untuk ditinjau.</p>'+F('rn','Nama lengkap','','autocomplete="name"')+F('rh','No HP (WhatsApp)','','type="tel" inputmode="tel" autocomplete="tel"')+F('rj','Jumlah pinjaman (Rp)','',MONEY+' placeholder="5,000,000"')+SEL('rt','Tenor',TEN,30)+F('ru','Tujuan pinjaman','','maxlength="300" placeholder="Contoh: modal usaha warung"')+'<div class="err" id="err"></div><button class="btn" id="rbtn" onclick="kirimP()">Kirim pengajuan</button><button class="btn g" onclick="cls()">Batal</button>')}
 async function kirimP(){var n=val('rn').trim(),hp=val('rh').replace(/[^\d+]/g,''),j=num('rj'),t=+val('rt'),u=val('ru').trim();
 if(!n)return emsg('Nama wajib diisi.');if(waNum(hp).length<10||waNum(hp).length>15)return emsg('No HP tidak valid.');if(j<100000)return emsg('Minimal pinjaman Rp100,000.');if(!u)return emsg('Tujuan pinjaman wajib diisi.');
 var b=document.getElementById('rbtn');if(b)b.disabled=true;
