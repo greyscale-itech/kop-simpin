@@ -372,7 +372,7 @@ document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<bu
 if(S.tab==='home'&&RQ.rows===null&&!RQ.busy)rqLoad();if(S.tab==='deb')lst();if(S.tab==='dev'&&DV.s&&!DV.rows&&!DV.busy)devLoad()}
 
 /* ===== Appwrite: catat login + tab Developer ===== */
-var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f',rq:'6ae9f69c00342165316b',st:'kosfa_data'},DEVMAIL='greyscale.itech@gmail.com';
+var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f',rq:'6ae9f69c00342165316b',st:'qwerty987654321'},DEVMAIL='greyscale.itech@gmail.com';
 var VK='kosfa-view';
 function viewMode(){var v=ls(VK);return v==='pc'||v==='hp'?v:'auto'}
 function applyView(){var m=viewMode(),a=document.getElementById('pcs'),b=document.getElementById('pcs2'),vp=document.querySelector('meta[name=viewport]');
@@ -477,7 +477,7 @@ return '<div class="upw"><div class="upb" role="progressbar" aria-valuemin="0" a
 async function devUpdate(){if(!DV.s||(DV.up&&DV.up.run))return;
 var U=DV.up={run:1,p:0,t:8,msg:'Menghubungi server…'};draw();
 function fail(m){if(DV.up===U)DV.up=null;draw();toast(m)}
-function fin(){cling();U.run=0;U.ok=true;U.at='Diperbarui pukul '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});draw();setTimeout(function(){if(DV.up===U){DV.up=null;if(AUTH&&S.tab==='dev')draw()}},4000)}
+function fin(){U.run=0;U.ok=true;U.at='Diperbarui pukul '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});draw();cling(.42);setTimeout(function(){if(DV.up===U){DV.up=null;if(AUTH&&S.tab==='dev')draw()}},4000)}
 var tk=setInterval(function(){if(DV.up!==U){clearInterval(tk);return}
 U.p=Math.min(U.t,U.p+Math.max(.4,(U.t-U.p)*.1));
 var f=document.getElementById('upf');if(f)f.style.width=U.p+'%';var pp=document.getElementById('upp');if(pp)pp.textContent=Math.round(U.p)+'%';var m=document.getElementById('upt');if(m)m.textContent=U.msg;
@@ -519,13 +519,23 @@ capBox()+
 '<div class="sec"><h2>Login terbaru</h2>'+(DV.rows?(list||'<p style="color:var(--mu)">Belum ada login tercatat.</p>'):'<p style="color:var(--mu)">Memuat data…</p>')+
 '<button class="btn g" onclick="devRefresh()">Muat ulang</button><button class="btn g" onclick="devOut()">Keluar Appwrite</button></div>'}
 
-/* ===== Bunyi "cling" saat update server berhasil ===== */
-var AC=null;
-function audUnlock(){try{var C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!AC)AC=new C();if(AC.state!=='running')AC.resume()}catch(e){}}
-['pointerdown','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,audUnlock,{passive:true})});
-function cling(){try{audUnlock();if(!AC)return;var t=AC.currentTime,g=AC.createGain();
-g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+1.2);g.connect(AC.destination);
-[[1568,1],[2349,.55],[3136,.3]].forEach(function(p){var o=AC.createOscillator(),pg=AC.createGain();o.type='sine';o.frequency.value=p[0];pg.gain.value=p[1];o.connect(pg);pg.connect(g);o.start(t);o.stop(t+1.25)})}catch(e){}}
+/* ===== Bunyi "cling" saat update server berhasil (gaya notifikasi iPhone) ===== */
+var AC=null,ACU=false;
+function audUnlock(){try{try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
+var C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!AC)AC=new C();
+if(AC.state!=='running')AC.resume();
+if(!ACU&&AC.state==='running'){var b=AC.createBuffer(1,1,22050),s=AC.createBufferSource();s.buffer=b;s.connect(AC.destination);s.start(0);ACU=true}}catch(e){}}
+['pointerdown','touchstart','touchend','click','keydown'].forEach(function(ev){document.addEventListener(ev,audUnlock,{passive:true})});
+document.addEventListener('visibilitychange',function(){if(!document.hidden){ACU=false;audUnlock()}});
+function clingPlay(d){var t=AC.currentTime+(d||0),m=AC.createGain();
+m.gain.value=.9;var cp=AC.createDynamicsCompressor();m.connect(cp);cp.connect(AC.destination);
+/* dua nada lonceng: E6 lalu B6, dengan partial tidak harmonis agar terdengar seperti "cling" */
+[[1318.5,0,1.1],[1975.5,.11,1.5]].forEach(function(n){var st=t+n[1],g=AC.createGain();
+g.gain.setValueAtTime(.0001,st);g.gain.exponentialRampToValueAtTime(.45,st+.004);g.gain.exponentialRampToValueAtTime(.0001,st+n[2]);g.connect(m);
+[[1,1],[2.76,.35],[5.4,.12]].forEach(function(p){var o=AC.createOscillator(),pg=AC.createGain();o.type='sine';o.frequency.value=n[0]*p[0];
+pg.gain.setValueAtTime(p[1],st);pg.gain.exponentialRampToValueAtTime(.0001,st+n[2]/(p[0]>1?3:1));o.connect(pg);pg.connect(g);o.start(st);o.stop(st+n[2]+.05)})})}
+function cling(d){try{audUnlock();if(!AC)return;
+if(AC.state==='running')clingPlay(d);else AC.resume().then(function(){clingPlay(d)}).catch(function(){})}catch(e){}}
 
 /* ===== Sinkron ke Appwrite (tabel kosfa_data: satu baris per debitur/kreditur/transaksi) ===== */
 var SYK='kosfa-syn',SYN={},SY={on:0,q:0,qf:0,msg:'',tm:0};
