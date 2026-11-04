@@ -60,8 +60,13 @@ nav button i{display:flex;align-items:center;justify-content:center;width:44px;h
 .sh{background:var(--card);width:100%;max-width:430px;border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:90vh;overflow-y:auto}
 .sh h3{font-size:16px}.sh>p{color:var(--mu);font-size:12.5px;margin:2px 0 8px}
 .btn{width:100%;border:0;border-radius:6px;background:var(--or);color:#fff;font-weight:600;font-size:14px;padding:12px;cursor:pointer;margin-top:12px}
-.actrow{display:flex;flex-wrap:wrap;gap:10px}
+.actrow{display:flex;flex-wrap:wrap;gap:10px;max-width:640px;margin:0 auto}
 .actrow .btn{flex:1 1 180px;margin-top:12px}
+.secrow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 16px}
+.secrow .sr-l{flex:1;min-width:160px}
+.secrow .sr-r{display:flex;flex-direction:column;gap:8px}
+.secrow .sr-r .btn{margin-top:0;width:auto;min-width:170px}
+.secrow .row{padding:6px 0}
 .btn.gr{background:#1F9D55;color:#fff}.btn.g{background:none;border:1px solid var(--or);color:var(--or)}.btn.d{background:none;border:1px solid var(--no);color:var(--no)}
 .nt{color:var(--mu);font-size:11.5px;text-align:center;margin:4px 12px 12px}
 .fl{display:block;font-size:12px;color:var(--mu);margin-top:10px}.fm{width:100%;border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:6px;padding:12px;font-size:16px;margin-top:4px;font-family:inherit}.err{color:var(--no);font-size:12.5px;margin-top:8px;min-height:16px}
@@ -359,7 +364,7 @@ A.cred=b64(c.rawId);saveA();toast('Biometrik aktif');draw()}catch(e){toast('Biom
 async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});setSess('biometrik')}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
 function logout(){devClear();AUTH=false;RQ.rows=null;try{localStorage.removeItem(SK)}catch(e){}draw()}
 function resetAkun(){if(confirm('Hapus akun admin di perangkat ini? Data debitur, kreditur, dan transaksi tidak ikut terhapus.')){try{localStorage.removeItem(AK)}catch(e){}A=null;draw()}}
-function akunSec(){return '<div class="sec"><h2>Akun</h2><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><b>'+(A.cred?'Aktif':'Belum aktif')+'</b></div>'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+'<button class="btn g" onclick="logout()">Keluar</button></div>'}
+function akunSec(){return '<div class="sec"><h2>Akun</h2><div class="secrow"><div class="sr-l"><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><b>'+(A.cred?'Aktif':'Belum aktif')+'</b></div></div><div class="sr-r">'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+'<button class="btn g" onclick="logout()">Keluar</button></div></div></div>'}
 
 var NK='kosfa-notif',sysN='';
 function dueToday(){var td=today();return L().filter(function(d){return d.st!=='Lunas'&&d.due===td})}
@@ -466,12 +471,12 @@ function devScroll(el){if(el.scrollTop+el.clientHeight>=el.scrollHeight-60){var 
 var CK='kosfa-cap';
 function fbyte(b){return b>=1048576?(b/1048576).toLocaleString('id-ID',{maximumFractionDigits:2})+' MB':(b/1024).toLocaleString('id-ID',{maximumFractionDigits:1})+' KB'}
 function capSet(){var c=prompt('Batas penyimpanan paket Appwrite Anda (dalam MB). Kosongkan untuk menghapus.',ls(CK)||'');if(c===null)return;c=parseFloat(String(c).replace(',','.'));if(c>0)lw(CK,String(c));else try{localStorage.removeItem(CK)}catch(e){}draw()}
-function capBox(){var up='<button class="btn" id="upbtn" onclick="devUpdate()"'+(DV.up&&DV.up.run?' disabled':'')+'>'+(DV.up&&DV.up.run?'Memperbarui…':'Update data server')+'</button>'+upUI();
-if(!DV.rows)return '<div class="sec sg"><h2>Kapasitas server</h2><small style="color:var(--mu)">Muat ulang data login, peran pengguna, dan pengajuan pinjaman dari server.</small>'+up+'</div>';
+function capBox(){var btn='<button class="btn" id="upbtn" onclick="devUpdate()"'+(DV.up&&DV.up.run?' disabled':'')+'>'+(DV.up&&DV.up.run?'Memperbarui…':'Update data server')+'</button>';
+if(!DV.rows)return '<div class="sec sg"><h2>Kapasitas server</h2><div class="secrow"><small style="color:var(--mu)">Muat ulang data login, peran pengguna, dan pengajuan pinjaman dari server.</small><div class="sr-r">'+btn+'</div></div>'+upUI()+'</div>';
 var nL=DV.total||0,bL=DV.rows.length?DV.bL/DV.rows.length*nL:0,rq=RQ.rows!==null&&RQ.rows!==undefined,nQ=rq?(RQ.total||RQ.rows.length):0,bQ=rq&&RQ.rows.length?RQ.bytes/RQ.rows.length*nQ:0,nR=DV.nR||0,bR=DV.bR||0,
 tb=bL+bQ+bR,tn=nL+nQ+nR,cap=parseFloat(ls(CK))||0,pct=cap?Math.min(100,tb/(cap*1048576)*100):0;
 function r(l,n,b,x){return '<div class="row"><span>'+l+'</span><b style="text-align:right">'+(x?'Belum dimuat':fmt(n)+' baris · '+fbyte(b))+'</b></div>'}
-return '<div class="sec sg"><h2>Kapasitas server</h2><small style="color:var(--mu)">Perkiraan pemakaian data Koperasi Kosfa di Appwrite.</small>'+up+
+return '<div class="sec sg"><h2>Kapasitas server</h2><div class="secrow"><small style="color:var(--mu)">Perkiraan pemakaian data Koperasi Kosfa di Appwrite.</small><div class="sr-r">'+btn+'</div></div>'+upUI()+
 '<div class="row" style="display:block"><div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">Total terpakai</span><b>'+fbyte(tb)+'</b></div>'+
 (cap?'<div class="prog"><div style="width:'+pct+'%'+(pct>=90?';background:var(--no)':pct>=70?';background:var(--wn)':'')+'"></div></div><small style="color:var(--mu)">'+pct.toLocaleString('id-ID',{maximumFractionDigits:1})+'% dari batas '+fmt(cap)+' MB</small>':'<small style="display:block;color:var(--mu);margin-top:4px">Batas paket belum diatur.</small>')+'</div>'+
 r('Catatan login',nL,bL)+r('Peran pengguna',nR,bR)+r('Pengajuan pinjaman',nQ,bQ,!rq)+
@@ -519,12 +524,10 @@ var loginBox;
 if(DV.seeAll){var sh=DV.shown||20,shown=R.slice(0,sh).map(lrow).join('');
 loginBox='<div class="sec sc"><h2 style="display:flex;justify-content:space-between;align-items:center">Semua login<i class="ti ti-x" style="cursor:pointer;font-size:18px" onclick="devSeeAllClose()"></i></h2>'+
 '<div id="devScroll" style="max-height:320px;overflow-y:auto" onscroll="devScroll(this)">'+(shown||'<p style="color:var(--mu)">Belum ada login tercatat.</p>')+'</div>'+
-(sh<R.length?'<p style="text-align:center;color:var(--mu);font-size:11.5px;padding-top:8px">Memuat lebih banyak…</p>':(R.length?'<p style="text-align:center;color:var(--mu);font-size:11.5px;padding-top:8px">Semua '+R.length+' data sudah ditampilkan.</p>':''))+
-'<button class="btn g" onclick="devRefresh()">Muat ulang</button></div>'}
+'<div class="secrow" style="margin-top:8px"><small style="color:var(--mu)">'+(sh<R.length?'Memuat lebih banyak…':(R.length?'Semua '+R.length+' data sudah ditampilkan.':'')) +'</small><div class="sr-r"><button class="btn g" onclick="devRefresh()">Muat ulang</button></div></div></div>'}
 else{var list=R.slice(0,5).map(lrow).join('');
 loginBox='<div class="sec sc"><h2>Login terbaru</h2>'+(DV.rows?(list||'<p style="color:var(--mu)">Belum ada login tercatat.</p>'):'<p style="color:var(--mu)">Memuat data…</p>')+
-(DV.rows&&R.length>5?'<button class="lk" type="button" style="width:auto;margin:4px 0 0" onclick="devSeeAll()">See all ('+R.length+')</button>':'')+
-'<button class="btn g" onclick="devRefresh()">Muat ulang</button></div>'}
+'<div class="secrow" style="margin-top:8px"><div>'+(DV.rows&&R.length>5?'<button class="lk" type="button" style="width:auto;margin:0" onclick="devSeeAll()">See all ('+R.length+')</button>':'')+'</div><div class="sr-r"><button class="btn g" onclick="devRefresh()">Muat ulang</button></div></div></div>'}
 return hd+'<div class="wal walrow"><div class="accinfo">'+acc+'</div><div class="grid g2"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?ul.length:'…')+'</b>Pengguna</div></div></div>'+
 capBox()+
 '<div class="sec sg"><h2>Pengguna dan peran</h2>'+(DV.err?'<div class="err">'+esc(DV.err)+'</div>':'')+(DV.rows?pl:'<p style="color:var(--mu)">Memuat data…</p>')+'</div>'+
