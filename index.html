@@ -139,6 +139,7 @@ body{display:block}
 #app>.hd h1{font-size:26px}#app>.hd p{font-size:15px}
 #app>.wal{margin:-56px 24px 0;padding:24px 28px}
 #app>.wal.walrow{max-width:760px}
+#app>.wal.walrow.dvh{max-width:none;margin:-56px 0 0}
 #app>.sec{margin:0;padding:22px 26px;--spx:26px;--spy:22px;font-size:15px}
 #app>.sec h2{font-size:16px}
 #app>.nt{margin:0}
@@ -578,7 +579,7 @@ for(i=0;i<7;i++){var dd=new Date(t0);dd.setDate(dd.getDate()-(6-i));lab+='<span 
 return '<div class="dvc"><div class="dvt"><b>Login 7 hari terakhir</b><div class="dvl">'+leg+'</div></div><div class="dvp"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Grafik login 7 hari terakhir"><defs>'+defs+'</defs>'+grid+areas+lines+marks+'</svg><div class="dvx">'+lab+'</div></div></div>'}
 function devTab(){var hd='<div class="hd"><h1>Developer</h1><p>Pantau login dan kelola peran pengguna</p></div>',
 bdg='<span class="tag" style="background:#1E6FD9;color:#fff;display:inline-block;margin-top:6px">Developer</span>',
-acc='<small>Akun yang sedang login</small><b style="display:block;font-size:16px;margin-top:2px;word-break:break-all">'+esc(A.email)+'</b>'+bdg;
+acc='<small>Account Panel</small><b style="display:block;font-size:16px;margin-top:2px;word-break:break-all">'+esc(A.email)+'</b>'+bdg;
 var R=DV.rows||[],RO=DV.roles||{},seen={},last={},ul=[DEVMAIL];seen[DEVMAIL]=1;
 R.forEach(function(x){var e=String(x.email||'').toLowerCase();if(!e)return;if(!last[e])last[e]=x;if(!seen[e]){seen[e]=1;ul.push(e)}});
 Object.keys(RO).forEach(function(e){if(!seen[e]){seen[e]=1;ul.push(e)}});
