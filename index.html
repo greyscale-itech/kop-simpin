@@ -6,10 +6,10 @@
 <title>Koperasi Kosfa</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231E6FD9'/%3E%3Cpath d='M20 14V50M20 34L40 16M27 29L42 50' stroke='white' stroke-width='7' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 <style>
-:root{--or:#1E6FD9;--or2:#1FB58A;--bg:#F5F5F5;--card:#fff;--tx:#222;--mu:#757575;--ln:#EAEAEA;--ok:#1B9A7A;--no:#D0011B;--wn:#C77700;--kb:#B8C4D6;
+:root{--or:#1E6FD9;--or2:#1FB58A;--bg:#F5F5F5;--card:#fff;--tx:#222;--mu:#757575;--ln:#EAEAEA;--ok:#1B9A7A;--no:#D0011B;--wn:#C77700;--kb:#B8C4D6;--sN-bg:#F1EFE8;--sN-tx:#444441;--sB-bg:#E6F1FB;--sB-tx:#0C447C;--sG-bg:#EAF3DE;--sG-tx:#27500A;--sC-bg:#FAECE7;--sC-tx:#4A1B0C;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121212;--card:#1E1E1E;--tx:#F2F2F2;--mu:#A0A0A0;--ln:#2E2E2E;--ok:#3CCBA5;--no:#FF6B6B;--wn:#FFB84D;--kb:#5B6778}}
-:root[data-theme="dark"]{--bg:#121212;--card:#1E1E1E;--tx:#F2F2F2;--mu:#A0A0A0;--ln:#2E2E2E;--ok:#3CCBA5;--no:#FF6B6B;--wn:#FFB84D;--kb:#5B6778}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121212;--card:#1E1E1E;--tx:#F2F2F2;--mu:#A0A0A0;--ln:#2E2E2E;--ok:#3CCBA5;--no:#FF6B6B;--wn:#FFB84D;--kb:#5B6778;--sN-bg:#2C2C2A;--sN-tx:#D3D1C7;--sB-bg:#0C447C;--sB-tx:#B5D4F4;--sG-bg:#27500A;--sG-tx:#C0DD97;--sC-bg:#4A1B0C;--sC-tx:#F5C4B3}}
+:root[data-theme="dark"]{--bg:#121212;--card:#1E1E1E;--tx:#F2F2F2;--mu:#A0A0A0;--ln:#2E2E2E;--ok:#3CCBA5;--no:#FF6B6B;--wn:#FFB84D;--kb:#5B6778;--sN-bg:#2C2C2A;--sN-tx:#D3D1C7;--sB-bg:#0C447C;--sB-tx:#B5D4F4;--sG-bg:#27500A;--sG-tx:#C0DD97;--sC-bg:#4A1B0C;--sC-tx:#F5C4B3}
 html{scroll-padding-top:env(safe-area-inset-top,0px);color-scheme:light dark}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--tx);font-family:"Inter","Segoe UI",Roboto,Arial,sans-serif;font-size:14px;display:flex;justify-content:center}
@@ -21,8 +21,9 @@ body{background:var(--bg);color:var(--tx);font-family:"Inter","Segoe UI",Roboto,
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid var(--ln)}
 .st{background:none;border:0;color:var(--tx);cursor:pointer;text-align:center;font-size:11.5px;padding:4px 0}
 .st b{display:block;font-size:20px;margin-bottom:2px}
-.sec{margin:12px;background:var(--card);border-radius:10px;padding:14px}
-.sec h2{font-size:14px;margin-bottom:10px}
+.sec{margin:12px;background:var(--card);border-radius:10px;padding:14px;--spx:14px;--spy:14px}
+.sec h2{font-size:14px;margin:calc(var(--spy) * -1) calc(var(--spx) * -1) 10px;padding:10px var(--spx);border-radius:10px 10px 0 0;background:var(--sN-bg);color:var(--sN-tx)}
+.sec.sb h2{background:var(--sB-bg);color:var(--sB-tx)}.sec.sg h2{background:var(--sG-bg);color:var(--sG-tx)}.sec.sc h2{background:var(--sC-bg);color:var(--sC-tx)}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln)}
 .row:last-child{border-bottom:0}.row>span{color:var(--mu)}.row small{display:block;color:var(--mu);font-size:11.5px;margin-top:2px}
 button.row{width:100%;background:none;border-left:0;border-right:0;border-top:0;color:var(--tx);text-align:left;font:inherit;cursor:pointer}
@@ -88,20 +89,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 <style id="pcs" media="(min-width:900px)">
 /* ===== Mode PC (layar lebar >= 900px, atau dipaksa lewat tab Admin) ===== */
 body{display:block}
-#app{width:auto;max-width:none;min-height:100vh;padding-bottom:40px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:16px;row-gap:16px;align-content:start}
+#app{width:auto;max-width:none;min-height:100vh;padding-bottom:40px;display:flex;flex-direction:column;gap:18px}
 #app>*{min-width:0}
-#app:has(nav){margin-left:220px;padding-inline:max(24px,calc((100% - 1000px)/2))}
+#app:has(nav){margin-left:220px;padding:28px max(24px,calc((100% - 1400px)/2)) 40px}
 #app:not(:has(nav)){display:block;width:100%;padding:0}
-#app>.hd,#app>.wal,#app>.nt{grid-column:1/-1}
-#app>.sec:last-of-type:nth-of-type(odd){grid-column:1/-1}
-#app>.hd{margin-top:24px;border-radius:16px;padding:28px 28px 76px}
-#app>.hd h1{font-size:22px}#app>.hd p{font-size:13.5px}
-#app>.wal{margin:-52px 20px 0;padding:20px 24px}
-#app>.sec{margin:0;padding:18px 20px}
+#app>.hd{margin-top:0;border-radius:16px;padding:32px 36px 84px}
+#app>.hd h1{font-size:26px}#app>.hd p{font-size:15px}
+#app>.wal{margin:-56px 24px 0;padding:24px 28px}
+#app>.sec{margin:0;padding:22px 26px;--spx:26px;--spy:22px;font-size:15px}
+#app>.sec h2{font-size:16px}
 #app>.nt{margin:0}
-.wal b.big{font-size:30px}
-.grid{max-width:560px}
-.bars{height:210px}.bp{height:176px}
+.wal b.big{font-size:32px}
+.grid{max-width:680px}
+.bars{height:230px}.bp{height:196px}
 #lst{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:32px}
 #lst>p{grid-column:1/-1}
 .row,button.row,.st,.chips button,.btn,.lk,.nm{transition:background .15s,opacity .15s}
@@ -127,7 +127,7 @@ nav button.on i{background:none}
 .sw .row:hover{background:var(--card)}
 </style>
 <style id="pcs2" media="(min-width:1500px)">
-#app:has(nav){padding-inline:max(24px,calc((100% - 1100px)/2))}
+#app:has(nav){padding-inline:max(32px,calc((100% - 1600px)/2))}
 </style>
 </head>
 <body>
@@ -208,8 +208,8 @@ return '<div class="hd"><h1>Koperasi Kosfa</h1><p>Pantau peminjam dan arus kas p
 '<div class="pmg"><div class="pmc"><small><i class="pmd" style="background:var(--or)"></i>Pokok hutang</small><b>'+rp(PA.p)+'</b><small>'+PP.toLocaleString('id-ID',{maximumFractionDigits:1})+'% dari piutang</small></div><div class="pmc"><small><i class="pmd" style="background:var(--or2)"></i>Margin</small><b>'+rp(PA.m)+'</b><small>'+(ak.length?(100-PP).toLocaleString('id-ID',{maximumFractionDigits:1}):'0')+'% dari piutang</small></div></div>'+
 '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--ln)"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--mu)">Tunggakan</span><b style="color:var(--no)">'+rp(sum(tl,'sisa'))+'</b></div><small style="display:block;color:var(--mu);font-size:11px;margin-top:2px;text-align:right">Pokok '+rp(PT.p)+' · Margin '+rp(PT.m)+'</small></div>'+
 '<div class="grid"><button class="st" onclick="go(\'deb\',\'Semua\')"><b>'+l.length+'</b>Semua</button><button class="st" onclick="go(\'deb\',\'Lancar\')"><b style="color:var(--ok)">'+cnt('Lancar')+'</b>Lancar</button><button class="st" onclick="go(\'deb\',\'Telat\')"><b style="color:var(--no)">'+tl.length+'</b>Telat</button><button class="st" onclick="go(\'deb\',\'Lunas\')"><b style="color:var(--or)">'+cnt('Lunas')+'</b>Lunas</button></div></div>'+
-'<div class="sec"><h2>Cash flow 6 bulan terakhir</h2><div class="bars">'+bars+'</div><div class="lg"><span><i style="background:var(--or)"></i>Kas masuk</span><span><i style="background:var(--kb)"></i>Kas keluar</span></div></div>'+
-'<div class="sec"><h2>Perlu ditagih</h2>'+(tl.map(item).join('')||'<p style="color:var(--mu)">'+(l.length?'Tidak ada yang telat.':'Belum ada debitur.')+'</p>')+'</div>'}
+'<div class="sec sb"><h2>Cash flow 6 bulan terakhir</h2><div class="bars">'+bars+'</div><div class="lg"><span><i style="background:var(--or)"></i>Kas masuk</span><span><i style="background:var(--kb)"></i>Kas keluar</span></div></div>'+
+'<div class="sec sc"><h2>Perlu ditagih</h2>'+(tl.map(item).join('')||'<p style="color:var(--mu)">'+(l.length?'Tidak ada yang telat.':'Belum ada debitur.')+'</p>')+'</div>'}
 function debitur(){var ch=['Semua','Lancar','Telat','Lunas'].map(function(c){return '<button class="'+(S.f===c?'on':'')+'" onclick="S.f=\''+c+'\';draw()">'+c+'</button>'}).join('');
 return '<div class="hd"><h1>Daftar debitur</h1><p>Siapa saja yang meminjam</p></div><div class="wal"><div class="sw"><span class="si">🔍</span><input class="srch" id="q" placeholder="Cari nama atau usaha" autocomplete="off" value="'+esc(S.q)+'" oninput="S.q=this.value;sug();lst()"><div id="sg" hidden></div></div><div class="chips">'+ch+'</div><div id="lst"></div></div>'}
 function sug(){var g=document.getElementById('sg'),q=S.q.trim().toLowerCase();
@@ -232,16 +232,16 @@ var tx=all.map(function(t){var b='<button class="row"'+((t.k==='t'&&!canAdmin())
 return !canAdmin()?b:'<div class="sw"><button type="button" class="sd" aria-label="Hapus transaksi" onclick="hapusS(\''+t.id+'\',\''+t.k+'\')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Hapus</button>'+b+'</div>'}).join('');
 return '<div class="hd"><h1>Cash flow</h1><p>Angsuran masuk dan pencairan keluar</p></div><div class="wal"><label class="fl" for="cm" style="margin-top:0">Pilih bulan</label><select class="fm" id="cm" onchange="S.cm=this.value;draw()">'+opts+'</select><small style="display:block;margin-top:12px">Kas bersih '+nm+'</small><b class="big '+(net>=0?'in':'out')+'">'+(net>=0?'+':'−')+rp(Math.abs(net))+'</b>'+
 '<div class="grid" style="grid-template-columns:1fr 1fr"><div class="st"><b class="in" style="font-size:16px">'+rp(masuk)+'</b>Kas masuk</div><div class="st"><b style="font-size:16px">'+rp(r.o)+'</b>Kas keluar</div></div>'+'</div>'+
-'<div class="sec"><h2>Rincian '+nm+'</h2><div class="row"><span>Angsuran debitur</span><b class="in">'+rp(r.a)+'</b></div><div class="row"><span>Setoran modal</span><b class="in">'+rp(r.m)+'</b></div><div class="row"><span>Pinjaman kreditur</span><b class="in">'+rp(r.k)+'</b></div><div class="row"><span>Pendapatan lain dan lainnya</span><b class="in">'+rp(r.l)+'</b></div><div class="row"><span>Pencairan pinjaman (keluar)</span><b class="out">'+rp(r.o)+'</b></div></div>'+
-'<div class="sec"><h2>Per bulan</h2>'+rows+'</div><div class="sec"><h2>Transaksi '+nm+'</h2>'+(tx||'<p style="color:var(--mu)">Belum ada transaksi.</p>')+'</div>'}
+'<div class="sec sb"><h2>Rincian '+nm+'</h2><div class="row"><span>Angsuran debitur</span><b class="in">'+rp(r.a)+'</b></div><div class="row"><span>Setoran modal</span><b class="in">'+rp(r.m)+'</b></div><div class="row"><span>Pinjaman kreditur</span><b class="in">'+rp(r.k)+'</b></div><div class="row"><span>Pendapatan lain dan lainnya</span><b class="in">'+rp(r.l)+'</b></div><div class="row"><span>Pencairan pinjaman (keluar)</span><b class="out">'+rp(r.o)+'</b></div></div>'+
+'<div class="sec sb"><h2>Per bulan</h2>'+rows+'</div><div class="sec sb"><h2>Transaksi '+nm+'</h2>'+(tx||'<p style="color:var(--mu)">Belum ada transaksi.</p>')+'</div>'}
 function kitem(k){var s=kst(k);return '<button class="row" onclick="kdet(\''+k.id+'\')"><div class="who"><span class="av">'+esc(ini(k.n))+'</span><div><b>'+esc(k.n)+'</b><small>'+esc(k.j)+' · '+(s==='Lunas'?'Sudah lunas':'Jatuh tempo '+fd(k.jt))+'</small></div></div><div class="rt"><span class="tag '+s+'">'+s+'</span><small style="display:block;color:var(--mu);font-size:11.5px;margin-top:4px">Sisa '+rp(k.sisa)+'</small></div></button>'}
 function admin(){var K=DB.K,ak=K.filter(function(k){return k.sisa>0}),tot=sum(ak,'sisa'),ang=sum(ak,'a'),pit=sum(L().filter(function(d){return d.st!=='Lunas'}),'sisa'),F2=flow(),cov=ang?F2.IN[5]/ang:0,mx=Math.max(pit,tot)||1;
 function bar(l,v,c){return '<div class="row" style="display:block"><div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">'+l+'</span><b>'+rp(v)+'</b></div><div class="prog"><div style="width:'+v/mx*100+'%;background:'+c+'"></div></div></div>'}
 return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p></div><div class="wal"><small>Total kewajiban ke kreditur</small><b class="big">'+rp(tot)+'</b><small style="display:block;margin-top:4px">Angsuran '+rp(ang)+' per bulan</small><div class="grid"><div class="st"><b>'+ak.length+'</b>Aktif</div><div class="st"><b>'+jt(ang)+'</b>Angsuran/bln</div><div class="st"><b style="color:var(--ok)">'+(ang?cov.toLocaleString('id-ID',{maximumFractionDigits:1})+'×':'-')+'</b>Cakupan</div><div class="st"><b style="color:var(--or)">'+(K.length-ak.length)+'</b>Lunas</div></div></div>'+
-'<div class="sec"><h2>Kelola Keuangan</h2><p style="color:var(--mu);font-size:12.5px">Setujui atau tolak pengajuan pinjaman nasabah, dan catat semua dana masuk (angsuran, modal, dan kreditur baru). Debitur yang disetujui otomatis muncul di tab Debitur, Home, dan Cash flow.</p><button class="btn" onclick="rqOpen()">Pengajuan Pinjaman'+(rqPend().length?' ('+rqPend().length+' baru)':'')+'</button><button class="btn gr" onclick="txf()">+ Tambah Dana Masuk</button></div>'+
-'<div class="sec"><h2>Piutang debitur vs kewajiban</h2>'+bar('Piutang beredar (debitur)',pit,'var(--or2)')+bar('Kewajiban (kreditur)',tot,'var(--kb)')+'<small style="color:var(--mu)">Cakupan = kas masuk bulan ini dibagi angsuran ke kreditur.</small></div>'+
-'<div class="sec"><h2>Pengingat jatuh tempo</h2><p style="color:var(--mu);font-size:12.5px">Daftar tagihan muncul otomatis pukul 07.00 pada tanggal jatuh tempo saat aplikasi terbuka. Notifikasi HP hanya jalan selama aplikasi masih berjalan di latar belakang.</p><div class="row"><span>Notifikasi HP</span><b>'+(window.Notification&&Notification.permission==='granted'?'Aktif':'Belum aktif')+'</b></div><button class="btn g" onclick="izinNotif()">Aktifkan notifikasi HP</button><button class="btn g" onclick="cekNotif(true)">Lihat tagihan hari ini</button></div>'+
-'<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data disimpan di perangkat ini dan disinkronkan ke Appwrite. '+syncTxt()+' Salin cadangan secara berkala agar aman.</p><button class="btn g" onclick="syncNow(1,1)">Sinkronkan sekarang</button><button class="btn g" onclick="backup()">Buka cadangan data</button></div>'+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar: layar lebar memakai tampilan PC, layar kecil memakai tampilan HP.</p>'+'<div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div>'+'<div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+akunSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
+'<div class="sec sg"><h2>Kelola Keuangan</h2><p style="color:var(--mu);font-size:12.5px">Setujui atau tolak pengajuan pinjaman nasabah, dan catat semua dana masuk (angsuran, modal, dan kreditur baru). Debitur yang disetujui otomatis muncul di tab Debitur, Home, dan Cash flow.</p><button class="btn" onclick="rqOpen()">Pengajuan Pinjaman'+(rqPend().length?' ('+rqPend().length+' baru)':'')+'</button><button class="btn gr" onclick="txf()">+ Tambah Dana Masuk</button></div>'+
+'<div class="sec sb"><h2>Piutang debitur vs kewajiban</h2>'+bar('Piutang beredar (debitur)',pit,'var(--or2)')+bar('Kewajiban (kreditur)',tot,'var(--kb)')+'<small style="color:var(--mu)">Cakupan = kas masuk bulan ini dibagi angsuran ke kreditur.</small></div>'+
+'<div class="sec sc"><h2>Pengingat jatuh tempo</h2><p style="color:var(--mu);font-size:12.5px">Daftar tagihan muncul otomatis pukul 07.00 pada tanggal jatuh tempo saat aplikasi terbuka. Notifikasi HP hanya jalan selama aplikasi masih berjalan di latar belakang.</p><div class="row"><span>Notifikasi HP</span><b>'+(window.Notification&&Notification.permission==='granted'?'Aktif':'Belum aktif')+'</b></div><button class="btn g" onclick="izinNotif()">Aktifkan notifikasi HP</button><button class="btn g" onclick="cekNotif(true)">Lihat tagihan hari ini</button></div>'+
+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar: layar lebar memakai tampilan PC, layar kecil memakai tampilan HP.</p>'+'<div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div>'+'<div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+akunSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
 
 /* ===== Debitur ===== */
 function waNum(h){var x=String(h||'').replace(/\D/g,'');if(x.indexOf('0')===0)x='62'+x.slice(1);else if(x.indexOf('8')===0)x='62'+x;return x}
@@ -381,7 +381,7 @@ if(b)b.media=m==='hp'?'not all':'(min-width:1500px)';
 if(vp)vp.setAttribute('content',m==='pc'?'width=1100, viewport-fit=cover':'width=device-width, initial-scale=1, viewport-fit=cover')}
 function setView(m){if(m==='auto'){try{localStorage.removeItem(VK)}catch(e){}}else lw(VK,m);applyView();draw();toast(m==='pc'?'Mode PC aktif':m==='hp'?'Mode HP aktif':'Mode otomatis aktif')}
 applyView();
-var DV={rows:null,total:0,busy:false,err:''};
+var DV={rows:null,total:0,busy:false,err:'',seeAll:false,shown:20};
 try{localStorage.removeItem('kosfa-dv');sessionStorage.removeItem('kosfa-dv')}catch(e){}
 function isDev(){return !!A&&A.email===DEVMAIL}
 function awUrlT(t,p){return AW.ep+'/tablesdb/'+AW.db+'/tables/'+t+'/rows'+(p||'')}
@@ -411,7 +411,7 @@ function rqRefresh(){RQ.rows=null;draw()}
 function rqPend(){return (RQ.rows||[]).filter(function(x){return x.status==='menunggu'})}
 function rqRow(x,adm){return '<button type="button" class="row" onclick="'+(adm?'rqDet(\''+x.$id+'\')':'rqView(\''+x.$id+'\')')+'"><div style="min-width:0"><b>'+(adm?esc(x.nama):rp(x.jumlah))+'</b><small style="display:block;color:var(--mu)">'+(adm?rp(x.jumlah)+' · ':'')+tlb(x.tenor)+' · '+fd(String(x.$createdAt||'').slice(0,10))+'</small></div>'+rqTag(x.status)+'</button>'}
 function rqBar(){if(!canAdmin())return '';var p=rqPend();
-return '<div class="sec"><h2>Pengajuan pinjaman'+(p.length?' <span class="tag Telat">'+p.length+' baru</span>':'')+'</h2>'+(RQ.err?'<p style="color:var(--no);font-size:12.5px">'+esc(RQ.err)+'</p>':'')+(RQ.rows===null?'<p style="color:var(--mu)">Memuat…</p>':(RQ.rows.slice(0,5).map(function(x){return rqRow(x,true)}).join('')||'<p style="color:var(--mu)">Belum ada pengajuan.</p>'))+(RQ.rows&&RQ.rows.length>5?'<button class="btn g" onclick="rqAll()">Lihat semua ('+RQ.rows.length+')</button>':'')+'<button class="btn g" onclick="rqRefresh()">Muat ulang</button></div>'}
+return '<div class="sec sg"><h2>Pengajuan pinjaman'+(p.length?' <span class="tag Telat">'+p.length+' baru</span>':'')+'</h2>'+(RQ.err?'<p style="color:var(--no);font-size:12.5px">'+esc(RQ.err)+'</p>':'')+(RQ.rows===null?'<p style="color:var(--mu)">Memuat…</p>':(RQ.rows.slice(0,5).map(function(x){return rqRow(x,true)}).join('')||'<p style="color:var(--mu)">Belum ada pengajuan.</p>'))+(RQ.rows&&RQ.rows.length>5?'<button class="btn g" onclick="rqAll()">Lihat semua ('+RQ.rows.length+')</button>':'')+'<button class="btn g" onclick="rqRefresh()">Muat ulang</button></div>'}
 function rqAll(){var R=RQ.rows||[];sheet('<h3>Pengajuan Pinjaman</h3>'+(RQ.err?'<p style="color:var(--no);font-size:12.5px">'+esc(RQ.err)+'</p>':'')+(R.map(function(x){return rqRow(x,true)}).join('')||'<p style="color:var(--mu)">Belum ada pengajuan.</p>')+'<button class="btn g" onclick="cls();dform()">+ Tambah debitur manual</button><button class="btn g" onclick="cls()">Tutup</button>')}
 async function rqOpen(){if(RQ.rows===null)await rqLoad();rqAll()}
 function rqFind(id){return (RQ.rows||[]).filter(function(x){return x.$id===id})[0]}
@@ -434,7 +434,7 @@ if(!r.ok){if(b)b.disabled=false;return emsg(r.status===404?'Layanan pengajuan be
 cls();RQ.rows=null;toast('Pengajuan terkirim');draw()}catch(e){if(b)b.disabled=false;emsg('Tidak bisa terhubung ke server. Cek internet.')}}
 function nasHome(){var L2=RQ.rows||[];
 return '<div class="hd"><h1>Koperasi Kosfa</h1><p>'+esc(A.email)+'</p></div><div class="wal"><small>Butuh dana?</small><b class="big" style="font-size:18px">Ajukan pinjaman</b><button class="btn" onclick="rqForm()">Ajukan pinjaman</button></div>'+
-'<div class="sec"><h2>Pengajuan saya</h2>'+(RQ.err?'<p style="color:var(--no);font-size:12.5px">'+esc(RQ.err)+'</p>':'')+(RQ.rows===null?'<p style="color:var(--mu)">Memuat…</p>':(L2.map(function(x){return rqRow(x,false)}).join('')||'<p style="color:var(--mu)">Belum ada pengajuan.</p>'))+'<button class="btn g" onclick="rqRefresh()">Muat ulang</button></div>'+akunSec()}
+'<div class="sec sb"><h2>Pengajuan saya</h2>'+(RQ.err?'<p style="color:var(--no);font-size:12.5px">'+esc(RQ.err)+'</p>':'')+(RQ.rows===null?'<p style="color:var(--mu)">Memuat…</p>':(L2.map(function(x){return rqRow(x,false)}).join('')||'<p style="color:var(--mu)">Belum ada pengajuan.</p>'))+'<button class="btn g" onclick="rqRefresh()">Muat ulang</button></div>'+akunSec()}
 function awH(x){var h={'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'};return Object.assign(h,x||{})}
 function devInfo(){var u=navigator.userAgent||'',o=/Android/i.test(u)?'Android':/iPhone/i.test(u)?'iPhone':/iPad/i.test(u)?'iPad':/Windows/i.test(u)?'Windows':/Mac/i.test(u)?'Mac':/Linux/i.test(u)?'Linux':'Perangkat lain',
 b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Firefox|FxiOS/.test(u)?'Firefox':/Chrome|CriOS/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'Browser';return (o+' · '+b).slice(0,255)}
@@ -452,20 +452,24 @@ else{var j=await r.json();DV.rows=j.rows||j.documents||[];DV.total=j.total||DV.r
 if(rs[1].ok){var k=await rs[1].json();DV.nR=k.total||(k.rows||[]).length;DV.bR=JSON.stringify(k.rows||[]).length;(k.rows||[]).forEach(function(x){if(x.role==='admin')DV.roles[String(x.email).toLowerCase()]=x.$id})}else DV.err='Tabel roles belum bisa dibaca ('+rs[1].status+'). Cek Table ID dan permission.'}}
 catch(e){DV.err='Tidak bisa terhubung ke Appwrite.'}
 DV.busy=false;if(DV.err&&!DV.rows)DV.rows=[];draw()}
-function devRefresh(){DV.rows=null;draw()}
+function devRefresh(){DV.rows=null;DV.seeAll=false;DV.shown=20;draw()}
+function devSeeAll(){DV.seeAll=true;DV.shown=20;draw()}
+function devSeeAllClose(){DV.seeAll=false;draw()}
+function devScroll(el){if(el.scrollTop+el.clientHeight>=el.scrollHeight-60){var R=DV.rows||[];if((DV.shown||20)<R.length){DV.shown=(DV.shown||20)+20;var sp=el.scrollTop;draw();var el2=document.getElementById('devScroll');if(el2)el2.scrollTop=sp}}}
 var CK='kosfa-cap';
 function fbyte(b){return b>=1048576?(b/1048576).toLocaleString('id-ID',{maximumFractionDigits:2})+' MB':(b/1024).toLocaleString('id-ID',{maximumFractionDigits:1})+' KB'}
 function capSet(){var c=prompt('Batas penyimpanan paket Appwrite Anda (dalam MB). Kosongkan untuk menghapus.',ls(CK)||'');if(c===null)return;c=parseFloat(String(c).replace(',','.'));if(c>0)lw(CK,String(c));else try{localStorage.removeItem(CK)}catch(e){}draw()}
-function capBox(){if(!DV.rows)return '';
+function capBox(){var up='<button class="btn" id="upbtn" onclick="devUpdate()"'+(DV.up&&DV.up.run?' disabled':'')+'>'+(DV.up&&DV.up.run?'Memperbarui…':'Update data server')+'</button>'+upUI();
+if(!DV.rows)return '<div class="sec sg"><h2>Kapasitas server</h2><small style="color:var(--mu)">Muat ulang data login, peran pengguna, dan pengajuan pinjaman dari server.</small>'+up+'</div>';
 var nL=DV.total||0,bL=DV.rows.length?DV.bL/DV.rows.length*nL:0,rq=RQ.rows!==null&&RQ.rows!==undefined,nQ=rq?(RQ.total||RQ.rows.length):0,bQ=rq&&RQ.rows.length?RQ.bytes/RQ.rows.length*nQ:0,nR=DV.nR||0,bR=DV.bR||0,
 tb=bL+bQ+bR,tn=nL+nQ+nR,cap=parseFloat(ls(CK))||0,pct=cap?Math.min(100,tb/(cap*1048576)*100):0;
 function r(l,n,b,x){return '<div class="row"><span>'+l+'</span><b style="text-align:right">'+(x?'Belum dimuat':fmt(n)+' baris · '+fbyte(b))+'</b></div>'}
-return '<div class="sec"><h2>Kapasitas server</h2><small style="color:var(--mu)">Perkiraan pemakaian data Koperasi Kosfa di Appwrite.</small>'+
+return '<div class="sec sg"><h2>Kapasitas server</h2><small style="color:var(--mu)">Perkiraan pemakaian data Koperasi Kosfa di Appwrite.</small>'+up+
 '<div class="row" style="display:block"><div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">Total terpakai</span><b>'+fbyte(tb)+'</b></div>'+
 (cap?'<div class="prog"><div style="width:'+pct+'%'+(pct>=90?';background:var(--no)':pct>=70?';background:var(--wn)':'')+'"></div></div><small style="color:var(--mu)">'+pct.toLocaleString('id-ID',{maximumFractionDigits:1})+'% dari batas '+fmt(cap)+' MB</small>':'<small style="display:block;color:var(--mu);margin-top:4px">Batas paket belum diatur.</small>')+'</div>'+
 r('Catatan login',nL,bL)+r('Peran pengguna',nR,bR)+r('Pengajuan pinjaman',nQ,bQ,!rq)+
 '<div class="row"><span>Total baris</span><b>'+fmt(tn)+'</b></div>'+
-'<small style="display:block;color:var(--mu);font-size:11.5px;margin-top:8px">Angka dihitung dari data yang dimuat, jadi hanya perkiraan. Angka resmi ada di Appwrite Console. Tekan Update data server untuk memuat ulang.</small><button class="btn g" onclick="capSet()">Atur batas paket (MB)</button></div>'}
+'<small style="display:block;color:var(--mu);font-size:11.5px;margin-top:8px">Angka dihitung dari data yang dimuat, jadi hanya perkiraan. Angka resmi ada di Appwrite Console.</small><button class="btn g" onclick="capSet()">Atur batas paket (MB)</button></div>'}
 function upUI(){var U=DV.up;if(!U)return '';
 if(U.ok)return '<div class="upw"><div class="upok" role="status"><svg class="okc" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16"/><path d="M11 18.5l5 5 9-10.5"/></svg><div>Data server diperbarui<small style="display:block;color:var(--mu);font-weight:400;font-size:11.5px;margin-top:2px">'+esc(U.at)+'</small></div></div></div>';
 return '<div class="upw"><div class="upb" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(U.p)+'"><div id="upf" style="width:'+U.p+'%"></div></div><div class="upl"><span id="upt">'+esc(U.msg)+'</span><span id="upp">'+Math.round(U.p)+'%</span></div></div>'}
@@ -503,13 +507,22 @@ var fm=function(x){var d=new Date(x.$createdAt);return isNaN(d)?'':d.toLocaleStr
 var tg=function(m){return m==='biometrik'?'Lunas':m==='password'?'Lancar':''};
 var pl=ul.map(function(e,i){var isd=e===DEVMAIL,b=isd?'<span class="tag" style="background:#1E6FD9;color:#fff">Developer</span>':RO[e]?'<span class="tag Lancar">Admin</span>':'<span class="tag" style="background:var(--bg);color:var(--mu)">Nasabah</span>';
 return '<div class="row"><div style="min-width:0"><b style="word-break:break-all">'+esc(e)+'</b><small>'+(last[e]?'Login terakhir '+fm(last[e]):'Belum ada login tercatat')+'</small></div><div style="text-align:right;flex-shrink:0">'+b+(isd?'':'<button type="button" class="lk" style="display:block;width:auto;margin:6px 0 0 auto" onclick="devRole('+i+')">'+(RO[e]?'Jadikan Nasabah':'Jadikan Admin')+'</button>')+'</div></div>'}).join('');
-var list=R.slice(0,50).map(function(x){return '<div class="row"><div style="min-width:0"><b style="word-break:break-all">'+esc(x.email)+'</b><small>'+esc(x.device||'-')+'</small></div><div style="text-align:right;flex-shrink:0"><span class="tag '+tg(x.method)+'"'+(tg(x.method)?'':' style="background:var(--bg);color:var(--wn)"')+'>'+esc(x.method||'-')+'</span><small>'+fm(x)+'</small></div></div>'}).join('');
-return hd+'<div class="wal">'+acc+'<div class="grid" style="grid-template-columns:1fr 1fr"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?ul.length:'…')+'</b>Pengguna</div></div></div>'+
-'<div class="sec"><h2>Data server</h2><small style="color:var(--mu)">Muat ulang data login, peran pengguna, dan pengajuan pinjaman dari server.</small><button class="btn" id="upbtn" onclick="devUpdate()"'+(DV.up&&DV.up.run?' disabled':'')+'>'+(DV.up&&DV.up.run?'Memperbarui…':'Update data server')+'</button>'+upUI()+'</div>'+
-capBox()+
-'<div class="sec"><h2>Pengguna dan peran</h2>'+(DV.err?'<div class="err">'+esc(DV.err)+'</div>':'')+(DV.rows?pl:'<p style="color:var(--mu)">Memuat data…</p>')+'</div>'+
-'<div class="sec"><h2>Login terbaru</h2>'+(DV.rows?(list||'<p style="color:var(--mu)">Belum ada login tercatat.</p>'):'<p style="color:var(--mu)">Memuat data…</p>')+
+var lrow=function(x){return '<div class="row"><div style="min-width:0"><b style="word-break:break-all">'+esc(x.email)+'</b><small>'+esc(x.device||'-')+'</small></div><div style="text-align:right;flex-shrink:0"><span class="tag '+tg(x.method)+'"'+(tg(x.method)?'':' style="background:var(--bg);color:var(--wn)"')+'>'+esc(x.method||'-')+'</span><small>'+fm(x)+'</small></div></div>'};
+var loginBox;
+if(DV.seeAll){var sh=DV.shown||20,shown=R.slice(0,sh).map(lrow).join('');
+loginBox='<div class="sec sc"><h2 style="display:flex;justify-content:space-between;align-items:center">Semua login<i class="ti ti-x" style="cursor:pointer;font-size:18px" onclick="devSeeAllClose()"></i></h2>'+
+'<div id="devScroll" style="max-height:320px;overflow-y:auto" onscroll="devScroll(this)">'+(shown||'<p style="color:var(--mu)">Belum ada login tercatat.</p>')+'</div>'+
+(sh<R.length?'<p style="text-align:center;color:var(--mu);font-size:11.5px;padding-top:8px">Memuat lebih banyak…</p>':(R.length?'<p style="text-align:center;color:var(--mu);font-size:11.5px;padding-top:8px">Semua '+R.length+' data sudah ditampilkan.</p>':''))+
 '<button class="btn g" onclick="devRefresh()">Muat ulang</button></div>'}
+else{var list=R.slice(0,5).map(lrow).join('');
+loginBox='<div class="sec sc"><h2>Login terbaru</h2>'+(DV.rows?(list||'<p style="color:var(--mu)">Belum ada login tercatat.</p>'):'<p style="color:var(--mu)">Memuat data…</p>')+
+(DV.rows&&R.length>5?'<button class="lk" type="button" style="width:auto;margin:4px 0 0" onclick="devSeeAll()">See all ('+R.length+')</button>':'')+
+'<button class="btn g" onclick="devRefresh()">Muat ulang</button></div>'}
+return hd+'<div class="wal">'+acc+'<div class="grid" style="grid-template-columns:1fr 1fr"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?ul.length:'…')+'</b>Pengguna</div></div></div>'+
+capBox()+
+'<div class="sec sg"><h2>Pengguna dan peran</h2>'+(DV.err?'<div class="err">'+esc(DV.err)+'</div>':'')+(DV.rows?pl:'<p style="color:var(--mu)">Memuat data…</p>')+'</div>'+
+loginBox+
+'<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data disimpan di perangkat ini dan disinkronkan ke Appwrite. '+syncTxt()+' Salin cadangan secara berkala agar aman.</p><button class="btn g" onclick="syncNow(1,1)">Sinkronkan sekarang</button><button class="btn g" onclick="backup()">Buka cadangan data</button></div>'}
 
 /* ===== Bunyi "cling" saat update server berhasil (gaya notifikasi iPhone) ===== */
 var AC=null,ACU=false;
