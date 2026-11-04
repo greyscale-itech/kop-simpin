@@ -147,6 +147,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .hd{position:relative}
 .wal{position:relative;z-index:1}
 .hd.hh p{margin-top:10px}
+.shr{position:absolute;right:14px;top:14px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.22);color:#fff;display:grid;place-items:center;cursor:pointer;padding:0;z-index:1}.shr svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.shr:active{background:rgba(255,255,255,.35)}
 .hd:not(.hh){padding-left:76px}
 .hd:not(.hh)::before{content:"";position:absolute;left:16px;top:15px;width:48px;height:48px;border-radius:14px;background:var(--lg-b) center/78% auto no-repeat #fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .lgcard{display:flex;flex-direction:column;gap:6px;width:230px;margin:0 auto 16px;background:#fff;border-radius:22px;padding:18px 20px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
@@ -187,6 +188,7 @@ body{display:block}
 .wal .grid:not(.g2) .st+.st{border-left:1px solid var(--ln)}
 #cm{max-width:360px}
 .secrow.cu{justify-content:space-between;text-align:left}.secrow.cu>small{flex:1 1 160px}
+.shr{right:30px;top:30px}.shr:hover{background:rgba(255,255,255,.34)}
 .bars{height:230px}.bp{height:196px}.hcp{height:240px}.hcv{font-size:11px}.hcf button{font-size:11.5px;padding:5px 12px}.hcw{grid-template-columns:56px minmax(0,1fr)}.hcy span,.hcx span{font-size:11.5px}
 #lst{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:32px}
 #lst>p{grid-column:1/-1}
@@ -366,7 +368,7 @@ return '<div class="hd"><h1>Cash flow</h1><p>Angsuran masuk dan pencairan keluar
 function kitem(k){var s=kst(k);return '<button class="row" onclick="kdet(\''+k.id+'\')"><div class="who"><span class="av">'+esc(ini(k.n))+'</span><div><b>'+esc(k.n)+'</b><small>'+esc(k.j)+' · '+(s==='Lunas'?'Sudah lunas':'Jatuh tempo '+fd(k.jt))+'</small></div></div><div class="rt"><span class="tag '+s+'">'+s+'</span><small style="display:block;color:var(--mu);font-size:11.5px;margin-top:4px">Sisa '+rp(k.sisa)+'</small></div></button>'}
 function admin(){var K=DB.K,ak=K.filter(function(k){return k.sisa>0}),tot=sum(ak,'sisa'),ang=sum(ak,'a'),pit=sum(L().filter(function(d){return d.st!=='Lunas'}),'sisa'),F2=flow(),cov=ang?F2.IN[5]/ang:0,mx=Math.max(pit,tot)||1;
 function bar(l,v,c){return '<div class="row" style="display:block"><div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">'+l+'</span><b>'+rp(v)+'</b></div><div class="prog"><div style="width:'+v/mx*100+'%;background:'+c+'"></div></div></div>'}
-return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p></div><div class="wal adm"><small>Total kewajiban ke kreditur</small><b class="big">'+rp(tot)+'</b><small style="display:block;margin-top:4px">Angsuran '+rp(ang)+' per bulan</small><div class="grid adg"><div class="st"><b>'+ak.length+'</b>Aktif</div><div class="st"><b>'+jt(ang)+'</b>Angsuran/bln</div><div class="st"><b style="color:var(--ok)">'+(ang?cov.toLocaleString('id-ID',{maximumFractionDigits:1})+'×':'-')+'</b>Cakupan</div><div class="st"><b style="color:var(--or)">'+(K.length-ak.length)+'</b>Lunas</div></div></div>'+
+return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p><button type="button" class="shr" aria-label="Bagikan Simpinku" onclick="shareApp()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button></div><div class="wal adm"><small>Total kewajiban ke kreditur</small><b class="big">'+rp(tot)+'</b><small style="display:block;margin-top:4px">Angsuran '+rp(ang)+' per bulan</small><div class="grid adg"><div class="st"><b>'+ak.length+'</b>Aktif</div><div class="st"><b>'+jt(ang)+'</b>Angsuran/bln</div><div class="st"><b style="color:var(--ok)">'+(ang?cov.toLocaleString('id-ID',{maximumFractionDigits:1})+'×':'-')+'</b>Cakupan</div><div class="st"><b style="color:var(--or)">'+(K.length-ak.length)+'</b>Lunas</div></div></div>'+
 '<div class="sec sg"><h2>Kelola Keuangan</h2><p style="color:var(--mu);font-size:12.5px">Catat dana masuk dan dana keluar. Semua transaksi otomatis masuk ke Cash flow.</p><div class="actrow"><button class="btn rd" onclick="dkOpen()">− Dana Keluar</button><button class="btn gr" onclick="txf()">+ Dana Masuk</button></div></div>'+
 '<div class="sec sg"><h2>Update Data</h2><div class="secrow cu"><small style="color:var(--mu)">Muat ulang data debitur, transaksi, dan pengajuan pinjaman.</small><div class="sr-r"><button class="btn up" onclick="adminUpdate()"'+(AU.up&&AU.up.run?' disabled':'')+'>'+ICR+(AU.up&&AU.up.run?'Memperbarui…':'Update Data')+'</button></div></div>'+upUI(AU.up)+'</div>'+
 '<div class="sec sb"><h2>Piutang debitur vs kewajiban</h2>'+bar('Piutang beredar (debitur)',pit,'var(--or2)')+bar('Kewajiban (kreditur)',tot,'var(--kb)')+'<small style="color:var(--mu)">Cakupan = kas masuk bulan ini dibagi angsuran ke kreditur.</small></div>'+
@@ -648,6 +650,16 @@ function okFloat(t,a){try{var o=document.querySelector('.upfl');if(o)o.remove();
 var d=document.createElement('div');d.className='upfl';d.setAttribute('role','status');
 d.innerHTML='<div class="upfc"><svg class="okc" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16"/><path d="M11 18.5l5 5 9-10.5"/></svg><b>'+esc(t)+'</b><small>'+esc(a||'')+'</small></div>';
 document.body.appendChild(d);setTimeout(function(){d.classList.add('out')},2300);setTimeout(function(){d.remove()},2700)}catch(e){}}
+var SHL='https://tinyurl.com/simpinku';
+function shImg(){return new Promise(function(ok){try{var a=new Image(),b=new Image(),n=0;
+function go(){if(++n<2)return;try{var W=900,H=520,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);x.imageSmoothingQuality='high';
+var bw=300,bh=bw*a.height/a.width,tw=560,th=tw*b.height/b.width,y=(H-(bh+36+th))/2;x.drawImage(a,(W-bw)/2,y,bw,bh);x.drawImage(b,(W-tw)/2,y+bh+36,tw,th);c.toBlob(function(bl){ok(bl)},'image/png')}catch(e){ok(null)}}
+a.onload=b.onload=go;a.onerror=b.onerror=function(){ok(null)};a.src=LG.b;b.src=LG.t}catch(e){ok(null)}})}
+async function shareApp(){var tx='Simpinku: pantau peminjam dan arus kas pinjaman.\n'+SHL;
+try{if(navigator.share){var bl=await shImg(),d={title:'Simpinku',text:tx};
+if(bl){var f=new File([bl],'simpinku.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]}))d.files=[f]}
+await navigator.share(d);return}}catch(e){if(e&&e.name==='AbortError')return}
+try{await navigator.clipboard.writeText(SHL);toast('Link tersalin: '+SHL)}catch(e){prompt('Salin link Simpinku:',SHL)}}
 var AU={up:null};
 function auWait(f){return new Promise(function(ok){(function w(){f()?setTimeout(w,80):ok()})()})}
 async function adminUpdate(){if(AU.up&&AU.up.run)return;
