@@ -118,6 +118,9 @@ nav button i{display:flex;align-items:center;justify-content:center;width:44px;h
 .upw{margin-top:12px}.upb{height:8px;background:var(--ln);border-radius:4px;overflow:hidden}.upb div{height:100%;background:linear-gradient(90deg,var(--or),var(--or2));border-radius:4px}.upl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mu);margin-top:6px}
 .upok{display:flex;align-items:center;gap:10px;color:var(--ok);font-weight:600}.okc{width:36px;height:36px;flex:none}.okc circle,.okc path{fill:none;stroke:var(--ok);stroke-linecap:round;stroke-linejoin:round}.okc circle{stroke-width:3;stroke-dasharray:101;stroke-dashoffset:101;transform-box:fill-box;transform-origin:center;transform:rotate(-90deg);animation:okd .5s ease-out forwards}.okc path{stroke-width:3.5;stroke-dasharray:30;stroke-dashoffset:30;animation:okd .35s .45s ease-out forwards}
 @keyframes okd{to{stroke-dashoffset:0}}
+.upfl{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:30;pointer-events:none;transition:opacity .4s}.upfl.out{opacity:0}.upfc{background:var(--card);color:var(--tx);border-radius:18px;padding:24px 32px;box-shadow:0 10px 36px rgba(0,0,0,.3);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;max-width:80%;animation:upin .25s ease-out}.upfc .okc{width:72px;height:72px}.upfc b{color:var(--ok);font-size:15px}.upfc small{color:var(--mu);font-size:11.5px}
+@keyframes upin{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.upfc{animation:none}}
 @media (prefers-reduced-motion:reduce){.okc circle,.okc path{animation-duration:.01s;animation-delay:0s}}
 .btn:disabled{opacity:.6;cursor:default}
 .nm{background:none;border:0;color:var(--tx);font:inherit;text-align:left;padding:0;cursor:pointer;display:block}.wa{display:inline-block;color:var(--or);font-size:11.5px;margin-top:2px;padding:4px 0;text-decoration:underline}
@@ -623,12 +626,12 @@ r('Catatan login',nL,bL)+r('Peran pengguna',nR,bR)+r('Pengajuan pinjaman',nQ,bQ,
 '<div class="row"><span>Total baris</span><b>'+fmt(tn)+'</b></div>'+
 '<small style="display:block;color:var(--mu);font-size:11.5px;margin-top:8px">Angka dihitung dari data yang dimuat, jadi hanya perkiraan. Angka resmi ada di Appwrite Console.</small><div class="capr"><button class="btn g" onclick="capSet()">Atur batas paket (MB)</button></div></div>'}
 function upUI(U){U=U||DV.up;if(!U)return '';
-if(U.ok)return '<div class="upw"><div class="upok" role="status"><svg class="okc" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16"/><path d="M11 18.5l5 5 9-10.5"/></svg><div>'+esc(U.txt||'Data server diperbarui')+'<small style="display:block;color:var(--mu);font-weight:400;font-size:11.5px;margin-top:2px">'+esc(U.at)+'</small></div></div></div>';
+if(U.ok)return '';
 return '<div class="upw"><div class="upb" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(U.p)+'"><div id="upf" style="width:'+U.p+'%"></div></div><div class="upl"><span id="upt">'+esc(U.msg)+'</span><span id="upp">'+Math.round(U.p)+'%</span></div></div>'}
 async function devUpdate(){if(DV.up&&DV.up.run)return;
 var U=DV.up={run:1,p:0,t:8,msg:'Menghubungi server…'};draw();
 function fail(m){if(DV.up===U)DV.up=null;draw();toast(m)}
-function fin(){U.run=0;U.ok=true;U.at='Diperbarui pukul '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});draw();cling(.42);setTimeout(function(){if(DV.up===U){DV.up=null;if(AUTH&&S.tab==='dev')draw()}},4000)}
+function fin(){U.run=0;U.ok=true;U.at='Diperbarui pukul '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});draw();okFloat(U.txt||'Data server diperbarui',U.at);cling(.42);setTimeout(function(){if(DV.up===U){DV.up=null;if(AUTH&&S.tab==='dev')draw()}},4000)}
 var tk=setInterval(function(){if(DV.up!==U){clearInterval(tk);return}
 U.p=Math.min(U.t,U.p+Math.max(.4,(U.t-U.p)*.1));
 var f=document.getElementById('upf');if(f)f.style.width=U.p+'%';var pp=document.getElementById('upp');if(pp)pp.textContent=Math.round(U.p)+'%';var m=document.getElementById('upt');if(m)m.textContent=U.msg;
@@ -641,12 +644,16 @@ await rqLoad();
 if(DV.up!==U)return;if(RQ.err){clearInterval(tk);return fail(RQ.err)}
 U.t=100;U.msg='Menyelesaikan…'}
 var ICR='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3M4 4v4h4M4 13a8 8 0 0 0 14.9 3M20 20v-4h-4"/></svg>';
+function okFloat(t,a){try{var o=document.querySelector('.upfl');if(o)o.remove();
+var d=document.createElement('div');d.className='upfl';d.setAttribute('role','status');
+d.innerHTML='<div class="upfc"><svg class="okc" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16"/><path d="M11 18.5l5 5 9-10.5"/></svg><b>'+esc(t)+'</b><small>'+esc(a||'')+'</small></div>';
+document.body.appendChild(d);setTimeout(function(){d.classList.add('out')},2300);setTimeout(function(){d.remove()},2700)}catch(e){}}
 var AU={up:null};
 function auWait(f){return new Promise(function(ok){(function w(){f()?setTimeout(w,80):ok()})()})}
 async function adminUpdate(){if(AU.up&&AU.up.run)return;
 var U=AU.up={run:1,p:0,t:8,msg:'Menghubungi…',txt:'Data diperbarui'};draw();
 function fail(m){if(AU.up===U)AU.up=null;SY.mute=0;draw();toast(m)}
-function fin(){U.run=0;U.ok=true;U.at='Diperbarui pukul '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});draw();cling(.42);setTimeout(function(){if(AU.up===U){AU.up=null;if(AUTH&&S.tab==='kre')draw()}},4000)}
+function fin(){U.run=0;U.ok=true;U.at='Diperbarui pukul '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});draw();okFloat(U.txt||'Data server diperbarui',U.at);cling(.42);setTimeout(function(){if(AU.up===U){AU.up=null;if(AUTH&&S.tab==='kre')draw()}},4000)}
 var tk=setInterval(function(){if(AU.up!==U){clearInterval(tk);return}
 U.p=Math.min(U.t,U.p+Math.max(.4,(U.t-U.p)*.1));
 var f=document.getElementById('upf');if(f)f.style.width=U.p+'%';var pp=document.getElementById('upp');if(pp)pp.textContent=Math.round(U.p)+'%';var m=document.getElementById('upt');if(m)m.textContent=U.msg;
