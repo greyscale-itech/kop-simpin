@@ -107,7 +107,7 @@ nav button i{display:flex;align-items:center;justify-content:center;width:44px;h
 .secrow .sr-r{display:flex;flex-direction:column;gap:8px}
 .secrow .sr-r .btn{margin-top:0;width:auto;min-width:170px}
 .secrow .row{padding:6px 0}
-.btn.gr{background:#1F9D55;color:#fff}.btn.g{background:none;border:1px solid var(--or);color:var(--or)}.btn.d{background:none;border:1px solid var(--no);color:var(--no)}
+.btn.gr{background:#1F9D55;color:#fff}.btn.rd{background:var(--no);color:#fff}.btn.g{background:none;border:1px solid var(--or);color:var(--or)}.btn.d{background:none;border:1px solid var(--no);color:var(--no)}
 .nt{color:var(--mu);font-size:11.5px;text-align:center;margin:4px 12px 12px}
 .fl{display:block;font-size:12px;color:var(--mu);margin-top:10px}.fm{width:100%;border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:6px;padding:12px;font-size:16px;margin-top:4px;font-family:inherit}.err{color:var(--no);font-size:12.5px;margin-top:8px;min-height:16px}
 .dt{position:relative;margin-top:4px}.dt .fm{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;z-index:1;cursor:pointer}.dv{display:block;min-height:46px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:6px;padding:12px;font-size:16px;font-family:inherit}
@@ -121,7 +121,7 @@ nav button i{display:flex;align-items:center;justify-content:center;width:44px;h
 @media (prefers-reduced-motion:reduce){.okc circle,.okc path{animation-duration:.01s;animation-delay:0s}}
 .btn:disabled{opacity:.6;cursor:default}
 .nm{background:none;border:0;color:var(--tx);font:inherit;text-align:left;padding:0;cursor:pointer;display:block}.wa{display:inline-block;color:var(--or);font-size:11.5px;margin-top:2px;padding:4px 0;text-decoration:underline}
-.tg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}.tg button{border:1px solid var(--ln);background:none;color:var(--tx);border-radius:8px;padding:10px 0;font-size:13px;cursor:pointer}.tg button.on{background:var(--or);border-color:var(--or);color:#fff}
+.tg.c1{grid-template-columns:1fr}.tg.c1 button{text-align:left;padding:11px 12px;font-size:14px}.tg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}.tg button{border:1px solid var(--ln);background:none;color:var(--tx);border-radius:8px;padding:10px 0;font-size:13px;cursor:pointer}.tg button.on{background:var(--or);border-color:var(--or);color:#fff}
 .bx{margin-top:12px;border:1px dashed var(--or);border-radius:8px;padding:2px 12px;background:var(--bg)}.big2{font-size:16px;color:var(--or)}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--or);outline-offset:2px}
 .toast{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:20;max-width:90%;text-align:center}
@@ -224,7 +224,7 @@ var KEY='kosfa-db-v3',AK='kosfa-auth',SK='kosfa-sess2',TK='kosfa-tab';
 var BLN=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bulan"]];
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
-var DB={D:[],K:[],T:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
+var DB={D:[],K:[],T:[],O:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -267,7 +267,7 @@ b.forEach(function(x){DB.D.push({id:uid(),n:x[0],u:x[1],pk:x[2],bg:x[3],tn:x[3]*
 m.forEach(function(x){DB.T.push({id:uid(),src:x[0],note:x[1],amt:x[2],date:x[3]})});
 if(b.length||m.length)save()}catch(e){}}
 try{var r=ls(KEY);if(r)DB=JSON.parse(r);else migrate()}catch(e){}
-DB.D=DB.D||[];DB.K=DB.K||[];DB.T=DB.T||[];
+DB.D=DB.D||[];DB.K=DB.K||[];DB.T=DB.T||[];DB.O=DB.O||[];
 
 /* ===== Hitungan ===== */
 function calc(d){var tot=Math.round(d.pk*(1+d.bg/100)),paid=0;DB.T.forEach(function(t){if(t.did===d.id)paid+=t.amt});
@@ -278,7 +278,7 @@ function kst(k){return k.sisa<=0?'Lunas':(k.jt&&k.jt<today()?'Telat':'Lancar')}
 function flow(){var n=new Date(),M=[],IN=[0,0,0,0,0,0],OUT=[0,0,0,0,0,0];
 for(var i=5;i>=0;i--){var d=new Date(n.getFullYear(),n.getMonth()-i,1);M.push([d.getFullYear(),d.getMonth()])}
 function ix(s){var p=s.split('-');for(var i=0;i<6;i++)if(M[i][0]===+p[0]&&M[i][1]===+p[1]-1)return i;return -1}
-DB.T.forEach(function(t){var i=ix(t.date);if(i>=0)IN[i]+=t.amt});DB.D.forEach(function(d){var i=ix(d.cair);if(i>=0)OUT[i]+=d.pk});
+DB.T.forEach(function(t){var i=ix(t.date);if(i>=0)IN[i]+=t.amt});DB.D.forEach(function(d){var i=ix(d.cair);if(i>=0)OUT[i]+=d.pk});DB.O.forEach(function(o){var i=ix(o.date);if(i>=0)OUT[i]+=o.amt});
 return{M:M,IN:IN,OUT:OUT}}
 
 /* ===== Tampilan ===== */
@@ -293,7 +293,7 @@ return d}
 function hcNice(v){var e=Math.pow(10,Math.floor(Math.log10(v))),f=v/e;return(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e}
 function hcSh(n){if(!n)return '0';if(n>=1e9)return (n/1e9).toLocaleString('id-ID',{maximumFractionDigits:2})+' M';if(n>=1e6)return (n/1e6).toLocaleString('id-ID',{maximumFractionDigits:2})+' jt';return Math.round(n/1e3).toLocaleString('id-ID')+' rb'}
 function hcData(r){var td=today(),K=[],LB=[],i,HR=['Min','Sen','Sel','Rab','Kam','Jum','Sab'],kf;
-if(r==='a'){var c=td.slice(0,7),mn=c;DB.T.forEach(function(t){if(t.date&&t.date.slice(0,7)<mn)mn=t.date.slice(0,7)});DB.D.forEach(function(d){if(d.cair&&d.cair.slice(0,7)<mn)mn=d.cair.slice(0,7)});
+if(r==='a'){var c=td.slice(0,7),mn=c;DB.T.forEach(function(t){if(t.date&&t.date.slice(0,7)<mn)mn=t.date.slice(0,7)});DB.D.forEach(function(d){if(d.cair&&d.cair.slice(0,7)<mn)mn=d.cair.slice(0,7)});DB.O.forEach(function(o){if(o.date&&o.date.slice(0,7)<mn)mn=o.date.slice(0,7)});
 var y=+mn.slice(0,4),m=+mn.slice(5,7),cy=+c.slice(0,4),cm=+c.slice(5,7);while((cy-y)*12+cm-m<5){m--;if(m<1){m=12;y--}}
 while(y<cy||(y===cy&&m<=cm)){K.push(y+'-'+pad(m));m++;if(m>12){m=1;y++}}
 kf=function(d){return d.slice(0,7)};
@@ -301,7 +301,7 @@ var st=Math.ceil(K.length/8);K.forEach(function(k,i){var show=(K.length-1-i)%st=
 else{var nn=r==='w'?7:30;for(i=nn-1;i>=0;i--)K.push(addDays(td,-i));kf=function(d){return d};
 K.forEach(function(k,i){var dd=pd(k),show=r==='w'||(nn-1-i)%5===0;LB.push(show?(r==='w'?HR[dd.getDay()]:dd.getDate()+' '+BLN[dd.getMonth()]):'')})}
 var ix={},IN=K.map(function(){return 0}),OUT=IN.slice();K.forEach(function(k,i){ix[k]=i});
-DB.T.forEach(function(t){var i=ix[kf(t.date||'')];if(i!==undefined)IN[i]+=t.amt});DB.D.forEach(function(d){var i=ix[kf(d.cair||'')];if(i!==undefined)OUT[i]+=d.pk});
+DB.T.forEach(function(t){var i=ix[kf(t.date||'')];if(i!==undefined)IN[i]+=t.amt});DB.D.forEach(function(d){var i=ix[kf(d.cair||'')];if(i!==undefined)OUT[i]+=d.pk});DB.O.forEach(function(o){var i=ix[kf(o.date||'')];if(i!==undefined)OUT[i]+=o.amt});
 return{K:K,LB:LB,IN:IN,OUT:OUT}}
 function hcSec(){var r=S.cr||'b',q=hcData(r),n=q.K.length,W=300,H=160,f=function(v){return v.toFixed(1)},
 mx=Math.max.apply(null,q.IN.concat(q.OUT)),step=hcNice((mx||1e6)/4),top=step*4,X=function(i){return i*W/(n-1)},Y=function(v){return H-v/top*H},
@@ -343,27 +343,28 @@ g.hidden=!m.length;g.innerHTML=m.map(function(d){return '<button type="button" o
 function pick(id){var d=DB.D.filter(function(x){return x.id===id})[0];S.q=d.n;document.getElementById('q').value=d.n;sug();lst()}
 function lst(){var q=S.q.toLowerCase(),h=L().filter(function(d){return(S.f==='Semua'||d.st===S.f)&&(d.n+' '+d.u+' '+(d.hp||'')).toLowerCase().indexOf(q)>-1}).map(item).join('');
 document.getElementById('lst').innerHTML=h||'<p style="color:var(--mu);padding:12px 0">'+(DB.D.length?'Tidak ada debitur yang cocok.':'Belum ada debitur. Tambahkan lewat tab Admin.')+'</p>'}
-function mlist(){var c=today().slice(0,7),ks=[c];DB.T.forEach(function(t){ks.push(t.date.slice(0,7))});DB.D.forEach(function(d){ks.push(d.cair.slice(0,7))});ks.sort();var a=ks[0].split('-'),b=ks[ks.length-1].split('-'),y=+a[0],m=+a[1],r=[];while(y<+b[0]||(y===+b[0]&&m<=+b[1])){r.push(y+'-'+pad(m));m++;if(m>12){m=1;y++}}return r.reverse()}
+function mlist(){var c=today().slice(0,7),ks=[c];DB.T.forEach(function(t){ks.push(t.date.slice(0,7))});DB.D.forEach(function(d){ks.push(d.cair.slice(0,7))});DB.O.forEach(function(o){ks.push(o.date.slice(0,7))});ks.sort();var a=ks[0].split('-'),b=ks[ks.length-1].split('-'),y=+a[0],m=+a[1],r=[];while(y<+b[0]||(y===+b[0]&&m<=+b[1])){r.push(y+'-'+pad(m));m++;if(m>12){m=1;y++}}return r.reverse()}
 function mlab(k){var p=k.split('-');return BLN[+p[1]-1]+' '+p[0]}
-function fsel(k){return{T:DB.T.filter(function(t){return k==='all'||t.date.slice(0,7)===k}),D:DB.D.filter(function(d){return k==='all'||d.cair.slice(0,7)===k})}}
-function sm2(f){var a=0,m=0,l=0,k=0;f.T.forEach(function(t){if(t.src==='Angsuran debitur')a+=t.amt;else if(t.src==='Setoran modal')m+=t.amt;else if(t.src===KRD)k+=t.amt;else l+=t.amt});return{a:a,m:m,l:l,k:k,o:sum(f.D,'pk')}}
+function fsel(k){return{T:DB.T.filter(function(t){return k==='all'||t.date.slice(0,7)===k}),D:DB.D.filter(function(d){return k==='all'||d.cair.slice(0,7)===k}),O:DB.O.filter(function(o){return k==='all'||o.date.slice(0,7)===k})}}
+function sm2(f){var a=0,m=0,l=0,k=0;f.T.forEach(function(t){if(t.src==='Angsuran debitur')a+=t.amt;else if(t.src==='Setoran modal')m+=t.amt;else if(t.src===KRD)k+=t.amt;else l+=t.amt});var pc=sum(f.D,'pk'),ba=0,lo=0;f.O.forEach(function(x){if(x.t==='angsuran')ba+=x.amt;else lo+=x.amt});return{a:a,m:m,l:l,k:k,pc:pc,ba:ba,lo:lo,o:pc+ba+lo}}
 function cash(){var ML=mlist(),c=today().slice(0,7),sm=(S.cm==='all'||ML.indexOf(S.cm)>-1)?S.cm:c;S.cm=sm;
 var f=fsel(sm),r=sm2(f),masuk=r.a+r.m+r.l+r.k,net=masuk-r.o,nm=sm==='all'?'semua bulan':mlab(sm);
 var opts='<option value="all"'+(sm==='all'?' selected':'')+'>Semua bulan</option>'+ML.map(function(k){return '<option value="'+k+'"'+(k===sm?' selected':'')+'>'+mlab(k)+'</option>'}).join('');
 var rows=ML.map(function(k){var q=sm2(fsel(k)),x=q.a+q.m+q.l+q.k-q.o;return '<button class="row" onclick="S.cm=\''+k+'\';draw()"><div><b>'+mlab(k)+'</b><small>Angsuran '+jt(q.a)+' · Modal '+jt(q.m)+' · Keluar '+jt(q.o)+'</small></div><div class="'+(x>=0?'in':'out')+'">'+(x>=0?'+':'−')+rp(Math.abs(x))+'</div></button>'}).join('');
 var all=f.T.map(function(t){var d=DB.D.filter(function(x){return x.id===t.did})[0];return{id:t.id,k:'t',ti:t.note||t.src,sb:t.src+(d?' · '+d.n:''),a:t.amt,dt:t.date}})
-.concat(f.D.map(function(d){return{id:d.id,k:'d',ti:d.n,sb:'Pencairan',a:-d.pk,dt:d.cair}})).sort(function(a,b){return a.dt<b.dt?1:a.dt>b.dt?-1:0}).slice(0,100);
-var tx=all.map(function(t){var b='<button class="row"'+((t.k==='t'&&!canAdmin())?'':' onclick="'+(t.k==='t'?'txf':'det')+'(\''+t.id+'\')"')+'><div><b>'+esc(t.ti)+'</b><small>'+esc(t.sb)+' · '+fd(t.dt)+'</small></div><div class="'+(t.a>0?'in':'out')+'">'+(t.a>0?'+':'−')+rp(Math.abs(t.a))+'</div></button>';
+.concat(f.D.map(function(d){return{id:d.id,k:'d',ti:d.n,sb:'Pencairan',a:-d.pk,dt:d.cair}})).concat(f.O.map(function(o){return{id:o.id,k:'o',ti:o.note||'Dana keluar',sb:o.t==='angsuran'?'Bayar angsuran':'Lainnya',a:-o.amt,dt:o.date}})).sort(function(a,b){return a.dt<b.dt?1:a.dt>b.dt?-1:0}).slice(0,100);
+var tx=all.map(function(t){var b='<button class="row"'+((t.k==='o'||(t.k==='t'&&!canAdmin()))?'':' onclick="'+(t.k==='t'?'txf':'det')+'(\''+t.id+'\')"')+'><div><b>'+esc(t.ti)+'</b><small>'+esc(t.sb)+' · '+fd(t.dt)+'</small></div><div class="'+(t.a>0?'in':'out')+'">'+(t.a>0?'+':'−')+rp(Math.abs(t.a))+'</div></button>';
 return !canAdmin()?b:'<div class="sw"><button type="button" class="sd" aria-label="Hapus transaksi" onclick="hapusS(\''+t.id+'\',\''+t.k+'\')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Hapus</button>'+b+'</div>'}).join('');
 return '<div class="hd"><h1>Cash flow</h1><p>Angsuran masuk dan pencairan keluar</p></div><div class="wal"><label class="fl" for="cm" style="margin-top:0">Pilih bulan</label><select class="fm" id="cm" onchange="S.cm=this.value;draw()">'+opts+'</select><small style="display:block;margin-top:12px">Kas bersih '+nm+'</small><b class="big '+(net>=0?'in':'out')+'">'+(net>=0?'+':'−')+rp(Math.abs(net))+'</b>'+
 '<div class="grid" style="grid-template-columns:1fr 1fr"><div class="st"><b class="in" style="font-size:16px">'+rp(masuk)+'</b>Kas masuk</div><div class="st"><b style="font-size:16px">'+rp(r.o)+'</b>Kas keluar</div></div>'+'</div>'+
-'<div class="sec sb"><h2>Rincian '+nm+'</h2><div class="row"><span>Angsuran debitur</span><b class="in">'+rp(r.a)+'</b></div><div class="row"><span>Setoran modal</span><b class="in">'+rp(r.m)+'</b></div><div class="row"><span>Pinjaman kreditur</span><b class="in">'+rp(r.k)+'</b></div><div class="row"><span>Pendapatan lain dan lainnya</span><b class="in">'+rp(r.l)+'</b></div><div class="row"><span>Pencairan pinjaman (keluar)</span><b class="out">'+rp(r.o)+'</b></div></div>'+
+'<div class="sec sb"><h2>Rincian '+nm+'</h2><div class="row"><span>Angsuran debitur</span><b class="in">'+rp(r.a)+'</b></div><div class="row"><span>Setoran modal</span><b class="in">'+rp(r.m)+'</b></div><div class="row"><span>Pinjaman kreditur</span><b class="in">'+rp(r.k)+'</b></div><div class="row"><span>Pendapatan lain dan lainnya</span><b class="in">'+rp(r.l)+'</b></div><div class="row"><span>Pencairan pinjaman (keluar)</span><b class="out">'+rp(r.pc)+'</b></div><div class="row"><span>Bayar angsuran (keluar)</span><b class="out">'+rp(r.ba)+'</b></div><div class="row"><span>Dana keluar lainnya</span><b class="out">'+rp(r.lo)+'</b></div></div>'+
 '<div class="sec sb"><h2>Per bulan</h2>'+rows+'</div><div class="sec sb"><h2>Transaksi '+nm+'</h2>'+(tx||'<p style="color:var(--mu)">Belum ada transaksi.</p>')+'</div>'}
 function kitem(k){var s=kst(k);return '<button class="row" onclick="kdet(\''+k.id+'\')"><div class="who"><span class="av">'+esc(ini(k.n))+'</span><div><b>'+esc(k.n)+'</b><small>'+esc(k.j)+' · '+(s==='Lunas'?'Sudah lunas':'Jatuh tempo '+fd(k.jt))+'</small></div></div><div class="rt"><span class="tag '+s+'">'+s+'</span><small style="display:block;color:var(--mu);font-size:11.5px;margin-top:4px">Sisa '+rp(k.sisa)+'</small></div></button>'}
 function admin(){var K=DB.K,ak=K.filter(function(k){return k.sisa>0}),tot=sum(ak,'sisa'),ang=sum(ak,'a'),pit=sum(L().filter(function(d){return d.st!=='Lunas'}),'sisa'),F2=flow(),cov=ang?F2.IN[5]/ang:0,mx=Math.max(pit,tot)||1;
 function bar(l,v,c){return '<div class="row" style="display:block"><div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">'+l+'</span><b>'+rp(v)+'</b></div><div class="prog"><div style="width:'+v/mx*100+'%;background:'+c+'"></div></div></div>'}
 return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p></div><div class="wal adm"><small>Total kewajiban ke kreditur</small><b class="big">'+rp(tot)+'</b><small style="display:block;margin-top:4px">Angsuran '+rp(ang)+' per bulan</small><div class="grid adg"><div class="st"><b>'+ak.length+'</b>Aktif</div><div class="st"><b>'+jt(ang)+'</b>Angsuran/bln</div><div class="st"><b style="color:var(--ok)">'+(ang?cov.toLocaleString('id-ID',{maximumFractionDigits:1})+'×':'-')+'</b>Cakupan</div><div class="st"><b style="color:var(--or)">'+(K.length-ak.length)+'</b>Lunas</div></div></div>'+
-'<div class="sec sg"><h2>Kelola Keuangan</h2><p style="color:var(--mu);font-size:12.5px">Setujui atau tolak pengajuan pinjaman nasabah, dan catat semua dana masuk (angsuran, modal, dan kreditur baru). Debitur yang disetujui otomatis muncul di tab Debitur, Home, dan Cash flow.</p><div class="actrow"><button class="btn" onclick="rqOpen()">Pengajuan Pinjaman'+(rqPend().length?' ('+rqPend().length+' baru)':'')+'</button><button class="btn gr" onclick="txf()">+ Tambah Dana Masuk</button></div></div>'+
+'<div class="sec sg"><h2>Kelola Keuangan</h2><p style="color:var(--mu);font-size:12.5px">Catat dana masuk dan dana keluar. Semua transaksi otomatis masuk ke Cash flow.</p><div class="actrow"><button class="btn rd" onclick="dkOpen()">− Dana Keluar</button><button class="btn gr" onclick="txf()">+ Dana Masuk</button></div></div>'+
+'<div class="sec sg"><h2>Pengajuan Pinjaman</h2><p style="color:var(--mu);font-size:12.5px">Setujui atau tolak pengajuan pinjaman nasabah. Debitur yang disetujui otomatis muncul di tab Debitur, Home, dan Cash flow.</p><div class="actrow"><button class="btn" onclick="rqOpen()">Buka pengajuan'+(rqPend().length?' ('+rqPend().length+' baru)':'')+'</button></div></div>'+
 '<div class="sec sg"><h2>Update Data</h2><div class="secrow"><small style="color:var(--mu)">Muat ulang data debitur, transaksi, dan pengajuan pinjaman.</small><div class="sr-r"><button class="btn" onclick="adminUpdate()"'+(AU.up&&AU.up.run?' disabled':'')+'>'+(AU.up&&AU.up.run?'Memperbarui…':'Update Data')+'</button></div></div>'+upUI(AU.up)+'</div>'+
 '<div class="sec sb"><h2>Piutang debitur vs kewajiban</h2>'+bar('Piutang beredar (debitur)',pit,'var(--or2)')+bar('Kewajiban (kreditur)',tot,'var(--kb)')+'<small style="color:var(--mu)">Cakupan = kas masuk bulan ini dibagi angsuran ke kreditur.</small></div>'+
 '<div class="sec sc"><h2>Pengingat jatuh tempo</h2><p style="color:var(--mu);font-size:12.5px">Daftar tagihan muncul otomatis pukul 07.00 pada tanggal jatuh tempo saat aplikasi terbuka. Notifikasi HP hanya jalan selama aplikasi masih berjalan di latar belakang.</p><div class="row"><span>Notifikasi HP</span><b>'+(window.Notification&&Notification.permission==='granted'?'Aktif':'Belum aktif')+'</b></div><div class="actrow"><button class="btn g" onclick="izinNotif()">Aktifkan notifikasi HP</button><button class="btn g" onclick="cekNotif(true)">Lihat tagihan hari ini</button></div></div>'+
@@ -423,6 +424,20 @@ if(old){if(old.kid){var kk=DB.K.filter(function(x){return x.id===old.kid})[0];if
 save();cls();draw();toast('Dana masuk tersimpan');if(did)det(did)}
 function hapusT(id){if(!canAdmin())return toast('Hanya admin yang bisa mengubah data ini.');var t=DB.T.filter(function(x){return x.id===id})[0],did=t&&t.did;if(!confirm(t&&t.kid?'Hapus transaksi ini? Data kreditur yang terkait juga ikut terhapus.':'Hapus transaksi ini?'))return;if(t&&t.kid)DB.K=DB.K.filter(function(k){return k.id!==t.kid});DB.T=DB.T.filter(function(x){return x.id!==id});save();cls();draw();toast('Transaksi dihapus');if(did)det(did)}
 
+/* ===== Dana keluar ===== */
+var DKT=['Pencairan Pinjaman','Bayar Angsuran','Lainnya'];
+function dkOpen(k){if(!canAdmin())return toast('Hanya admin yang bisa mengubah data ini.');k=k||0;
+var b=DKT.map(function(x,i){return '<button type="button" class="'+(i===k?'on':'')+'" onclick="dkOpen('+i+')">'+x+'</button>'}).join(''),f;
+if(k===0)f='<p style="color:var(--mu);font-size:12.5px;margin-top:12px">Isi data debitur, pokok, bunga, dan tenor di formulir berikutnya. Debitur baru otomatis masuk ke tab Debitur dan Cash flow.</p><button class="btn rd" onclick="cls();dform()">Lanjut</button>';
+else f=(k===1?SEL('okr','Kreditur',[['','— Pilih kreditur —']].concat(DB.K.filter(function(x){return x.sisa>0}).map(function(x){return[x.id,x.n+' · sisa '+rp(x.sisa)]})),''):F('oke','Keterangan','','maxlength="60" placeholder="Contoh: Biaya operasional kantor"'))+F('ono','Nominal (Rp)','',MONEY+' placeholder="500,000"')+DT('odt','Tanggal',today())+'<div class="err" id="err"></div><button class="btn rd" onclick="simpanO('+k+')">Simpan</button>';
+sheet('<h3>Dana keluar</h3><p>Pilih jenis pengeluaran, lalu isi detailnya.</p><label class="fl">Jenis dana keluar</label><div class="tg c1">'+b+'</div>'+f+'<button class="btn g" onclick="cls()">Batal</button>')}
+function simpanO(k){if(!canAdmin())return toast('Hanya admin yang bisa mengubah data ini.');var n=num('ono'),dt=val('odt'),o={id:uid(),amt:n,date:dt},kk=null;
+if(k===1){var kid=val('okr');if(!kid)return emsg('Pilih kreditur.');kk=DB.K.filter(function(x){return x.id===kid})[0];if(!kk)return emsg('Kreditur tidak ditemukan.');o.t='angsuran';o.kid=kid;o.note='Angsuran '+kk.n}
+else{var nt=val('oke').trim();if(!nt)return emsg('Keterangan wajib diisi.');o.t='lain';o.note=nt}
+if(n<1000)return emsg('Minimal dana keluar Rp1,000.');if(!dt)return emsg('Tanggal wajib diisi.');
+if(kk){o.red=Math.min(kk.sisa,n);kk.sisa-=o.red}
+DB.O.push(o);save();cls();draw();toast('Dana keluar tersimpan')}
+
 /* ===== Kreditur ===== */
 function kdet(id){var k=DB.K.filter(function(x){return x.id===id})[0];if(!k)return;var s=kst(k),p=k.pl>0?Math.max(0,100*(k.pl-k.sisa)/k.pl):0;
 sheet('<div class="who"><span class="av">'+esc(ini(k.n))+'</span><div><h3>'+esc(k.n)+'</h3></div><span class="tag '+s+'" style="margin-left:auto">'+s+'</span></div><p>'+esc(k.j)+'</p><div class="prog"><div style="width:'+p+'%"></div></div><small style="color:var(--mu)">'+Math.round(p)+'% pokok sudah dilunasi</small>'+
@@ -443,7 +458,7 @@ function hapusK(id){if(!confirm('Hapus kreditur ini?'))return;DB.K=DB.K.filter(f
 function backup(){sheet('<h3>Cadangan data</h3><p>Salin teks ini dan simpan di tempat aman. Untuk memulihkan, tempel teks cadangan lalu tekan Pulihkan.</p><textarea class="fm" id="bk" rows="8" style="font-size:12px">'+esc(JSON.stringify(DB))+'</textarea><div class="err" id="err"></div><button class="btn" onclick="salin()">Salin</button><button class="btn g" onclick="pulih()">Pulihkan dari teks</button><button class="btn g" onclick="cls()">Tutup</button>')}
 function salin(){var e=document.getElementById('bk');e.select();try{navigator.clipboard.writeText(e.value).then(function(){toast('Cadangan tersalin')},function(){toast('Tekan lama lalu salin manual')})}catch(x){toast('Tekan lama lalu salin manual')}}
 function pulih(){try{var o=JSON.parse(val('bk'));if(!Array.isArray(o.D)||!Array.isArray(o.K)||!Array.isArray(o.T))throw 0;
-if(!confirm('Ganti semua data saat ini dengan cadangan ini?'))return;DB=o;save();cls();draw();toast('Data dipulihkan')}catch(e){emsg('Teks cadangan tidak valid.')}}
+if(!confirm('Ganti semua data saat ini dengan cadangan ini?'))return;o.O=Array.isArray(o.O)?o.O:[];DB=o;save();cls();draw();toast('Data dipulihkan')}catch(e){emsg('Teks cadangan tidak valid.')}}
 
 /* ===== Akun ===== */
 function b64(b){return btoa(String.fromCharCode.apply(null,new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
@@ -738,7 +753,7 @@ if(AC.state==='running')clingPlay(d);else AC.resume().then(function(){clingPlay(
 var SYK='kosfa-syn',SYN={},SY={on:0,q:0,qf:0,msg:'',tm:0};
 try{SYN=JSON.parse(ls(SYK)||'{}')||{}}catch(e){SYN={}}
 function sOk(id){return /^[A-Za-z0-9][A-Za-z0-9._-]{0,35}$/.test(String(id))}
-function sRecs(){var m={};[['D',DB.D],['K',DB.K],['T',DB.T]].forEach(function(p){p[1].forEach(function(x){if(x&&sOk(x.id))m[x.id]={k:p[0],j:JSON.stringify(x)}})});return m}
+function sRecs(){var m={};[['D',DB.D],['K',DB.K],['T',DB.T],['O',DB.O]].forEach(function(p){p[1].forEach(function(x){if(x&&sOk(x.id))m[x.id]={k:p[0],j:JSON.stringify(x)}})});return m}
 function sHd(){return{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'}}
 function sMsg(c){return c===404?'Tabel "'+AW.st+'" belum dibuat di Appwrite.':(c===401||c===403)?'Izin tabel "'+AW.st+'" belum diatur.':'Tidak bisa terhubung ke server.'}
 function syncTxt(){return SY.msg||'Belum tersinkron.'}
@@ -769,9 +784,9 @@ else if(s){if(o&&s.j===o.j)op=['x',id];else t=s}
 else if(o)op=['x',id];
 if(t){res.push(t);if(s&&t.j===s.j)SYN[id]=s}else if(!op)delete SYN[id];
 if(op)ops.push(op)});
-if(full){var nd={D:[],K:[],T:[]};['D','K','T'].forEach(function(k){DB[k].forEach(function(x){if(!(x&&sOk(x.id)))nd[k].push(x)})});
+if(full){var nd={D:[],K:[],T:[],O:[]};['D','K','T','O'].forEach(function(k){DB[k].forEach(function(x){if(!(x&&sOk(x.id)))nd[k].push(x)})});
 res.forEach(function(t){nd[t.k].push(JSON.parse(t.j))});var ns=JSON.stringify(nd);
-if(ns!==JSON.stringify({D:DB.D,K:DB.K,T:DB.T})){DB=nd;lw(KEY,ns);chg=true}}
+if(ns!==JSON.stringify({D:DB.D,K:DB.K,T:DB.T,O:DB.O})){DB=nd;lw(KEY,ns);chg=true}}
 for(var i=0;i<ops.length;i++){var o2=ops[i],r2=await sOp(o2);
 if(r2===true){if(o2[0]==='x')delete SYN[o2[1]];else SYN[o2[1]]=o2[2]}else{bad++;code=r2}}
 SY.msg=bad?(code===404||code===401||code===403?sMsg(code)+' (kode '+code+')':'Sebagian perubahan belum terkirim (kode '+code+'). Kolom body di Appwrite mungkin terlalu kecil.'):'Tersinkron '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'. '+(full?'Baris di server: '+Object.keys(srv).length+'. ':'')+'Dikirim: '+(ops.length-bad)+(chg?'. Data di perangkat ini diperbarui dari server.':'.');
@@ -796,6 +811,10 @@ function hapusS(id,k){if(!canAdmin())return toast('Hanya admin yang bisa menguba
 if(k==='d'){var d=DB.D.filter(function(x){return x.id===id})[0];if(!d)return;
 if(!confirm('Hapus pencairan ini? Debitur '+d.n+' beserta riwayat angsurannya ikut terhapus, dan seluruh data kas dihitung ulang. Tindakan ini tidak bisa dibatalkan.'))return swc();
 DB.D=DB.D.filter(function(x){return x.id!==id});DB.T=DB.T.filter(function(t){return t.did!==id});save();draw();return toast('Pencairan dan debitur dihapus. Data kas diperbarui')}
+if(k==='o'){var o=DB.O.filter(function(x){return x.id===id})[0];if(!o)return;
+if(!confirm('Hapus dana keluar ini?'+(o.kid?' Sisa kewajiban kreditur dikembalikan,':'')+' kas dihitung ulang.'))return swc();
+if(o.kid){var kk=DB.K.filter(function(x){return x.id===o.kid})[0];if(kk)kk.sisa=Math.min(kk.pl,kk.sisa+(o.red||0))}
+DB.O=DB.O.filter(function(x){return x.id!==id});save();draw();return toast('Dana keluar dihapus. Data kas diperbarui')}
 var t=DB.T.filter(function(x){return x.id===id})[0];if(!t)return;
 if(!confirm(t.kid?'Hapus transaksi ini? Data kreditur yang terkait juga ikut terhapus, dan kas dihitung ulang.':'Hapus transaksi ini? Kas masuk, kas bersih, dan sisa tagihan debitur akan dihitung ulang.'))return swc();
 if(t.kid)DB.K=DB.K.filter(function(k){return k.id!==t.kid});DB.T=DB.T.filter(function(x){return x.id!==id});save();draw();toast('Transaksi dihapus. Data kas diperbarui')}
