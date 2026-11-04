@@ -161,6 +161,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .hcd{position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 12px 4px rgba(255,255,255,.32)}
 .hcx{grid-column:2;position:relative;height:16px;margin-top:10px}.hcx span{position:absolute;transform:translateX(-50%);font-size:10.5px;color:#8B8FA5;white-space:nowrap}
 .hcl{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:#B7BBCF;margin-top:12px}.hcl span{display:inline-flex;align-items:center;gap:6px}.hcl i{width:14px;height:6px;border-radius:3px;display:block}
+.dvg{position:relative}.hcv{position:absolute;font-size:10px;font-weight:600;line-height:1;white-space:nowrap;pointer-events:none;text-shadow:0 0 3px rgba(20,22,35,.95),0 0 3px rgba(20,22,35,.95)}
 </style>
 <style id="pcs" media="(min-width:900px)">
 /* ===== Mode PC (layar lebar >= 900px, atau dipaksa lewat tab Admin) ===== */
@@ -182,7 +183,7 @@ body{display:block}
 .wal .grid:not(.g2) .st{padding:4px 12px}
 .wal .grid:not(.g2) .st+.st{border-left:1px solid var(--ln)}
 #cm{max-width:360px}
-.bars{height:230px}.bp{height:196px}.hcp{height:240px}.hcf button{font-size:11.5px;padding:5px 12px}.hcw{grid-template-columns:56px minmax(0,1fr)}.hcy span,.hcx span{font-size:11.5px}
+.bars{height:230px}.bp{height:196px}.hcp{height:240px}.hcv{font-size:11px}.hcf button{font-size:11.5px;padding:5px 12px}.hcw{grid-template-columns:56px minmax(0,1fr)}.hcy span,.hcx span{font-size:11.5px}
 #lst{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:32px}
 #lst>p{grid-column:1/-1}
 .row,button.row,.st,.chips button,.btn,.lk,.nm{transition:background .15s,opacity .15s}
@@ -307,17 +308,20 @@ mx=Math.max.apply(null,q.IN.concat(q.OUT)),step=hcNice((mx||1e6)/4),top=step*4,X
 sI=q.IN.reduce(function(a,b){return a+b},0),sO=q.OUT.reduce(function(a,b){return a+b},0),net=sI-sO,i,j,
 ttl={w:'Cash flow 7 hari terakhir',b:'Cash flow 30 hari terakhir',a:'Cash flow semua waktu'}[r],
 SR=[{n:'Kas masuk',v:q.IN,t:sI,c:['#00C8FF','#1FE0A5','#B5E61D']},{n:'Kas keluar',v:q.OUT,t:sO,c:['#FFB200','#FF5E7E','#E02BD8']}],
-defs='',g='',ln='',dots='',yl='',xl='',lg='';
+defs='',g='',ln='',dots='',yl='',xl='',lg='',mk='',dl='';
 SR.forEach(function(s,k){defs+='<linearGradient id="hcg'+k+'" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="'+W+'" y2="0">'+s.c.map(function(c,x){return '<stop offset="'+(x/(s.c.length-1))+'" stop-color="'+c+'"/>'}).join('')+'</linearGradient>';
 ln='<path d="'+hsp(s.v.map(function(v,i){return [X(i),Y(v)]}))+'" fill="none" stroke="url(#hcg'+k+')" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+ln;
 dots+='<i class="hcd" style="left:100%;top:'+(Y(s.v[n-1])/H*100).toFixed(2)+'%" title="'+s.n+': '+rp(s.v[n-1])+'"></i>';
+var lx=1e9,j2;for(j2=n-1;j2>=0;j2--){var v=s.v[j2],px=X(j2),py=Y(v);
+if(n<=14||v>0)mk+='<path d="M'+f(px)+','+f(py)+'h.01" stroke="'+s.c[1]+'" stroke-width="9" stroke-linecap="round" vector-effect="non-scaling-stroke"><title>'+s.n+' · '+(r==='a'?mlab(q.K[j2]):fd(q.K[j2]))+': '+rp(v)+'</title></path><path d="M'+f(px)+','+f(py)+'h.01" stroke="#2C2E3F" stroke-width="3.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+if(v>0&&lx-px>=38){lx=px;var yy=py/H*100,bl=k===0?yy<14:yy>86;dl+='<span class="hcv" style="left:'+(px/W*100).toFixed(2)+'%;top:'+yy.toFixed(2)+'%;color:'+s.c[1]+';transform:translate(-50%,'+(bl?'60%':'-165%')+')">'+hcSh(v)+'</span>'}}
 lg+='<span><i style="background:linear-gradient(90deg,'+s.c.join(',')+')"></i>'+s.n+' '+rp(s.t)+'</span>'});
 for(j=0;j<=4;j++){g+='M0,'+f(j*H/4)+'H'+W;yl+='<span style="top:'+(j*25)+'%">'+hcSh(top-j*step)+'</span>'}
 var sv=n<=12?1:Math.ceil((n-1)/12);for(i=0;i<n;i++){if((n-1-i)%sv===0)g+='M'+f(X(i))+',0V'+H}
 for(i=0;i<n;i++)if(q.LB[i])xl+='<span style="left:'+(X(i)/W*100).toFixed(2)+'%">'+q.LB[i]+'</span>';
 var bt=[['w','Minggu'],['b','Bulan'],['a','Semua waktu']].map(function(x){return '<button type="button" class="'+(r===x[0]?'on':'')+'" onclick="hcSet(\''+x[0]+'\')">'+x[1]+'</button>'}).join('');
 return '<div class="sec sb" id="hcs"><h2>'+ttl+'</h2><div class="hc"><div class="hch"><div class="hcn"><small>Kas bersih</small><b style="color:'+(net>=0?'#3CCBA5':'#FF6B6B')+'">'+(net>=0?'+':'')+rp(net)+'</b></div><div class="hcf" role="group" aria-label="Rentang waktu">'+bt+'</div></div>'+
-'<div class="hcw"><div class="hcy">'+yl+'</div><div class="hcp"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="'+ttl+'"><defs>'+defs+'</defs><path d="'+g+'" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1" vector-effect="non-scaling-stroke"/>'+ln+'</svg>'+dots+'</div><div class="hcx">'+xl+'</div></div><div class="hcl">'+lg+'</div></div></div>'}
+'<div class="hcw"><div class="hcy">'+yl+'</div><div class="hcp"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="'+ttl+'"><defs>'+defs+'</defs><path d="'+g+'" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1" vector-effect="non-scaling-stroke"/>'+ln+mk+'</svg>'+dots+dl+'</div><div class="hcx">'+xl+'</div></div><div class="hcl">'+lg+'</div></div></div>'}
 function hcSet(r){S.cr=r;var e=document.getElementById('hcs');if(e)e.outerHTML=hcSec()}
 function home(){var l=L(),ak=l.filter(function(d){return d.st!=='Lunas'}),tl=l.filter(function(d){return d.st==='Telat'}),F2=flow(),mx=Math.max.apply(null,F2.IN.concat(F2.OUT))||1;
 function cnt(s){return l.filter(function(d){return d.st===s}).length}
@@ -639,6 +643,15 @@ U.t=75;U.msg='Memuat pengajuan pinjaman…';
 await auWait(function(){return RQ.busy});RQ.rows=null;await rqLoad();
 if(AU.up!==U)return;if(RQ.err){clearInterval(tk);return fail(RQ.err)}
 U.t=100;U.msg='Menyelesaikan…'}
+async function devAddAdmin(){var el=document.getElementById('ae'),em=((el&&el.value)||'').trim().toLowerCase();
+if(!DV.rows)return toast('Data pengguna belum dimuat. Tunggu sebentar.');
+if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return emsg('Format email belum benar.');
+if(em===DEVMAIL)return emsg('Akun developer sudah punya akses penuh.');
+if((DV.roles||{})[em])return emsg('Email ini sudah menjadi admin.');
+if(!confirm('Jadikan '+em+' sebagai Admin? Bisa membuka tab Admin, mengubah data, dan data tersinkron ke server.'))return;
+try{var r=await fetch(awUrlT(AW.rt),{method:'POST',headers:awH(),body:JSON.stringify({rowId:'unique()',data:{email:em,role:'admin'}})});
+if(!r.ok)return emsg('Gagal menambah admin ('+r.status+'). Cek permission table roles.');
+var j=await r.json();DV.roles=DV.roles||{};DV.roles[em]=j.$id;draw();toast(em+' kini Admin')}catch(e){emsg('Tidak bisa terhubung ke Appwrite.')}}
 async function devRole(i){var em=(DV.ul||[])[i];if(!em||em===DEVMAIL)return;var adm=!!(DV.roles||{})[em];
 if(!confirm(adm?'Ubah '+em+' menjadi Nasabah? Akses tab Admin dan edit cash flow dicabut.':'Jadikan '+em+' sebagai Admin? Bisa membuka tab Admin dan mengubah cash flow.'))return;
 try{var h=awH();var r;
@@ -658,6 +671,7 @@ var d='M'+f(P[0][0])+','+f(P[0][1]);
 for(i=0;i<n-1;i++){var dx=(P[i+1][0]-P[i][0])/3;d+='C'+f(P[i][0]+dx)+','+f(P[i][1]+m[i]*dx)+' '+f(P[i+1][0]-dx)+','+f(P[i+1][1]-m[i+1]*dx)+' '+f(P[i+1][0])+','+f(P[i+1][1])}
 return d}
 var defs='',grid='M',areas='',lines='',marks='',leg='',lab='',i,j;
+var dn=[];for(i=0;i<7;i++){var d0=new Date(t0);d0.setDate(d0.getDate()-(6-i));dn.push(d0.getDate()+' '+BLN[d0.getMonth()])}
 S.forEach(function(q,k){var st=q.c.map(function(c,x){return '<stop offset="'+(x/(q.c.length-1))+'" stop-color="'+c+'"/>'}).join('');
 defs+='<linearGradient id="dvs'+k+'" gradientUnits="userSpaceOnUse" x1="'+PX+'" y1="0" x2="'+(W-PX)+'" y2="0">'+st+'</linearGradient>'+
 '<linearGradient id="dva'+k+'" gradientUnits="userSpaceOnUse" x1="0" y1="'+PY+'" x2="0" y2="'+(H-PY)+'"><stop offset="0" stop-color="'+q.c[1]+'" stop-opacity=".42"/><stop offset="1" stop-color="'+q.c[1]+'" stop-opacity="0"/></linearGradient>';
@@ -668,11 +682,13 @@ for(j=0;j<5;j++)grid+=PX+','+f(PY+j*bh/4)+'H'+(W-PX)+'M';
 grid='<path d="'+grid.slice(0,-1)+'" fill="none" stroke="rgba(255,255,255,.11)" stroke-width="1" vector-effect="non-scaling-stroke"/>';
 [2,1,0].forEach(function(k){var q=S[k];areas+='<path d="'+q.d+'L'+f(X(6))+','+(H-PY)+'L'+f(X(0))+','+(H-PY)+'Z" fill="url(#dva'+k+')"/>';
 lines+='<path d="'+q.d+'" fill="none" stroke="url(#dvs'+k+')" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
-if(q.t){var pk=q.v.indexOf(Math.max.apply(null,q.v)),mx0=f(q.P[pk][0]),my0=f(q.P[pk][1]);
-marks+='<path d="M'+mx0+','+my0+'h.01" stroke="'+q.c[1]+'" stroke-width="13" stroke-linecap="round" vector-effect="non-scaling-stroke"><title>'+q.n+': '+q.v[pk]+' login</title></path><path d="M'+mx0+','+my0+'h.01" stroke="#2F3445" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'}});
+q.v.forEach(function(v,i){var px=f(q.P[i][0]),py=f(q.P[i][1]);marks+='<path d="M'+px+','+py+'h.01" stroke="'+q.c[1]+'" stroke-width="10" stroke-linecap="round" vector-effect="non-scaling-stroke"><title>'+q.n+' · '+dn[i]+': '+v+' login</title></path><path d="M'+px+','+py+'h.01" stroke="#2F3445" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'})});
+var dl='';for(i=0;i<7;i++){var T=S[0].v[i];if(T>0){var itm=[{k:0,v:T,y:S[0].P[i][1],up:1}],B=S[1].v[i],P2=S[2].v[i];
+if(B>0&&B!==T)itm.push({k:1,v:B,y:S[1].P[i][1]});if(P2>0&&P2!==T&&P2!==B)itm.push({k:2,v:P2,y:S[2].P[i][1]});
+var dwn=0;itm.forEach(function(o){var yy=o.y/H*100,bl=!o.up,ox=bl?(dwn++*12):0;dl+='<span class="hcv" style="left:'+(X(i)/W*100).toFixed(2)+'%;top:'+yy.toFixed(2)+'%;color:'+S[o.k].c[1]+';transform:translate(-50%,calc('+(bl?'60%':'-165%')+' + '+ox+'px))">'+o.v+'</span>'})}}
 var hr=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
 for(i=0;i<7;i++){var dd=new Date(t0);dd.setDate(dd.getDate()-(6-i));lab+='<span style="left:'+(X(i)/W*100).toFixed(2)+'%">'+hr[dd.getDay()]+'</span>'}
-return '<div class="dvc"><div class="dvt"><b>Login 7 hari terakhir</b><div class="dvl">'+leg+'</div></div><div class="dvp"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Grafik login 7 hari terakhir"><defs>'+defs+'</defs>'+grid+areas+lines+marks+'</svg><div class="dvx">'+lab+'</div></div></div>'}
+return '<div class="dvc"><div class="dvt"><b>Login 7 hari terakhir</b><div class="dvl">'+leg+'</div></div><div class="dvp"><div class="dvg"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Grafik login 7 hari terakhir"><defs>'+defs+'</defs>'+grid+areas+lines+marks+'</svg>'+dl+'</div><div class="dvx">'+lab+'</div></div></div>'}
 function devTab(){var hd='<div class="hd"><h1>Developer</h1><p>Pantau login dan kelola peran pengguna</p></div>',
 bdg='<span class="tag" style="background:#1E6FD9;color:#fff;display:inline-block;margin-top:6px">Developer</span>',
 acc='<small>Account Panel</small><b style="display:block;font-size:16px;margin-top:2px;word-break:break-all">'+esc(A.email)+'</b>'+bdg;
@@ -696,7 +712,7 @@ loginBox='<div class="sec sc"><h2>Login terbaru</h2>'+(DV.rows?(list||'<p style=
 var chart=dvChart(R);
 return hd+'<div class="wal walrow dvh"><div class="accinfo">'+acc+'</div><div class="grid g2"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?ul.length:'…')+'</b>Pengguna</div></div>'+(DV.rows?chart:'')+'</div>'+
 capBox()+
-'<div class="sec sg"><h2>Pengguna dan peran</h2>'+(DV.err?'<div class="err">'+esc(DV.err)+'</div>':'')+(DV.rows?pl:'<p style="color:var(--mu)">Memuat data…</p>')+'</div>'+
+'<div class="sec sg"><h2>Pengguna dan peran</h2><label class="fl" for="ae" style="margin-top:0">Tambah admin lewat email</label><div style="display:flex;gap:8px;align-items:stretch"><input class="fm" id="ae" type="email" inputmode="email" autocomplete="off" placeholder="nama@email.com" style="margin-top:4px" onkeydown="if(event.key===\'Enter\'){event.preventDefault();devAddAdmin()}"><button type="button" class="btn" style="width:auto;margin:4px 0 0;padding:0 16px;white-space:nowrap" onclick="devAddAdmin()">Tambah Admin</button></div><div class="err" id="err"></div>'+(DV.err?'<div class="err">'+esc(DV.err)+'</div>':'')+(DV.rows?pl:'<p style="color:var(--mu)">Memuat data…</p>')+'</div>'+
 loginBox+
 '<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data disimpan di perangkat ini dan disinkronkan ke Appwrite. '+syncTxt()+' Salin cadangan secara berkala agar aman.</p><div class="actrow"><button class="btn g" onclick="syncNow(1,1)">Sinkronkan sekarang</button><button class="btn g" onclick="backup()">Buka cadangan data</button></div></div>'}
 
