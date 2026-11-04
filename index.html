@@ -5,6 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Koperasi Kosfa</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231E6FD9'/%3E%3Cpath d='M20 14V50M20 34L40 16M27 29L42 50' stroke='white' stroke-width='7' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#1E6FD9">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kosfa">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script>
+/* PWA: pakai manifest.webmanifest jika ada; jika tidak, buat manifest bawaan agar tetap bisa di-install */
+(function(){
+function ic(n){try{var c=document.createElement('canvas');c.width=c.height=n;var x=c.getContext('2d');x.fillStyle='#1E6FD9';x.fillRect(0,0,n,n);var f=n*.6/64,o=n*.2;x.strokeStyle='#fff';x.lineWidth=7*f;x.lineCap=x.lineJoin='round';x.beginPath();[[20,14,20,50],[20,34,40,16],[27,29,42,50]].forEach(function(q){x.moveTo(o+q[0]*f,o+q[1]*f);x.lineTo(o+q[2]*f,o+q[3]*f)});x.stroke();return c.toDataURL('image/png')}catch(e){return ''}}
+function fb(){var l=document.querySelector('link[rel=manifest]'),b=location.href.split('#')[0].split('?')[0],i1=ic(192),i2=ic(512);if(!l||!i1)return;
+var m={id:b,name:'Koperasi Kosfa',short_name:'Kosfa',start_url:b,scope:b.replace(/[^\/]*$/,''),display:'standalone',orientation:'any',background_color:'#F5F5F5',theme_color:'#1E6FD9',lang:'id',icons:[{src:i1,sizes:'192x192',type:'image/png',purpose:'any'},{src:i2,sizes:'512x512',type:'image/png',purpose:'any'},{src:i1,sizes:'192x192',type:'image/png',purpose:'maskable'},{src:i2,sizes:'512x512',type:'image/png',purpose:'maskable'}]};
+l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'}))}
+window.addEventListener('DOMContentLoaded',function(){
+try{fetch('manifest.webmanifest',{cache:'no-store'}).then(function(r){if(!r.ok)throw 0}).catch(fb)}catch(e){fb()}
+try{if('serviceWorker' in navigator&&location.protocol==='https:'||location.hostname==='localhost')navigator.serviceWorker.register('sw.js').catch(function(){})}catch(e){}});
+})();
+</script>
 <style>
 :root{--or:#1E6FD9;--or2:#1FB58A;--bg:#F5F5F5;--card:#fff;--tx:#222;--mu:#757575;--ln:#EAEAEA;--ok:#1B9A7A;--no:#D0011B;--wn:#C77700;--kb:#B8C4D6;--sN-bg:#F1EFE8;--sN-tx:#444441;--sB-bg:#E6F1FB;--sB-tx:#0C447C;--sG-bg:#EAF3DE;--sG-tx:#27500A;--sC-bg:#FAECE7;--sC-tx:#4A1B0C;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
