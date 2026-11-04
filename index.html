@@ -41,10 +41,15 @@ body{background:var(--bg);color:var(--tx);font-family:"Inter","Segoe UI",Roboto,
 .walrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px 28px}
 .walrow .accinfo{min-width:180px}
 .walrow.dvh{justify-content:flex-start;flex-wrap:wrap;gap:14px 22px;overflow:hidden}
-.dvh .dvc{flex:1 1 150px;min-width:130px;align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;margin:-14px -14px -14px 0}
-#app>.wal.dvh .dvc{margin:-24px -28px -24px 0}
-.dvc svg{width:100%;height:84px;display:block}
-.dvc small{font-size:10.5px;padding:0 6px 6px 0;text-align:right}
+.dvh .dvc{flex:1 1 100%;min-width:0;margin:0;background:#2F3445;color:#D9DCE8;border-radius:10px;padding:12px 14px 10px}
+.dvt{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 14px;margin-bottom:8px}
+.dvt b{font-size:12.5px;font-weight:600;color:#fff}
+.dvl{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:#B7BCCF}
+.dvl span{display:inline-flex;align-items:center;gap:5px}
+.dvl i{width:14px;height:6px;border-radius:3px;display:block}
+.dvp svg{width:100%;height:160px;display:block}
+.dvx{position:relative;height:16px;margin-top:6px}
+.dvx span{position:absolute;top:0;transform:translateX(-50%);font-size:10.5px;color:#9AA0B4;white-space:nowrap}
 .akb{display:flex;align-items:center;gap:10px}.akb .btn{width:auto;min-width:0;margin:0;padding:6px 12px;font-size:12.5px}
 .akk{display:flex;justify-content:center;margin-top:12px}.akk .btn{width:auto;min-width:170px;margin:0}
 .capr{display:flex;justify-content:flex-end}.capr .btn{width:auto;min-width:170px}
@@ -417,10 +422,17 @@ function applyView(){var m=viewMode(),a=document.getElementById('pcs'),b=documen
 if(a)a.media=m==='pc'?'all':m==='hp'?'not all':'(min-width:900px)';
 if(b)b.media=m==='hp'?'not all':'(min-width:1500px)';
 if(vp)vp.setAttribute('content',m==='pc'?pcVp():'width=device-width, initial-scale=1, viewport-fit=cover')}
-function pcVp(){var l=window.matchMedia&&matchMedia('(orientation:landscape)').matches,sw=screen.width||0,sh=screen.height||0,w=l?Math.max(sw,sh):Math.min(sw,sh),W=1100;
+function isLand(){try{if(screen.orientation&&screen.orientation.type)return screen.orientation.type.indexOf('landscape')===0}catch(e){}
+if(typeof window.orientation==='number')return Math.abs(window.orientation)===90;
+return !!(window.matchMedia&&matchMedia('(orientation:landscape)').matches)}
+function pcVp(){var l=isLand(),sw=screen.width||0,sh=screen.height||0,w=l?Math.max(sw,sh):Math.min(sw,sh),W=1100;
 if(!w||w>=W)return 'width=device-width, initial-scale=1, viewport-fit=cover';var sc=Math.floor(w/W*1000)/1000;return 'width='+W+', initial-scale='+sc+', minimum-scale='+sc+', viewport-fit=cover'}
-var vpT;function vpRot(){if(viewMode()!=='pc')return;var vp=document.querySelector('meta[name=viewport]');if(!vp)return;vp.setAttribute('content','width=device-width, initial-scale=1, viewport-fit=cover');clearTimeout(vpT);vpT=setTimeout(function(){applyView()},150)}
-window.addEventListener('orientationchange',vpRot);if(window.matchMedia){var oq=matchMedia('(orientation:landscape)');if(oq.addEventListener)oq.addEventListener('change',vpRot);else if(oq.addListener)oq.addListener(vpRot)}
+var vpT=[];function vpRot(){if(viewMode()!=='pc')return;var vp=document.querySelector('meta[name=viewport]');if(!vp)return;
+vp.setAttribute('content','width=device-width, initial-scale=1, viewport-fit=cover');
+vpT.forEach(clearTimeout);vpT=[250,600,1200].map(function(ms){return setTimeout(applyView,ms)})}
+window.addEventListener('orientationchange',vpRot);
+try{if(screen.orientation&&screen.orientation.addEventListener)screen.orientation.addEventListener('change',vpRot)}catch(e){}
+if(window.matchMedia){var oq=matchMedia('(orientation:landscape)');if(oq.addEventListener)oq.addEventListener('change',vpRot);else if(oq.addListener)oq.addListener(vpRot)}
 function setView(m){if(m==='auto'){try{localStorage.removeItem(VK)}catch(e){}}else lw(VK,m);applyView();draw();toast(m==='pc'?'Mode PC aktif':m==='hp'?'Mode HP aktif':'Mode otomatis aktif')}
 applyView();
 var DV={rows:null,total:0,busy:false,err:'',seeAll:false,shown:20};
@@ -538,6 +550,32 @@ else r=await fetch(awUrlT(AW.rt),{method:'POST',headers:h,body:JSON.stringify({r
 if(!r.ok)return toast('Gagal mengubah peran ('+r.status+'). Cek permission table roles.');
 if(adm)delete DV.roles[em];else{var j=await r.json();DV.roles[em]=j.$id}
 draw();toast(adm?em+' kini Nasabah':em+' kini Admin')}catch(e){toast('Tidak bisa terhubung ke Appwrite.')}}
+function dvChart(R){
+var W=300,H=160,PX=14,PY=16,t0=new Date();t0.setHours(0,0,0,0);
+var S=[{n:'Total',v:[0,0,0,0,0,0,0],c:['#00B4F0','#2EE6A8','#FFD05A']},{n:'Biometrik',v:[0,0,0,0,0,0,0],c:['#FFB88C','#FF6B7A','#FF3C78']},{n:'Password',v:[0,0,0,0,0,0,0],c:['#6A00FF','#B31AF0','#FF2BC8']}];
+R.forEach(function(x){var d=new Date(x.$createdAt);if(isNaN(d))return;d.setHours(0,0,0,0);var k=Math.round((t0-d)/864e5);if(k<0||k>=7)return;var i=6-k;S[0].v[i]++;if(x.method==='biometrik')S[1].v[i]++;else if(x.method==='password')S[2].v[i]++});
+var mx=Math.max.apply(null,S[0].v)||1,bw=W-2*PX,bh=H-2*PY,f=function(n){return n.toFixed(1)},X=function(i){return PX+i*bw/6},Y=function(v){return H-PY-v/mx*bh};
+function sp(P){var n=P.length,m=[],i;
+for(i=0;i<n;i++){if(i===0)m[i]=(P[1][1]-P[0][1])/(P[1][0]-P[0][0]);else if(i===n-1)m[i]=(P[i][1]-P[i-1][1])/(P[i][0]-P[i-1][0]);else{var u=P[i][1]-P[i-1][1],w=P[i+1][1]-P[i][1];m[i]=u*w<=0?0:(P[i+1][1]-P[i-1][1])/(P[i+1][0]-P[i-1][0])}}
+var d='M'+f(P[0][0])+','+f(P[0][1]);
+for(i=0;i<n-1;i++){var dx=(P[i+1][0]-P[i][0])/3;d+='C'+f(P[i][0]+dx)+','+f(P[i][1]+m[i]*dx)+' '+f(P[i+1][0]-dx)+','+f(P[i+1][1]-m[i+1]*dx)+' '+f(P[i+1][0])+','+f(P[i+1][1])}
+return d}
+var defs='',grid='M',areas='',lines='',marks='',leg='',lab='',i,j;
+S.forEach(function(q,k){var st=q.c.map(function(c,x){return '<stop offset="'+(x/(q.c.length-1))+'" stop-color="'+c+'"/>'}).join('');
+defs+='<linearGradient id="dvs'+k+'" gradientUnits="userSpaceOnUse" x1="'+PX+'" y1="0" x2="'+(W-PX)+'" y2="0">'+st+'</linearGradient>'+
+'<linearGradient id="dva'+k+'" gradientUnits="userSpaceOnUse" x1="0" y1="'+PY+'" x2="0" y2="'+(H-PY)+'"><stop offset="0" stop-color="'+q.c[1]+'" stop-opacity=".42"/><stop offset="1" stop-color="'+q.c[1]+'" stop-opacity="0"/></linearGradient>';
+q.t=q.v.reduce(function(a,b){return a+b},0);q.P=q.v.map(function(v,i){return [X(i),Y(v)]});q.d=sp(q.P);
+leg+='<span><i style="background:linear-gradient(90deg,'+q.c.join(',')+')"></i>'+q.n+' '+q.t+'</span>'});
+for(i=0;i<7;i++)grid+=f(X(i))+','+PY+'V'+(H-PY)+'M';
+for(j=0;j<5;j++)grid+=PX+','+f(PY+j*bh/4)+'H'+(W-PX)+'M';
+grid='<path d="'+grid.slice(0,-1)+'" fill="none" stroke="rgba(255,255,255,.11)" stroke-width="1" vector-effect="non-scaling-stroke"/>';
+[2,1,0].forEach(function(k){var q=S[k];areas+='<path d="'+q.d+'L'+f(X(6))+','+(H-PY)+'L'+f(X(0))+','+(H-PY)+'Z" fill="url(#dva'+k+')"/>';
+lines+='<path d="'+q.d+'" fill="none" stroke="url(#dvs'+k+')" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+if(q.t){var pk=q.v.indexOf(Math.max.apply(null,q.v)),mx0=f(q.P[pk][0]),my0=f(q.P[pk][1]);
+marks+='<path d="M'+mx0+','+my0+'h.01" stroke="'+q.c[1]+'" stroke-width="13" stroke-linecap="round" vector-effect="non-scaling-stroke"><title>'+q.n+': '+q.v[pk]+' login</title></path><path d="M'+mx0+','+my0+'h.01" stroke="#2F3445" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'}});
+var hr=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+for(i=0;i<7;i++){var dd=new Date(t0);dd.setDate(dd.getDate()-(6-i));lab+='<span style="left:'+(X(i)/W*100).toFixed(2)+'%">'+hr[dd.getDay()]+'</span>'}
+return '<div class="dvc"><div class="dvt"><b>Login 7 hari terakhir</b><div class="dvl">'+leg+'</div></div><div class="dvp"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Grafik login 7 hari terakhir"><defs>'+defs+'</defs>'+grid+areas+lines+marks+'</svg><div class="dvx">'+lab+'</div></div></div>'}
 function devTab(){var hd='<div class="hd"><h1>Developer</h1><p>Pantau login dan kelola peran pengguna</p></div>',
 bdg='<span class="tag" style="background:#1E6FD9;color:#fff;display:inline-block;margin-top:6px">Developer</span>',
 acc='<small>Akun yang sedang login</small><b style="display:block;font-size:16px;margin-top:2px;word-break:break-all">'+esc(A.email)+'</b>'+bdg;
@@ -558,10 +596,7 @@ loginBox='<div class="sec sc"><h2 style="display:flex;justify-content:space-betw
 else{var list=R.slice(0,5).map(lrow).join('');
 loginBox='<div class="sec sc"><h2>Login terbaru</h2>'+(DV.rows?(list||'<p style="color:var(--mu)">Belum ada login tercatat.</p>'):'<p style="color:var(--mu)">Memuat data…</p>')+
 '<div class="secrow" style="margin-top:8px"><div>'+(DV.rows&&R.length>5?'<button class="lk" type="button" style="width:auto;margin:0" onclick="devSeeAll()">See all ('+R.length+')</button>':'')+'</div><div class="sr-r"><button class="btn g" onclick="devRefresh()">Muat ulang</button></div></div></div>'}
-var days=[],cnt=[0,0,0,0,0,0,0],t0=new Date();t0.setHours(0,0,0,0);
-R.forEach(function(x){var d=new Date(x.$createdAt);if(isNaN(d))return;d.setHours(0,0,0,0);var k=Math.round((t0-d)/864e5);if(k>=0&&k<7)cnt[6-k]++});
-var mxc=Math.max.apply(null,cnt)||1,pts=cnt.map(function(v,i){return (i*100/6).toFixed(1)+','+(46-v/mxc*38).toFixed(1)}),
-chart='<div class="dvc"><svg viewBox="0 0 100 50" preserveAspectRatio="none" aria-label="Grafik login 7 hari terakhir"><polygon points="0,50 '+pts.join(' ')+' 100,50" fill="var(--or)" opacity=".15"/><polyline points="'+pts.join(' ')+'" fill="none" stroke="var(--or)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><small>Login 7 hari terakhir</small></div>';
+var chart=dvChart(R);
 return hd+'<div class="wal walrow dvh"><div class="accinfo">'+acc+'</div><div class="grid g2"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?ul.length:'…')+'</b>Pengguna</div></div>'+(DV.rows?chart:'')+'</div>'+
 capBox()+
 '<div class="sec sg"><h2>Pengguna dan peran</h2>'+(DV.err?'<div class="err">'+esc(DV.err)+'</div>':'')+(DV.rows?pl:'<p style="color:var(--mu)">Memuat data…</p>')+'</div>'+
