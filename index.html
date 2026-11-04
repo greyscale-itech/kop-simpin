@@ -771,7 +771,7 @@ res.forEach(function(t){nd[t.k].push(JSON.parse(t.j))});var ns=JSON.stringify(nd
 if(ns!==JSON.stringify({D:DB.D,K:DB.K,T:DB.T})){DB=nd;lw(KEY,ns);chg=true}}
 for(var i=0;i<ops.length;i++){var o2=ops[i],r2=await sOp(o2);
 if(r2===true){if(o2[0]==='x')delete SYN[o2[1]];else SYN[o2[1]]=o2[2]}else{bad++;code=r2}}
-SY.msg=bad?(code===404||code===401||code===403?sMsg(code):'Sebagian perubahan belum terkirim, akan dicoba lagi.'):'Tersinkron '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'.';
+SY.msg=bad?(code===404||code===401||code===403?sMsg(code)+' (kode '+code+')':'Sebagian perubahan belum terkirim (kode '+code+'). Kolom body di Appwrite mungkin terlalu kecil.'):'Tersinkron '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'. '+(full?'Baris di server: '+Object.keys(srv).length+'. ':'')+'Dikirim: '+(ops.length-bad)+(chg?'. Data di perangkat ini diperbarui dari server.':'.');
 if(!SY.mute&&!bad&&(ops.length||man))cling();
 if(chg&&!document.querySelector('.mk'))draw()}
 catch(e){SY.msg=sMsg(e)}
