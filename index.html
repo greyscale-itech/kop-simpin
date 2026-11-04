@@ -360,6 +360,7 @@ function admin(){var K=DB.K,ak=K.filter(function(k){return k.sisa>0}),tot=sum(ak
 function bar(l,v,c){return '<div class="row" style="display:block"><div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">'+l+'</span><b>'+rp(v)+'</b></div><div class="prog"><div style="width:'+v/mx*100+'%;background:'+c+'"></div></div></div>'}
 return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p></div><div class="wal adm"><small>Total kewajiban ke kreditur</small><b class="big">'+rp(tot)+'</b><small style="display:block;margin-top:4px">Angsuran '+rp(ang)+' per bulan</small><div class="grid adg"><div class="st"><b>'+ak.length+'</b>Aktif</div><div class="st"><b>'+jt(ang)+'</b>Angsuran/bln</div><div class="st"><b style="color:var(--ok)">'+(ang?cov.toLocaleString('id-ID',{maximumFractionDigits:1})+'×':'-')+'</b>Cakupan</div><div class="st"><b style="color:var(--or)">'+(K.length-ak.length)+'</b>Lunas</div></div></div>'+
 '<div class="sec sg"><h2>Kelola Keuangan</h2><p style="color:var(--mu);font-size:12.5px">Setujui atau tolak pengajuan pinjaman nasabah, dan catat semua dana masuk (angsuran, modal, dan kreditur baru). Debitur yang disetujui otomatis muncul di tab Debitur, Home, dan Cash flow.</p><div class="actrow"><button class="btn" onclick="rqOpen()">Pengajuan Pinjaman'+(rqPend().length?' ('+rqPend().length+' baru)':'')+'</button><button class="btn gr" onclick="txf()">+ Tambah Dana Masuk</button></div></div>'+
+'<div class="sec sg"><h2>Update Data</h2><div class="secrow"><small style="color:var(--mu)">Muat ulang data debitur, transaksi, dan pengajuan pinjaman.</small><div class="sr-r"><button class="btn" onclick="adminUpdate()"'+(AU.up&&AU.up.run?' disabled':'')+'>'+(AU.up&&AU.up.run?'Memperbarui…':'Update Data')+'</button></div></div>'+upUI(AU.up)+'</div>'+
 '<div class="sec sb"><h2>Piutang debitur vs kewajiban</h2>'+bar('Piutang beredar (debitur)',pit,'var(--or2)')+bar('Kewajiban (kreditur)',tot,'var(--kb)')+'<small style="color:var(--mu)">Cakupan = kas masuk bulan ini dibagi angsuran ke kreditur.</small></div>'+
 '<div class="sec sc"><h2>Pengingat jatuh tempo</h2><p style="color:var(--mu);font-size:12.5px">Daftar tagihan muncul otomatis pukul 07.00 pada tanggal jatuh tempo saat aplikasi terbuka. Notifikasi HP hanya jalan selama aplikasi masih berjalan di latar belakang.</p><div class="row"><span>Notifikasi HP</span><b>'+(window.Notification&&Notification.permission==='granted'?'Aktif':'Belum aktif')+'</b></div><div class="actrow"><button class="btn g" onclick="izinNotif()">Aktifkan notifikasi HP</button><button class="btn g" onclick="cekNotif(true)">Lihat tagihan hari ini</button></div></div>'+
 '<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar: layar lebar memakai tampilan PC, layar kecil memakai tampilan HP.</p>'+'<div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div>'+'<div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+akunSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
@@ -602,8 +603,8 @@ return '<div class="sec sg"><h2>Kapasitas server</h2><div class="secrow"><small 
 r('Catatan login',nL,bL)+r('Peran pengguna',nR,bR)+r('Pengajuan pinjaman',nQ,bQ,!rq)+
 '<div class="row"><span>Total baris</span><b>'+fmt(tn)+'</b></div>'+
 '<small style="display:block;color:var(--mu);font-size:11.5px;margin-top:8px">Angka dihitung dari data yang dimuat, jadi hanya perkiraan. Angka resmi ada di Appwrite Console.</small><div class="capr"><button class="btn g" onclick="capSet()">Atur batas paket (MB)</button></div></div>'}
-function upUI(){var U=DV.up;if(!U)return '';
-if(U.ok)return '<div class="upw"><div class="upok" role="status"><svg class="okc" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16"/><path d="M11 18.5l5 5 9-10.5"/></svg><div>Data server diperbarui<small style="display:block;color:var(--mu);font-weight:400;font-size:11.5px;margin-top:2px">'+esc(U.at)+'</small></div></div></div>';
+function upUI(U){U=U||DV.up;if(!U)return '';
+if(U.ok)return '<div class="upw"><div class="upok" role="status"><svg class="okc" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16"/><path d="M11 18.5l5 5 9-10.5"/></svg><div>'+esc(U.txt||'Data server diperbarui')+'<small style="display:block;color:var(--mu);font-weight:400;font-size:11.5px;margin-top:2px">'+esc(U.at)+'</small></div></div></div>';
 return '<div class="upw"><div class="upb" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(U.p)+'"><div id="upf" style="width:'+U.p+'%"></div></div><div class="upl"><span id="upt">'+esc(U.msg)+'</span><span id="upp">'+Math.round(U.p)+'%</span></div></div>'}
 async function devUpdate(){if(DV.up&&DV.up.run)return;
 var U=DV.up={run:1,p:0,t:8,msg:'Menghubungi server…'};draw();
@@ -619,6 +620,24 @@ if(DV.up!==U)return;if(DV.err){clearInterval(tk);return fail(DV.err||'Gagal memp
 U.t=75;U.msg='Memuat pengajuan pinjaman…';
 await rqLoad();
 if(DV.up!==U)return;if(RQ.err){clearInterval(tk);return fail(RQ.err)}
+U.t=100;U.msg='Menyelesaikan…'}
+var AU={up:null};
+function auWait(f){return new Promise(function(ok){(function w(){f()?setTimeout(w,80):ok()})()})}
+async function adminUpdate(){if(AU.up&&AU.up.run)return;
+var U=AU.up={run:1,p:0,t:8,msg:'Menghubungi…',txt:'Data diperbarui'};draw();
+function fail(m){if(AU.up===U)AU.up=null;SY.mute=0;draw();toast(m)}
+function fin(){U.run=0;U.ok=true;U.at='Diperbarui pukul '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});draw();cling(.42);setTimeout(function(){if(AU.up===U){AU.up=null;if(AUTH&&S.tab==='kre')draw()}},4000)}
+var tk=setInterval(function(){if(AU.up!==U){clearInterval(tk);return}
+U.p=Math.min(U.t,U.p+Math.max(.4,(U.t-U.p)*.1));
+var f=document.getElementById('upf');if(f)f.style.width=U.p+'%';var pp=document.getElementById('upp');if(pp)pp.textContent=Math.round(U.p)+'%';var m=document.getElementById('upt');if(m)m.textContent=U.msg;
+if(U.t>=100&&U.p>=100){clearInterval(tk);SY.mute=0;fin()}},50);
+U.t=40;U.msg='Memuat data debitur dan transaksi…';SY.mute=1;
+await auWait(function(){return SY.on});
+await syncNow(1);await auWait(function(){return SY.on});
+if(AU.up!==U)return;if(SY.msg.indexOf('Tersinkron')!==0){clearInterval(tk);return fail(SY.msg||'Gagal memperbarui data.')}
+U.t=75;U.msg='Memuat pengajuan pinjaman…';
+await auWait(function(){return RQ.busy});RQ.rows=null;await rqLoad();
+if(AU.up!==U)return;if(RQ.err){clearInterval(tk);return fail(RQ.err)}
 U.t=100;U.msg='Menyelesaikan…'}
 async function devRole(i){var em=(DV.ul||[])[i];if(!em||em===DEVMAIL)return;var adm=!!(DV.roles||{})[em];
 if(!confirm(adm?'Ubah '+em+' menjadi Nasabah? Akses tab Admin dan edit cash flow dicabut.':'Jadikan '+em+' sebagai Admin? Bisa membuka tab Admin dan mengubah cash flow.'))return;
@@ -737,7 +756,7 @@ if(ns!==JSON.stringify({D:DB.D,K:DB.K,T:DB.T})){DB=nd;lw(KEY,ns);chg=true}}
 for(var i=0;i<ops.length;i++){var o2=ops[i],r2=await sOp(o2);
 if(r2===true){if(o2[0]==='x')delete SYN[o2[1]];else SYN[o2[1]]=o2[2]}else{bad++;code=r2}}
 SY.msg=bad?(code===404||code===401||code===403?sMsg(code):'Sebagian perubahan belum terkirim, akan dicoba lagi.'):'Tersinkron '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'.';
-if(!bad&&(ops.length||man))cling();
+if(!SY.mute&&!bad&&(ops.length||man))cling();
 if(chg&&!document.querySelector('.mk'))draw()}
 catch(e){SY.msg=sMsg(e)}
 lw(SYK,JSON.stringify(SYN));SY.on=0;
