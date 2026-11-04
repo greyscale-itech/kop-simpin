@@ -747,7 +747,8 @@ async function sFetch(){var out={},cur=null;for(;;){var q=new URLSearchParams();
 var r=await fetch(awUrlT(AW.st,'?'+q.toString()),{headers:{'X-Appwrite-Project':AW.pj}});if(!r.ok)throw r.status;var p=(await r.json()).rows||[];
 p.forEach(function(x){out[x.$id]={k:x.kind,j:x.body}});if(p.length<100)return out;cur=p[p.length-1].$id}}
 async function sOp(o){var id=o[1],v=o[2],r;
-if(o[0]==='x'){r=await fetch(awUrlT(AW.st,'/'+id),{method:'DELETE',headers:sHd()});return(r.ok||r.status===404)?true:r.status}
+if(o[0]==='x'){var tb={kind:'X',body:'{"x":1}'};r=await fetch(awUrlT(AW.st,'/'+id),{method:'PATCH',headers:sHd(),body:JSON.stringify({data:tb})});if(r.ok)return true;if(r.status!==404)return r.status;
+r=await fetch(awUrlT(AW.st),{method:'POST',headers:sHd(),body:JSON.stringify({rowId:id,data:tb})});return(r.ok||r.status===409)?true:r.status}
 var d={kind:v.k,body:v.j};
 if(o[0]==='u'){r=await fetch(awUrlT(AW.st,'/'+id),{method:'PATCH',headers:sHd(),body:JSON.stringify({data:d})});if(r.ok)return true;if(r.status!==404)return r.status}
 r=await fetch(awUrlT(AW.st),{method:'POST',headers:sHd(),body:JSON.stringify({rowId:id,data:d})});if(r.ok)return true;
@@ -761,9 +762,11 @@ if(full&&!Object.keys(srv).length&&Object.keys(SYN).length)SYN={};
 var loc=sRecs(),ids={},ops=[],res=[];
 [loc,srv,SYN].forEach(function(m){Object.keys(m).forEach(function(i){ids[i]=1})});
 Object.keys(ids).forEach(function(id){var l=loc[id],s=srv[id],o=SYN[id],t=null,op=null;
+if(s&&s.k==='X'){delete SYN[id];return}
 if(l&&s){if(o&&l.j!==o.j){t=l;if(s.j!==l.j)op=['u',id,l]}else t=s}
 else if(l){if(!o||l.j!==o.j){t=l;op=['c',id,l]}}
 else if(s){if(o&&s.j===o.j)op=['x',id];else t=s}
+else if(o)op=['x',id];
 if(t){res.push(t);if(s&&t.j===s.j)SYN[id]=s}else if(!op)delete SYN[id];
 if(op)ops.push(op)});
 if(full){var nd={D:[],K:[],T:[]};['D','K','T'].forEach(function(k){DB[k].forEach(function(x){if(!(x&&sOk(x.id)))nd[k].push(x)})});
