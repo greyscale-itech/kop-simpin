@@ -508,7 +508,8 @@ try{var c=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{n
 A.cred=b64(c.rawId);saveA();toast('Biometrik aktif');draw()}catch(e){toast('Biometrik belum bisa diaktifkan. Buka link langsung di browser HP, bukan di dalam preview.')}}
 async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});setSess('biometrik')}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
 function logout(){devClear();AUTH=false;RQ.rows=null;try{localStorage.removeItem(SK)}catch(e){}draw()}
-function resetAkun(){var k=prompt('Akun di perangkat ini akan dihapus (data pinjaman tidak ikut terhapus). Ketik RESET untuk melanjutkan.');if(k&&k.trim().toUpperCase()==='RESET'){try{localStorage.removeItem(AK)}catch(e){}A=null;draw()}}
+function resetAkun(){sheet('<h3>Reset akun</h3><p>Akun di perangkat ini akan dihapus. Data debitur, kreditur, dan transaksi tidak ikut terhapus. Ketik RESET untuk melanjutkan.</p>'+F('rk','Ketik RESET','','autocomplete="off" autocapitalize="characters"')+'<div class="err" id="err"></div><button class="btn d" onclick="resetOk()">Hapus akun</button><button class="btn g" onclick="cls()">Batal</button>')}
+function resetOk(){if(val('rk').trim().toUpperCase()!=='RESET')return emsg('Ketik RESET dulu.');try{localStorage.removeItem(AK);localStorage.removeItem('kosfa-lf')}catch(e){}A=null;cls();draw()}
 function akunSec(){return '<div class="sec"><h2>Akun</h2><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><div class="akb"><b>'+(A.cred?'Aktif':'Belum aktif')+'</b>'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+'</div></div><div class="akk"><button class="btn g" onclick="logout()">Keluar</button></div></div>'}
 
 var NK='kosfa-notif',sysN='';
