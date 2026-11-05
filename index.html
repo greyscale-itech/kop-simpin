@@ -462,7 +462,15 @@ function hapusK(id){if(!confirm('Hapus kreditur ini?'))return;DB.K=DB.K.filter(f
 /* ===== Cadangan ===== */
 function backup(){sheet('<h3>Cadangan data</h3><p>Salin teks ini dan simpan di tempat aman. Untuk memulihkan, tempel teks cadangan lalu tekan Pulihkan.</p><textarea class="fm" id="bk" rows="8" style="font-size:12px">'+esc(JSON.stringify(DB))+'</textarea><div class="err" id="err"></div><button class="btn" onclick="salin()">Salin</button><button class="btn g" onclick="pulih()">Pulihkan dari teks</button><button class="btn g" onclick="cls()">Tutup</button>')}
 function salin(){var e=document.getElementById('bk');e.select();try{navigator.clipboard.writeText(e.value).then(function(){toast('Cadangan tersalin')},function(){toast('Tekan lama lalu salin manual')})}catch(x){toast('Tekan lama lalu salin manual')}}
-function pulih(){try{var o=JSON.parse(val('bk'));if(!Array.isArray(o.D)||!Array.isArray(o.K)||!Array.isArray(o.T))throw 0;
+function cekDB(o){var N=function(x){return typeof x==='number'&&isFinite(x)},S=function(x){return typeof x==='string'},Dt=function(x){return S(x)&&/^\d{4}-\d{2}-\d{2}$/.test(x)},ids={};
+if(!o||typeof o!=='object'||!Array.isArray(o.D)||!Array.isArray(o.K)||!Array.isArray(o.T))return 'Struktur cadangan tidak lengkap.';
+if(o.D.length+o.K.length+o.T.length>50000)return 'Cadangan terlalu besar.';
+var i,x;for(i=0;i<o.D.length;i++){x=o.D[i];if(!x||!S(x.id)||!S(x.n)||!S(x.u)||!N(x.pk)||x.pk<0||!N(x.bg)||x.bg<0||x.bg>100||!Dt(x.cair)||!N(x.tn)||(x.jt&&!Dt(x.jt)))return 'Data debitur ke-'+(i+1)+' tidak valid.'}
+for(i=0;i<o.T.length;i++){x=o.T[i];if(!x||!S(x.id)||!S(x.src)||!N(x.amt)||!Dt(x.date))return 'Transaksi ke-'+(i+1)+' tidak valid.'}
+for(i=0;i<o.K.length;i++){x=o.K[i];if(!x||!S(x.id)||!S(x.n)||!N(x.pl)||!N(x.sisa))return 'Data kreditur ke-'+(i+1)+' tidak valid.'}
+var O=Array.isArray(o.O)?o.O:[];for(i=0;i<O.length;i++){x=O[i];if(!x||!S(x.id)||!N(x.amt)||!Dt(x.date))return 'Dana keluar ke-'+(i+1)+' tidak valid.'}
+return ''}
+function pulih(){try{var o=JSON.parse(val('bk')),er=cekDB(o);if(er)return emsg(er);
 if(!confirm('Ganti semua data saat ini dengan cadangan ini?'))return;o.O=Array.isArray(o.O)?o.O:[];DB=o;save();cls();draw();toast('Data dipulihkan')}catch(e){emsg('Teks cadangan tidak valid.')}}
 
 /* ===== Akun ===== */
@@ -489,15 +497,18 @@ async function daftar(){var em=val('le').trim().toLowerCase(),p=val('lp'),q=val(
 if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return emsg('Format email belum benar.');
 if(p.length<8)return emsg('Kata sandi minimal 8 karakter.');if(p!==q)return emsg('Ulangi kata sandi belum sama.');
 try{var sl=b64(rnd(16));A={v:2,email:em,salt:sl,hash:await hp(sl,p),cred:null};saveA();setSess('daftar')}catch(e){emsg('Browser ini belum mendukung penyimpanan kata sandi yang aman.')}}
-async function masuk(){var em=val('le').trim().toLowerCase(),p=val('lp');
-try{if(em===A.email){var ok=A.v===2?await hp(A.salt,p)===A.hash:await sha(A.salt+p)===A.hash;if(ok){if(A.v!==2){A.v=2;A.hash=await hp(A.salt,p);saveA()}return setSess('password')}}}catch(e){}
+function lfGet(){try{return JSON.parse(ls('kosfa-lf')||'{}')}catch(e){return{}}}
+async function masuk(){var em=val('le').trim().toLowerCase(),p=val('lp'),lf=lfGet(),w=(lf.u||0)-Date.now();
+if(w>0)return emsg('Terlalu banyak percobaan. Coba lagi dalam '+Math.ceil(w/1000)+' detik.');
+try{if(em===A.email){var ok=A.v===2?await hp(A.salt,p)===A.hash:await sha(A.salt+p)===A.hash;if(ok){if(A.v!==2){A.v=2;A.hash=await hp(A.salt,p);saveA()}try{localStorage.removeItem('kosfa-lf')}catch(x){}return setSess('password')}}}catch(e){}
+var n=(lf.n||0)+1;lw('kosfa-lf',JSON.stringify({n:n,u:n>=5?Date.now()+Math.min(300,30*Math.pow(2,n-5))*1000:0}));
 emsg('Email atau kata sandi salah.')}
 async function bioReg(){if(!window.PublicKeyCredential||!navigator.credentials)return toast('Perangkat ini belum mendukung biometrik.');
 try{var c=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'Simpinku'},user:{id:rnd(16),name:A.email,displayName:A.email},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});
 A.cred=b64(c.rawId);saveA();toast('Biometrik aktif');draw()}catch(e){toast('Biometrik belum bisa diaktifkan. Buka link langsung di browser HP, bukan di dalam preview.')}}
 async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});setSess('biometrik')}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
 function logout(){devClear();AUTH=false;RQ.rows=null;try{localStorage.removeItem(SK)}catch(e){}draw()}
-function resetAkun(){if(confirm('Hapus akun admin di perangkat ini? Data debitur, kreditur, dan transaksi tidak ikut terhapus.')){try{localStorage.removeItem(AK)}catch(e){}A=null;draw()}}
+function resetAkun(){var k=prompt('Akun di perangkat ini akan dihapus (data pinjaman tidak ikut terhapus). Ketik RESET untuk melanjutkan.');if(k&&k.trim().toUpperCase()==='RESET'){try{localStorage.removeItem(AK)}catch(e){}A=null;draw()}}
 function akunSec(){return '<div class="sec"><h2>Akun</h2><div class="row"><span>Email</span><b>'+esc(A.email)+'</b></div><div class="row"><span>Biometrik</span><div class="akb"><b>'+(A.cred?'Aktif':'Belum aktif')+'</b>'+(A.cred?'':'<button class="btn g" onclick="bioReg()">Aktifkan biometrik</button>')+'</div></div><div class="akk"><button class="btn g" onclick="logout()">Keluar</button></div></div>'}
 
 var NK='kosfa-notif',sysN='';
