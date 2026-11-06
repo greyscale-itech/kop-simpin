@@ -95,8 +95,8 @@ button.row{width:100%;background:none;border-left:0;border-right:0;border-top:0;
 .chips{display:flex;gap:8px;margin:10px 0 4px;flex-wrap:wrap}.chips button{border:1px solid var(--ln);background:none;color:var(--tx);border-radius:16px;padding:6px 12px;font-size:12.5px;cursor:pointer}
 .chips button.on{background:var(--or);border-color:var(--or);color:#fff}
 .prog{height:8px;background:var(--ln);border-radius:4px;overflow:hidden;margin:8px 0 4px}.prog div{height:100%;background:linear-gradient(90deg,var(--or),var(--or2))}
-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--or);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
-nav button{flex:1;background:none;border:0;color:#fff;opacity:.72;padding:8px 0 7px;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--or);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}nav::-webkit-scrollbar{display:none}
+nav button{flex:1 0 20%;min-width:0;scroll-snap-align:start;background:none;border:0;color:#fff;opacity:.72;padding:8px 0 7px;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
 nav button i{display:flex;align-items:center;justify-content:center;width:44px;height:26px;border-radius:13px}nav button i svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}nav button.on{opacity:1;font-weight:600}nav button.on i{background:rgba(255,255,255,.22)}nav button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
 .mk{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:9}
 .sh{background:var(--card);width:100%;max-width:430px;border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:90vh;overflow-y:auto}
@@ -199,14 +199,14 @@ body{display:block}
 button.row:hover,.row:hover{background:rgba(30,111,217,.06)}
 .btn:hover{opacity:.9}.st:hover{opacity:.75}
 .sec .btn,.wal .btn{max-width:420px}
-nav{top:0;bottom:0;left:0;transform:none;width:220px;max-width:none;flex-direction:column;justify-content:flex-start;gap:4px;padding:24px 12px;background:linear-gradient(180deg,var(--or),var(--or2));box-shadow:2px 0 12px rgba(0,0,0,.12);z-index:8}
+nav{top:0;bottom:0;left:0;transform:none;width:220px;max-width:none;overflow:visible;scroll-snap-type:none;flex-direction:column;justify-content:flex-start;gap:4px;padding:24px 12px;background:linear-gradient(180deg,var(--or),var(--or2));box-shadow:2px 0 12px rgba(0,0,0,.12);z-index:8}
 nav::before{content:"";display:block;flex:none;height:56px;margin:0 2px 16px;border-radius:14px;background:var(--lg-b) 15px center/auto 34px no-repeat,var(--lg-t) 69px center/auto 24px no-repeat,#fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 #app>.hd:not(.hh){padding-left:106px}
 #app>.hd:not(.hh)::before{left:36px;top:30px;width:56px;height:56px;border-radius:16px}
 .lgchip{--bh:42px;--th:30px;padding:10px 18px;gap:12px;border-radius:16px}
 #app>.hd.hh p{margin-top:12px}
 .lgcard{width:260px}
-nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:11px 14px;font-size:14px;border-radius:10px;opacity:.85;text-align:left}
+nav button{flex:none;scroll-snap-align:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:11px 14px;font-size:14px;border-radius:10px;opacity:.85;text-align:left}
 nav button i{width:24px;height:24px;border-radius:0;background:none}
 nav button:hover{background:rgba(255,255,255,.14);opacity:1}
 nav button.on{background:rgba(255,255,255,.24);opacity:1}
@@ -551,12 +551,13 @@ if(ls(NK)!==td&&!document.querySelector('.mk')){lw(NK,td);listDue(l)}}
 function izinNotif(){if(!window.Notification)return toast('Perangkat ini belum mendukung notifikasi.');try{Notification.requestPermission().then(function(p){toast(p==='granted'?'Notifikasi aktif':'Izin notifikasi ditolak');draw()})}catch(e){toast('Notifikasi belum bisa diaktifkan di sini.')}}
 var IC={home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>',deb:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15.5 5.2a3.2 3.2 0 010 6"/><path d="M17 14.3c2 .6 3.5 2.300 3.5 4.700"/>',cash:'<path d="M5 20V11"/><path d="M12 20V5"/><path d="M19 20v-6"/>',kre:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',dev:'<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><path d="M13.5 5l-3 14"/>'};
 function ico(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(IC[k]||IC.home)+'</svg>'}
-IC.pin='<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 12h6M10 16h6"/>';IC.set='<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>';
+IC.pin='<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 12h6M10 16h6"/>';IC.set='<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>';
 function draw(){if(!AUTH)return loginView();
 if(isNas()&&['home','pin','set'].indexOf(S.tab)<0)S.tab='home';if(S.tab==='dev'&&!isDev())S.tab='home';if(S.tab==='kre'&&!canAdmin())S.tab='home';
 var v=isNas()?{home:nasHome,pin:nasPin,set:nasSet}[S.tab]():{home:home,deb:debitur,cash:cash,kre:admin,set:nasSet,dev:devTab}[S.tab]();
 var n=isNas()?[['home','home','Home'],['pin','pin','Pinjaman'],['set','set','Setting']]:[['home','home','Home'],['deb','deb','Debitur'],['cash','cash','Cash flow']];if(canAdmin())n.push(['kre','kre','Admin'],['set','set','Setting']);if(isDev())n.push(['dev','dev','Developer']);
 document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<button class="'+(S.tab===x[0]?'on':'')+'" onclick="go(\''+x[0]+'\')"><i>'+ico(x[1])+'</i>'+x[2]+'</button>'}).join('')+'</nav>';
+var nv=document.querySelector('nav'),nb=nv&&nv.querySelector('button.on');if(nv&&nb&&nv.scrollWidth>nv.clientWidth&&nv.clientWidth>nv.clientHeight)nv.scrollLeft=Math.max(0,nb.offsetLeft+nb.offsetWidth-nv.clientWidth);
 if((S.tab==='home'||(S.tab==='pin'&&isNas())||(S.tab==='deb'&&canAdmin()))&&RQ.rows===null&&!RQ.busy)rqLoad();if(S.tab==='deb')lst();if(S.tab==='dev'&&!DV.rows&&!DV.busy)devLoad()}
 
 /* ===== Appwrite: catat login + tab Developer ===== */
