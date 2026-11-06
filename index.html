@@ -522,12 +522,13 @@ if(ls(NK)!==td&&!document.querySelector('.mk')){lw(NK,td);listDue(l)}}
 function izinNotif(){if(!window.Notification)return toast('Perangkat ini belum mendukung notifikasi.');try{Notification.requestPermission().then(function(p){toast(p==='granted'?'Notifikasi aktif':'Izin notifikasi ditolak');draw()})}catch(e){toast('Notifikasi belum bisa diaktifkan di sini.')}}
 var IC={home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>',deb:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15.5 5.2a3.2 3.2 0 010 6"/><path d="M17 14.3c2 .6 3.5 2.300 3.5 4.700"/>',cash:'<path d="M5 20V11"/><path d="M12 20V5"/><path d="M19 20v-6"/>',kre:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',dev:'<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><path d="M13.5 5l-3 14"/>'};
 function ico(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(IC[k]||IC.home)+'</svg>'}
+IC.pin='<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 12h6M10 16h6"/>';IC.set='<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>';
 function draw(){if(!AUTH)return loginView();
-if(isNas())S.tab='home';if(S.tab==='dev'&&!isDev())S.tab='home';if(S.tab==='kre'&&!canAdmin())S.tab='home';
-var v=isNas()?nasHome():{home:home,deb:debitur,cash:cash,kre:admin,dev:devTab}[S.tab]();
-var n=isNas()?[['home','home','Home']]:[['home','home','Home'],['deb','deb','Debitur'],['cash','cash','Cash flow']];if(canAdmin())n.push(['kre','kre','Admin']);if(isDev())n.push(['dev','dev','Developer']);
+if(isNas()&&['home','pin','set'].indexOf(S.tab)<0)S.tab='home';if(S.tab==='dev'&&!isDev())S.tab='home';if(S.tab==='kre'&&!canAdmin())S.tab='home';
+var v=isNas()?{home:nasHome,pin:nasPin,set:nasSet}[S.tab]():{home:home,deb:debitur,cash:cash,kre:admin,dev:devTab}[S.tab]();
+var n=isNas()?[['home','home','Home'],['pin','pin','Pinjaman'],['set','set','Setting']]:[['home','home','Home'],['deb','deb','Debitur'],['cash','cash','Cash flow']];if(canAdmin())n.push(['kre','kre','Admin']);if(isDev())n.push(['dev','dev','Developer']);
 document.getElementById('app').innerHTML=v+'<nav>'+n.map(function(x){return '<button class="'+(S.tab===x[0]?'on':'')+'" onclick="go(\''+x[0]+'\')"><i>'+ico(x[1])+'</i>'+x[2]+'</button>'}).join('')+'</nav>';
-if(S.tab==='home'&&RQ.rows===null&&!RQ.busy)rqLoad();if(S.tab==='deb')lst();if(S.tab==='dev'&&!DV.rows&&!DV.busy)devLoad()}
+if((S.tab==='home'||(S.tab==='pin'&&isNas()))&&RQ.rows===null&&!RQ.busy)rqLoad();if(S.tab==='deb')lst();if(S.tab==='dev'&&!DV.rows&&!DV.busy)devLoad()}
 
 /* ===== Appwrite: catat login + tab Developer ===== */
 var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f',rq:'6ae9f69c00342165316b',st:'qwerty987654321'},DEVMAIL='greyscale.itech@gmail.com';
@@ -601,9 +602,16 @@ var b=document.getElementById('rbtn');if(b)b.disabled=true;
 try{var r=await fetch(awUrlT(AW.rq),{method:'POST',headers:rqH(),body:JSON.stringify({rowId:'unique()',data:{email:A.email,nama:n.slice(0,100),hp:hp.slice(0,20),jumlah:j,tenor:t,tujuan:u.slice(0,300),status:'menunggu',catatan:''}})});
 if(!r.ok){if(b)b.disabled=false;return emsg(r.status===404?'Layanan pengajuan belum siap. Hubungi admin.':'Gagal mengirim ('+r.status+'). Coba lagi.')}
 cls();RQ.rows=null;toast('Pengajuan terkirim');draw()}catch(e){if(b)b.disabled=false;emsg('Tidak bisa terhubung ke server. Cek internet.')}}
+function nasHdr(t,p){return '<div class="hd"><h1>'+t+'</h1><p>'+p+'</p></div>'}
+function nasErr(){return RQ.err?'<p style="color:var(--no);font-size:12.5px">'+esc(RQ.err)+'</p>':''}
+function nasList(a){return RQ.rows===null?'<p style="color:var(--mu)">Memuat…</p>':(a.map(function(x){return rqRow(x,false)}).join('')||'<p style="color:var(--mu)">Belum ada pengajuan.</p>')}
 function nasHome(){var L2=RQ.rows||[];
 return '<div class="hd hh"><div class="lgchip" role="img" aria-label="Simpinku"><i class="lgB"></i><i class="lgT"></i></div><p>'+esc(A.email)+'</p></div><div class="wal"><small>Butuh dana?</small><b class="big" style="font-size:18px">Ajukan pinjaman</b><button class="btn" onclick="rqForm()">Ajukan pinjaman</button></div>'+
-'<div class="sec sb"><h2>Pengajuan saya</h2>'+(RQ.err?'<p style="color:var(--no);font-size:12.5px">'+esc(RQ.err)+'</p>':'')+(RQ.rows===null?'<p style="color:var(--mu)">Memuat…</p>':(L2.map(function(x){return rqRow(x,false)}).join('')||'<p style="color:var(--mu)">Belum ada pengajuan.</p>'))+'<button class="btn g" onclick="rqRefresh()">Muat ulang</button></div>'+akunSec()}
+'<div class="sec sb"><h2>Pengajuan terakhir</h2>'+nasErr()+nasList(L2.slice(0,3))+(L2.length>3?'<button class="btn g" onclick="go(\'pin\')">Lihat semua ('+L2.length+')</button>':'')+'</div>'}
+function nasPin(){var L2=RQ.rows||[];
+return nasHdr('Pinjaman','Riwayat pengajuan pinjaman Anda')+'<div class="sec sb"><h2>Pengajuan saya</h2>'+nasErr()+nasList(L2)+'<button class="btn" onclick="rqForm()">+ Ajukan pinjaman</button><button class="btn g" onclick="rqRefresh()">Muat ulang</button></div>'}
+function nasSet(){
+return nasHdr('Setting','Pengaturan akun dan tampilan')+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar.</p><div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div><div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+akunSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
 function awH(x){var h={'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'};return Object.assign(h,x||{})}
 function devInfo(){var u=navigator.userAgent||'',o=/Android/i.test(u)?'Android':/iPhone/i.test(u)?'iPhone':/iPad/i.test(u)?'iPad':/Windows/i.test(u)?'Windows':/Mac/i.test(u)?'Mac':/Linux/i.test(u)?'Linux':'Perangkat lain',
 b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Firefox|FxiOS/.test(u)?'Firefox':/Chrome|CriOS/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'Browser';return (o+' · '+b).slice(0,255)}
