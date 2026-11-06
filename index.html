@@ -484,7 +484,7 @@ function rnd(n){return crypto.getRandomValues(new Uint8Array(n))}
 async function sha(t){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return Array.prototype.map.call(new Uint8Array(b),function(x){return('0'+x.toString(16)).slice(-2)}).join('')}
 async function hp(salt,p){var k=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveBits']);return b64(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:unb64(salt),iterations:150000},k,256))}
 function saveA(){lw(AK,JSON.stringify(A))}
-function setSess(m){AUTH=true;lw(SK,'1');ACT=Date.now();ACTW=ACT;lw(AKT,String(ACT));logLogin(m||'password');fetchRole();draw();cekNotif()}
+function setSess(m){AUTH=true;lw(SK,'1');ACT=Date.now();ACTW=ACT;lw(AKT,String(ACT));logLogin(m||'password');hbBeat();fetchRole();draw();cekNotif()}
 function logo(z){return '<svg width="'+z+'" height="'+z+'" viewBox="0 0 64 64" role="img" aria-label="Logo Simpinku"><defs><linearGradient id="lgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E6FD9"/><stop offset="1" stop-color="#1FB58A"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="#fff"/><path d="M20 14V50M20 34L40 16M27 29L42 50" stroke="url(#lgg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="48" cy="17" r="5" fill="url(#lgg)"/></svg>'}
 var EYE_ON='<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',EYE_OFF='<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
 function pwf(id,ac,ph){return '<div class="pw"><input class="fm" id="'+id+'" type="password" autocomplete="'+ac+'"'+(ph?' placeholder="'+ph+'"':'')+'><button type="button" class="eye" aria-label="Tampilkan kata sandi" onclick="togglePw(this)">'+EYE_ON+'</button></div>'}
@@ -712,16 +712,24 @@ function devInfo(){var u=navigator.userAgent||'',o=/Android/i.test(u)?'Android':
 b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Firefox|FxiOS/.test(u)?'Firefox':/Chrome|CriOS/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'Browser';return (o+' · '+b+' #'+did()).slice(0,255)}
 function did(){var k='kosfa-did',v=ls(k);if(!v||!/^\w{3,8}$/.test(v)){v=Math.random().toString(36).slice(2,6);lw(k,v)}return v}
 function logLogin(m){try{if(!A||!A.email)return;fetch(awUrl(),{method:'POST',headers:{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'},body:JSON.stringify({rowId:'unique()',data:{email:String(A.email).slice(0,254),device:devInfo(),method:String(m).slice(0,20)}})}).catch(function(){})}catch(e){}}
+function hbId(){var h=5381,e=String(A.email||'');for(var i=0;i<e.length;i++)h=((h<<5)+h+e.charCodeAt(i))>>>0;return 'h'+did()+'_'+h.toString(36)}
+async function hbBeat(){if(!AUTH||!A||document.hidden)return;try{var id=hbId(),d={email:String(A.email).slice(0,254),device:devInfo(),method:'hb'+(Math.floor(Date.now()/6e4)%10)};
+var r=await fetch(awUrl('/'+id),{method:'PATCH',headers:awH(),body:JSON.stringify({data:d})});
+if(r.status===404)await fetch(awUrl(),{method:'POST',headers:awH(),body:JSON.stringify({rowId:id,data:d})})}catch(e){}}
+setInterval(hbBeat,60000);document.addEventListener('visibilitychange',function(){if(!document.hidden)hbBeat()});
+function devPoll(){if(!AUTH||!isDev()||S.tab!=='dev'||DV.busy||DV.seeAll||document.hidden||document.querySelector('.mk'))return;var a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;devLoad()}
+setInterval(devPoll,15000);
 function dvDrop(){try{localStorage.removeItem('kosfa-dv')}catch(e){}try{sessionStorage.removeItem('kosfa-dv')}catch(e){}}
 function devClear(){DV.rows=null;dvDrop()}
 async function devLoad(){if(DV.busy)return;DV.busy=true;DV.err='';
 try{var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'orderDesc',attribute:'$createdAt'}));q.append('queries[]',JSON.stringify({method:'limit',values:[500]}));
 var q2=new URLSearchParams();q2.append('queries[]',JSON.stringify({method:'limit',values:[500]}));
 var h=awH();
-var rs=await Promise.all([fetch(awUrl('?'+q.toString()),{headers:h}),fetch(awUrlT(AW.rt,'?'+q2.toString()),{headers:h})]),r=rs[0];
+var q3=new URLSearchParams();q3.append('queries[]',JSON.stringify({method:'startsWith',attribute:'method',values:['hb']}));q3.append('queries[]',JSON.stringify({method:'limit',values:[100]}));
+var rs=await Promise.all([fetch(awUrl('?'+q.toString()),{headers:h}),fetch(awUrlT(AW.rt,'?'+q2.toString()),{headers:h}),fetch(awUrl('?'+q3.toString()),{headers:h}).catch(function(){return {ok:false}})]),r=rs[0];
 if(r.status===401||r.status===403){DV.err='Akses ditolak ('+r.status+'). Cek permission table login di Appwrite.'}
 else if(!r.ok){DV.err='Gagal memuat data ('+r.status+').'}
-else{var j=await r.json();DV.rows=j.rows||j.documents||[];DV.total=j.total||DV.rows.length;DV.bL=JSON.stringify(DV.rows).length;DV.roles={};
+else{var j=await r.json(),all=j.rows||j.documents||[],hb=[];if(rs[2]&&rs[2].ok){try{hb=(await rs[2].json()).rows||[]}catch(e){}}all.forEach(function(x){if(String(x.method||'').indexOf('hb')===0&&!hb.some(function(y){return y.$id===x.$id}))hb.push(x)});DV.hb=hb;DV.rows=all.filter(function(x){return String(x.method||'').indexOf('hb')!==0});DV.total=Math.max(0,(j.total||all.length)-all.length+DV.rows.length);DV.bL=JSON.stringify(DV.rows).length;DV.roles={};
 if(rs[1].ok){var k=await rs[1].json();DV.nR=k.total||(k.rows||[]).length;DV.bR=JSON.stringify(k.rows||[]).length;(k.rows||[]).forEach(function(x){if(x.role==='admin')DV.roles[String(x.email).toLowerCase()]=x.$id})}else DV.err='Tabel roles belum bisa dibaca ('+rs[1].status+'). Cek Table ID dan permission.'}}
 catch(e){DV.err='Tidak bisa terhubung ke Appwrite.'}
 DV.busy=false;if(DV.err&&!DV.rows)DV.rows=[];draw()}
@@ -846,7 +854,8 @@ var fm=function(x){var d=new Date(x.$createdAt);return isNaN(d)?'':d.toLocaleStr
 var tg=function(m){return m==='biometrik'?'Lunas':m==='password'?'Lancar':''};
 var pl=ul.map(function(e,i){var isd=e===DEVMAIL,b=isd?'<span class="tag" style="background:#1E6FD9;color:#fff">Developer</span>':RO[e]?'<span class="tag Lancar">Admin</span>':'<span class="tag" style="background:var(--bg);color:var(--mu)">Nasabah</span>';
 return '<div class="row"><div style="min-width:0"><b style="word-break:break-all">'+esc(e)+'</b><small>'+(last[e]?'Login terakhir '+fm(last[e]):'Belum ada login tercatat')+'</small></div><div style="text-align:right;flex-shrink:0">'+b+(isd?'':'<button type="button" class="lk" style="display:block;width:auto;margin:6px 0 0 auto" onclick="devRole('+i+')">'+(RO[e]?'Jadikan Nasabah':'Jadikan Admin')+'</button>')+'</div></div>'}).join('');
-var nowT=Date.now(),isOn=function(x){return lastDev[String(x.email||'').toLowerCase()+'|'+(x.device||'')]===x&&nowT-new Date(x.$createdAt)<600000};
+var nowT=Date.now(),pres={};(DV.hb||[]).forEach(function(x){var k=String(x.email||'').toLowerCase()+'|'+(x.device||''),t=new Date(x.$updatedAt||x.$createdAt).getTime();if(!(pres[k]>t))pres[k]=t});
+var isOn=function(x){var k=String(x.email||'').toLowerCase()+'|'+(x.device||'');return lastDev[k]===x&&(nowT-(pres[k]||0)<150000||nowT-new Date(x.$createdAt)<150000)};
 var lrow=function(x){var o=isOn(x);return '<div class="row"><div style="min-width:0"><b style="word-break:break-all">'+esc(x.email)+'</b><small>'+esc(String(x.device||'-').replace(/ #\w+$/,''))+'</small></div><div style="text-align:right;flex-shrink:0"><div style="display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap"><span class="tag '+(o?'Lancar':'')+'"'+(o?'':' style="background:var(--bg);color:var(--mu)"')+'>'+(o?'● Online':'○ Offline')+'</span><span class="tag '+tg(x.method)+'"'+(tg(x.method)?'':' style="background:var(--bg);color:var(--wn)"')+'>'+esc(x.method||'-')+'</span></div><small>'+fm(x)+'</small></div></div>'};
 var loginBox;
 if(DV.seeAll){var sh=DV.shown||20,shown=R.slice(0,sh).map(lrow).join('');
@@ -944,7 +953,7 @@ try{A=JSON.parse(ls(AK))}catch(e){}
 AUTH=!!A&&ls(SK)==='1';var SEXP=false;if(AUTH&&Date.now()-(+ls(AKT)||0)>TO){AUTH=false;SEXP=true;try{localStorage.removeItem(SK)}catch(e){}}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 draw();if(SEXP)toast('Sesi berakhir karena tidak aktif 10 menit. Silakan masuk lagi.');
-cekNotif();setInterval(function(){cekNotif()},30000);document.addEventListener('visibilitychange',function(){cekNotif();if(!document.hidden&&AUTH)fetchRole()});if(AUTH)fetchRole();
+cekNotif();setInterval(function(){cekNotif()},30000);document.addEventListener('visibilitychange',function(){cekNotif();if(!document.hidden&&AUTH)fetchRole()});if(AUTH){fetchRole();hbBeat()}
 
 /* ===== Geser untuk hapus (Cash flow) ===== */
 function hapusS(id,k){if(!canAdmin())return toast('Hanya admin yang bisa mengubah data ini.');
