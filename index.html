@@ -715,7 +715,7 @@ function logLogin(m){try{if(!A||!A.email)return;fetch(awUrl(),{method:'POST',hea
 function hbId(){var h=5381,e=String(A.email||'');for(var i=0;i<e.length;i++)h=((h<<5)+h+e.charCodeAt(i))>>>0;return 'h'+did()+'_'+h.toString(36)}
 async function hbBeat(){if(!AUTH||!A||document.hidden)return;try{var id=hbId(),d={email:String(A.email).slice(0,254),device:devInfo(),method:'hb'+(Math.floor(Date.now()/6e4)%10)};
 var r=await fetch(awUrl('/'+id),{method:'PATCH',headers:awH(),body:JSON.stringify({data:d})});
-if(r.status===404)await fetch(awUrl(),{method:'POST',headers:awH(),body:JSON.stringify({rowId:id,data:d})})}catch(e){}}
+if(r.status===404)await fetch(awUrl(),{method:'POST',headers:awH(),body:JSON.stringify({rowId:id,data:d,permissions:['update("any")']})});else if(!r.ok)console.warn('hb gagal',r.status)}catch(e){}}
 setInterval(hbBeat,60000);document.addEventListener('visibilitychange',function(){if(!document.hidden)hbBeat()});
 function devPoll(){if(!AUTH||!isDev()||S.tab!=='dev'||DV.busy||DV.seeAll||document.hidden||document.querySelector('.mk'))return;var a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;devLoad()}
 setInterval(devPoll,15000);
