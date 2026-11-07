@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!--
+CATATAN UNTUK CLAUDE / PENGEDIT (baca dulu sebelum mengedit file ini)
+Aplikasi: Simpinku (Koperasi Kosfa). Developer: Fajar Q.
+1. VERSI: nomor versi tampil di tab Developer dan tab Setting sebagai "Simpinku 2026 - V1.<APPREV>".
+   Angka itu = jumlah revisi/deployment. Setiap kali file ini diedit (revisi apa pun), WAJIB naikkan
+   variabel APPREV (cari "var APPREV=") sebanyak +1. Satu-satunya tempat angka versi ada di APPREV;
+   jangan tulis angka versi di tempat lain. Mulai dari nilai yang ada di file yang diupload.
+2. ISTILAH: user menulis "ilus" = hanya mockup/ilustrasi, JANGAN edit kode. "gas" = langsung edit kode.
+3. Bahasa: user pakai bahasa Indonesia santai dan natural, bukan yang kaku.
+4. Tulisan "Developed by Fajar Q." tetap di paling bawah tab Developer dan Setting, di bawah baris versi.
+-->
 <html lang="id">
 <head>
 <meta charset="utf-8">
@@ -304,6 +315,8 @@ var BLN=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"
 var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bulan"]];
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
 var DB={D:[],K:[],T:[],O:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
+/* VERSI: naikkan APPREV +1 tiap revisi file ini (lihat catatan di paling atas file) */
+var APPREV=94;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -989,7 +1002,7 @@ nasAng()+'<div class="sec sb"><h2>Pengajuan terakhir</h2>'+nasErr()+nasList(L2.s
 function nasPin(){var A2=(RQ.rows||[]).filter(function(x){return x.status==='disetujui'});
 return nasHdr('Pinjaman','Detail pinjaman Anda')+(RQ.rows===null?'<div class="sec sb"><p style="color:var(--mu)">Memuat…</p></div>':A2.map(function(x){return '<div class="sec sb"><h2>'+rp(x.jumlah)+'</h2><div class="row"><span>Status</span>'+(rqMeta(x).lunas?'<span class="tag Lunas">Lunas</span>':rqTag(x.status))+'</div><div class="row"><span>Tenor</span><b>'+tlb(x.tenor)+'</b></div><div class="row"><span>Tujuan</span><b>'+esc(x.tujuan)+'</b></div><div class="row"><span>Tanggal pengajuan</span><b>'+fd(String(x.$createdAt||'').slice(0,10))+'</b></div>'+rqNoteRows(x,x.status==='disetujui')+'</div>'}).join('')||'<div class="sec sb">'+nasErr()+'<p style="color:var(--mu)">Belum ada pinjaman yang disetujui.</p></div>')}
 function nasSet(){
-return '<div class="hd ov"><h1>Setting</h1><p>Pengaturan akun dan tampilan</p><button type="button" class="shr" aria-label="Bagikan Simpinku" onclick="shareApp()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button></div>'+(canAdmin()?pengSec():'')+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar.</p><div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div><div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+'<div class=\"sec\"><h2>Getaran (haptic)</h2><p style=\"color:var(--mu);font-size:12.5px\">HP bergetar halus saat tombol disentuh. Hanya aktif di Mode HP.</p><div class=\"row\"><span>Getaran saat ini</span><b>'+(hapOn()?'Nyala':'Mati')+'</b></div><div class=\"tg\" style=\"grid-template-columns:repeat(2,1fr)\">'+[[1,'Nyala'],[0,'Mati']].map(function(x){return '<button type=\"button\" class=\"'+((hapOn()?1:0)===x[0]?'on':'')+'\" onclick=\"setHap('+x[0]+')\">'+x[1]+'</button>'}).join('')+'</div></div>'+profSec()+logoutSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
+return '<div class="hd ov"><h1>Setting</h1><p>Pengaturan akun dan tampilan</p><button type="button" class="shr" aria-label="Bagikan Simpinku" onclick="shareApp()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button></div>'+(canAdmin()?pengSec():'')+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar.</p><div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div><div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+'<div class=\"sec\"><h2>Getaran (haptic)</h2><p style=\"color:var(--mu);font-size:12.5px\">HP bergetar halus saat tombol disentuh. Hanya aktif di Mode HP.</p><div class=\"row\"><span>Getaran saat ini</span><b>'+(hapOn()?'Nyala':'Mati')+'</b></div><div class=\"tg\" style=\"grid-template-columns:repeat(2,1fr)\">'+[[1,'Nyala'],[0,'Mati']].map(function(x){return '<button type=\"button\" class=\"'+((hapOn()?1:0)===x[0]?'on':'')+'\" onclick=\"setHap('+x[0]+')\">'+x[1]+'</button>'}).join('')+'</div></div>'+profSec()+logoutSec()+'<p class="nt" style="margin:16px 12px 2px">'+appVer()+'</p><p class="nt" style="margin:0 12px 8px">Developed by Fajar Q.</p>'}
 function awH(x){var h={'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'};return Object.assign(h,x||{})}
 function devInfo(){var u=navigator.userAgent||'',o=/Android/i.test(u)?'Android':/iPhone/i.test(u)?'iPhone':/iPad/i.test(u)?'iPad':/Windows/i.test(u)?'Windows':/Mac/i.test(u)?'Mac':/Linux/i.test(u)?'Linux':'Perangkat lain',
 b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Firefox|FxiOS/.test(u)?'Firefox':/Chrome|CriOS/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'Browser';return (o+' · '+b+' #'+did()).slice(0,255)}
@@ -1177,7 +1190,7 @@ var auBox=auBoxH();
 var chart=dvChart(R);
 return hd+'<div class="wal walrow dvh"><div class="apr"><div class="apl"><div class="accinfo">'+acc+'</div><div class="grid g2"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?ul.length:'…')+'</b>Pengguna</div></div></div><div class="apu">'+upBtn()+upUI()+'</div></div>'+(DV.rows?chart:'')+'</div>'+
 userBox+loginBox+auBox+
-'<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data disimpan di perangkat ini dan disinkronkan ke Appwrite. '+syncTxt()+' Salin cadangan secara berkala agar aman.</p><div class="actrow"><button class="btn g" onclick="syncNow(1,1)">Sinkronkan sekarang</button><button class="btn g" onclick="backup()">Buka cadangan data</button></div></div>'+mtBox+capBox()}
+'<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data disimpan di perangkat ini dan disinkronkan ke Appwrite. '+syncTxt()+' Salin cadangan secara berkala agar aman.</p><div class="actrow"><button class="btn g" onclick="syncNow(1,1)">Sinkronkan sekarang</button><button class="btn g" onclick="backup()">Buka cadangan data</button></div></div>'+mtBox+capBox()+'<p class="nt" style="margin:16px 12px 2px">'+appVer()+'</p><p class="nt" style="margin:0 12px 8px">Developed by Fajar Q.</p>'}
 
 /* ===== Bunyi "cling" saat update server berhasil (gaya notifikasi iPhone) ===== */
 var AC=null,ACU=false;
