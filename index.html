@@ -41,6 +41,13 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);color-scheme:light dark}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--tx);font-family:"Inter","Segoe UI",Roboto,Arial,sans-serif;font-size:14px;display:flex;justify-content:center}
 #app{width:100%;max-width:430px;min-height:100vh;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+html:root.mtg{--or:#6B7280;--or2:#9AA0A8;--ok:#7B818C;--no:#6B7280;--wn:#7B818C;--sB-bg:rgba(128,132,140,.2);--sB-tx:#6B7280;--sG-bg:rgba(128,132,140,.2);--sG-tx:#6B7280;--sC-bg:rgba(128,132,140,.3);--sC-tx:#5B616B}
+#dvm{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);right:12px;z-index:7;display:inline-flex;align-items:center;gap:6px;background:#FFB84D;color:#412402;font-size:11px;font-weight:600;padding:4px 11px;border-radius:999px;pointer-events:none}
+#dvm i{width:7px;height:7px;border-radius:50%;background:#412402;display:block;animation:dvb 1.2s ease-in-out infinite}
+#dvm::after{content:"";position:absolute;inset:0;border-radius:999px;border:2px solid #FFB84D;animation:dvr 1.2s ease-out infinite}
+@keyframes dvb{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.6}}
+@keyframes dvr{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.35,1.9);opacity:0}}
+@media (prefers-reduced-motion:reduce){#dvm i,#dvm::after{animation:none}}
 .hd{background:linear-gradient(135deg,var(--or),var(--or2));color:#fff;padding:18px 16px 64px}
 .hd h1{font-size:17px;font-weight:700}.hd p{font-size:12px;opacity:.9;margin-top:2px}
 .cpb{background:none;border:0;padding:4px;margin-left:6px;cursor:pointer;color:var(--or);display:inline-grid;place-items:center;vertical-align:middle;min-width:32px;min-height:32px;border-radius:6px}.cpb svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.cpb:active{background:rgba(0,0,0,.1)}
@@ -335,6 +342,15 @@ return{M:M,IN:IN,OUT:OUT}}
 
 /* ===== Tampilan ===== */
 function go(t,f){S.tab=t;if(f)S.f=f;lw(TK,t);draw()}
+var BKT=0,BKG=false;
+function bkGuard(){try{history.pushState({bk:1},'',location.href)}catch(e){}}
+function bkArm(){if(BKG||!AUTH)return;BKG=true;bkGuard()}
+window.addEventListener('popstate',function(){if(!BKG)return;if(!AUTH){BKG=false;return}
+if(document.querySelector('.mk')){cls();if(S.tab==='dev')draw();bkGuard();return}
+if(S.tab!=='home'){go('home');bkGuard();return}
+if(BKT&&Date.now()-BKT<2000){BKG=false;history.back();return}
+BKT=Date.now();toast('Tekan back sekali lagi untuk keluar');bkGuard()});
+
 function item(d){return '<div class="row"><div class="who rg" onclick="rowGo(event,\''+d.id+'\')" ondblclick="rowDbl(event,\''+d.id+'\')"><span class="av">'+esc(ini(d.n))+'</span><div><button type="button" class="nm"><b>'+esc(d.n)+'</b></button><small>'+esc(d.u)+' · '+rp(d.pk)+'</small>'+(d.ts?'<small class="upd">Data update: '+fts(d.ts)+'</small>':'')+(d.hp?'<a class="wa" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" href="https://wa.me/'+waNum(d.hp)+'" target="_blank" rel="noopener">'+esc(d.hp)+'</a>':'')+'</div></div><div class="rt" style="cursor:pointer" onclick="menu(\''+d.id+'\')"><span class="tag '+d.st+'">'+d.st+'</span><small style="display:block;color:var(--mu);font-size:11.5px;margin-top:4px">'+(d.st==='Telat'?'Telat '+d.late+' hari · ':'')+'Sisa '+rp(d.sisa)+'</small></div></div>'}
 /* ===== Grafik Home: kas masuk vs kas keluar, filter Minggu / Bulan / Semua waktu ===== */
 function hsp(P){var n=P.length,m=[],i;
@@ -537,7 +553,7 @@ function rnd(n){return crypto.getRandomValues(new Uint8Array(n))}
 async function sha(t){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return Array.prototype.map.call(new Uint8Array(b),function(x){return('0'+x.toString(16)).slice(-2)}).join('')}
 async function hp(salt,p){var k=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveBits']);return b64(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:unb64(salt),iterations:150000},k,256))}
 function saveA(){lw(AK,JSON.stringify(A))}
-function setSess(m){AUTH=true;lw(SK,'1');ACT=Date.now();ACTW=ACT;lw(AKT,String(ACT));logLogin(m||'password');hbBeat();fetchRole();draw();cekNotif()}
+function setSess(m){AUTH=true;lw(SK,'1');ACT=Date.now();ACTW=ACT;lw(AKT,String(ACT));logLogin(m||'password');hbBeat();fetchRole();draw();cekNotif();bkArm()}
 function logo(z){return '<svg width="'+z+'" height="'+z+'" viewBox="0 0 64 64" role="img" aria-label="Logo Simpinku"><defs><linearGradient id="lgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E6FD9"/><stop offset="1" stop-color="#1FB58A"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="#fff"/><path d="M20 14V50M20 34L40 16M27 29L42 50" stroke="url(#lgg)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="48" cy="17" r="5" fill="url(#lgg)"/></svg>'}
 var EYE_ON='<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',EYE_OFF='<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
 function pwf(id,ac,ph){return '<div class="pw"><input class="fm" id="'+id+'" type="password" autocomplete="'+ac+'"'+(ph?' placeholder="'+ph+'"':'')+'><button type="button" class="eye" aria-label="Tampilkan kata sandi" onclick="togglePw(this)">'+EYE_ON+'</button></div>'}
@@ -654,7 +670,7 @@ try{var r=Notification.requestPermission(fin);if(r&&r.then)r.then(fin,function()
 var IC={home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>',deb:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M15.5 5.2a3.2 3.2 0 010 6"/><path d="M17 14.3c2 .6 3.5 2.300 3.5 4.700"/>',cash:'<path d="M5 20V11"/><path d="M12 20V5"/><path d="M19 20v-6"/>',kre:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',dev:'<path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><path d="M13.5 5l-3 14"/>'};
 function ico(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(IC[k]||IC.home)+'</svg>'}
 IC.pin='<path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4"/><path d="M10 12h6M10 16h6"/>';IC.set='<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>';
-function draw(){if(!AUTH)return loginView();if(MT.on&&!isDev())return mtView();
+function draw(){mtUi();if(!AUTH)return loginView();if(MT.on&&!isDev())return mtView();
 if(isNas()&&['home','pin','set'].indexOf(S.tab)<0)S.tab='home';if(S.tab==='dev'&&!isDev())S.tab='home';if(S.tab==='kre'&&!canAdmin())S.tab='home';
 var v=isNas()?{home:nasHome,pin:nasPin,set:nasSet}[S.tab]():{home:home,deb:debitur,cash:cash,kre:admin,set:nasSet,dev:devTab}[S.tab]();
 var n=isNas()?[['home','home','Home'],['pin','pin','Pinjaman'],['set','set','Setting']]:[['home','home','Home'],['deb','deb','Debitur'],['cash','cash','Cash flow']];if(canAdmin())n.push(['kre','kre','Admin'],['set','set','Setting']);if(isDev())n.push(['dev','dev','Developer']);
@@ -914,6 +930,7 @@ function mtEnd(el){var to=(+el.value)>=50?100:0;(function f(){var v=+el.value,n=
 function mtAsk(on){cls();var t=on?'Maintenance':'Live';document.body.insertAdjacentHTML('beforeend','<div class="mk" style="align-items:center;padding:24px" onclick="if(event.target===this)mtNo()"><div class="sh" role="dialog" aria-modal="true" style="border-radius:14px;max-width:320px;padding:20px 16px 16px;text-align:center"><h3>Enter '+t+' Mode?</h3><p style="margin-top:6px">'+(on?'Semua akun selain developer akan melihat halaman maintenance.':'Aplikasi dapat dipakai semua akun.')+'</p><div style="display:flex;gap:10px;margin-top:16px"><button type="button" class="btn" style="margin:0" onclick="mtYes('+(on?1:0)+')">Ya</button><button type="button" class="btn g" style="margin:0" onclick="mtNo()">Batalkan</button></div></div></div>')}
 function mtYes(on){cls();mtSet(!!on)}
 function mtNo(){cls();draw()}
+function mtUi(){var on=!!(AUTH&&MT.on),h=document.documentElement;h.classList.toggle('mtg',on);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',on?'#6B7280':'#1E6FD9');var b=document.getElementById('dvm'),sh=on&&isDev();if(sh&&!b)document.body.insertAdjacentHTML('beforeend','<div id="dvm" role="status" aria-label="Mode developer aktif"><i></i>Dev Mode</div>');else if(!sh&&b)b.remove()}
 function mtView(){document.getElementById('app').innerHTML='<div class="lgn"><div style="text-align:center"><img src="'+MT_IMG+'" alt="Sabar ya, aplikasinya sedang maintenance" style="width:min(86vw,380px);height:auto;display:block;margin:0 auto"></div><div class="lc"><button class="btn" type="button" onclick="mtLoad().then(draw)">Muat ulang</button><button class="lk" type="button" onclick="logout()">Keluar</button></div></div>'}
 setInterval(mtLoad,30000);document.addEventListener('visibilitychange',function(){if(!document.hidden)mtLoad()});
 function acpOpen(){DV.acp=true;DV.pg=1;try{window.scrollTo(0,0)}catch(e){}draw()}
@@ -1134,7 +1151,7 @@ try{A=JSON.parse(ls(AK))}catch(e){}
 AUTH=!RV&&!!A&&ls(SK)==='1';var SEXP=false;if(AUTH&&Date.now()-(+ls(AKT)||0)>TO){AUTH=false;SEXP=true;try{localStorage.removeItem(SK)}catch(e){}}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 draw();if(SEXP)toast('Sesi berakhir karena tidak aktif 10 menit. Silakan masuk lagi.');
-cekNotif();setInterval(function(){cekNotif()},30000);document.addEventListener('visibilitychange',function(){cekNotif();if(!document.hidden&&AUTH)fetchRole()});if(AUTH){fetchRole();hbBeat()}
+cekNotif();setInterval(function(){cekNotif()},30000);document.addEventListener('visibilitychange',function(){cekNotif();if(!document.hidden&&AUTH)fetchRole()});if(AUTH){fetchRole();hbBeat();bkArm()}
 
 /* ===== Geser untuk hapus (Cash flow) ===== */
 function hapusS(id,k){if(!canAdmin())return toast('Hanya admin yang bisa mengubah data ini.');
