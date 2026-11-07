@@ -730,7 +730,7 @@ applyView();
 var DV={rows:null,total:0,busy:false,err:'',seeAll:false,shown:20,ro:false};
 try{localStorage.removeItem('kosfa-dv');sessionStorage.removeItem('kosfa-dv')}catch(e){}
 /* ===== Apps Update: log aktivitas + notifikasi developer ===== */
-AW.au='activity';
+AW.au='6aef247300339ee2bd3d';
 var AP={rows:null,busy:false,err:'',f:'all',pg:1,fresh:{}},AUSK='kosfa-auseen',AUPP=10;
 function auLog(kind,title,detail){try{if(!AUTH||!A||!A.email||!AW.au)return;
 fetch(awUrlT(AW.au),{method:'POST',headers:{'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'},body:JSON.stringify({rowId:'unique()',data:{kind:String(kind).slice(0,20),title:String(title).slice(0,120),detail:String(detail||'').slice(0,255),actor:String(A.email).slice(0,254)}})}).catch(function(){})}catch(e){}}
@@ -747,7 +747,7 @@ async function auLoad(quiet){if(AP.busy||!AUTH||!A||!isDev()||!AW.au)return;AP.b
 try{var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'orderDesc',attribute:'$createdAt'}));q.append('queries[]',JSON.stringify({method:'limit',values:[100]}));
 var r=await fetch(awUrlT(AW.au,'?'+q.toString()),{headers:awH()});
 if(r.status===401||r.status===403)AP.err='Akses ditolak ('+r.status+'). Cek permission tabel activity di Appwrite.';
-else if(r.status===404)AP.err='Tabel activity belum dibuat di Appwrite. Buat tabel dengan ID activity (kolom kind, title, detail, actor).';
+else if(r.status===404)AP.err='Tabel activity tidak ditemukan di Appwrite. Cek Table ID dan database-nya.';
 else if(!r.ok)AP.err='Gagal memuat Apps Update ('+r.status+').';
 else{var j=await r.json();AP.rows=j.rows||j.documents||[];AP.err=''}}
 catch(e){if(!quiet)AP.err='Tidak bisa terhubung ke Appwrite.'}
