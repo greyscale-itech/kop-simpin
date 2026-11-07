@@ -514,28 +514,63 @@ function logo(z){return '<svg width="'+z+'" height="'+z+'" viewBox="0 0 64 64" r
 var EYE_ON='<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',EYE_OFF='<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
 function pwf(id,ac,ph){return '<div class="pw"><input class="fm" id="'+id+'" type="password" autocomplete="'+ac+'"'+(ph?' placeholder="'+ph+'"':'')+'><button type="button" class="eye" aria-label="Tampilkan kata sandi" onclick="togglePw(this)">'+EYE_ON+'</button></div>'}
 function togglePw(b){var i=b.parentNode.querySelector('input'),h=i.type==='password';i.type=h?'text':'password';b.innerHTML=h?EYE_OFF:EYE_ON;b.setAttribute('aria-label',h?'Sembunyikan kata sandi':'Tampilkan kata sandi')}
-function loginView(){var a=!!A,bio=a&&A.cred&&window.PublicKeyCredential;
+var RV=null;try{var _q=new URLSearchParams(location.search);if(_q.get('userId')&&_q.get('secret'))RV={u:_q.get('userId'),s:_q.get('secret')}}catch(e){}
+function recClr(){try{history.replaceState(null,'',location.pathname)}catch(e){}}
+function recBatal(){RV=null;recClr();LM='masuk';loginView()}
+function recView(){document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh"><div class="lgcard" role="img" aria-label="Simpinku"><i class="lgB"></i><i class="lgT"></i></div><p>Buat kata sandi baru</p></div><div class="lc"><form novalidate onsubmit="event.preventDefault();recOk()"><label class="fl" for="rp" style="margin-top:0">Kata sandi baru</label>'+pwf('rp','new-password','Minimal 8 karakter')+'<label class="fl" for="rq">Ulangi kata sandi baru</label>'+pwf('rq','new-password')+'<div class="err" id="err"></div><button class="btn" type="submit">Simpan kata sandi</button></form><button class="lk" type="button" onclick="recBatal()">Batal</button></div></div>'}
+async function recOk(){var p=val('rp'),q=val('rq');if(p.length<8)return emsg('Kata sandi minimal 8 karakter.');if(p!==q)return emsg('Ulangi kata sandi belum sama.');
+try{var r=await fetch(AW.ep+'/account/recovery',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:RV.u,secret:RV.s,password:p})});
+if(r.ok){RV=null;recClr();try{localStorage.removeItem('kosfa-lf')}catch(e){}LM='masuk';loginView();return toast('Kata sandi berhasil diganti. Silakan masuk.')}
+if(r.status===401||r.status===404){RV=null;recClr();LM='masuk';loginView();return emsg('Link reset sudah kedaluwarsa atau sudah dipakai. Minta link baru lewat Lupa kata sandi.')}
+if(r.status===429)return emsg('Terlalu banyak percobaan. Coba lagi beberapa saat lagi.');
+return emsg('Kata sandi ditolak server. Gunakan kata sandi minimal 8 karakter.')}catch(e){emsg('Tidak bisa terhubung ke server. Periksa koneksi internet.')}}
+function lupa(){var e0=document.getElementById('le'),em=e0?e0.value.trim():'';
+sheet('<h3>Lupa kata sandi</h3><p>Kami kirim link untuk membuat kata sandi baru ke email akun Anda. Link berlaku 1 jam dan bisa dibuka di perangkat mana saja.</p>'+F('lpe','Email',em,'type="email" autocomplete="email"')+'<div class="err" id="lerr"></div><button class="btn" id="lpb" onclick="lupaKirim()">Kirim link reset</button><button class="btn g" onclick="cls()">Batal</button>')}
+async function lupaKirim(){var el=document.getElementById('lerr'),b=document.getElementById('lpb'),em=val('lpe').trim().toLowerCase(),m=function(t){if(el)el.textContent=t;return 0};
+if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return m('Format email belum benar.');
+if(!/^https?:$/.test(location.protocol))return m('Fitur ini hanya jalan jika aplikasi dibuka lewat alamat https, bukan file lokal.');
+if(b)b.disabled=true;
+try{var r=await fetch(AW.ep+'/account/recovery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,url:location.origin+location.pathname})});
+if(r.ok){cls();return toast('Link reset dikirim ke '+em+'. Cek inbox atau folder spam.')}
+if(b)b.disabled=false;
+if(r.status===404)return m('Email ini belum terdaftar. Gunakan Daftar.');
+if(r.status===429)return m('Terlalu banyak permintaan. Coba lagi beberapa menit lagi.');
+if(r.status===400)return m('Alamat aplikasi ini belum didaftarkan di Appwrite (Platforms). Hubungi admin.');
+return m('Server belum bisa mengirim email. Hubungi admin.')}catch(e){if(b)b.disabled=false;return m('Tidak bisa terhubung ke server.')}}
+var LM='masuk';function setLM(m){LM=m;loginView()}
+function loginView(){if(RV)return recView();var a=LM==='masuk',bio=a&&!!A&&A.cred&&window.PublicKeyCredential;
 document.getElementById('app').innerHTML='<div class="lgn"><div class="lgh"><div class="lgcard" role="img" aria-label="Simpinku"><i class="lgB"></i><i class="lgT"></i></div><p>'+(a?'Masuk untuk melanjutkan':'Buat akun untuk mulai')+'</p></div><div class="lc"><form novalidate onsubmit="event.preventDefault();'+(a?'masuk()':'daftar()')+'">'+
-'<label class="fl" for="le" style="margin-top:0">Email</label><input class="fm" id="le" type="email" autocomplete="email" placeholder="nama@email.com"'+(a?' value="'+esc(A.email)+'"':'')+'>'+
+'<label class="fl" for="le" style="margin-top:0">Email</label><input class="fm" id="le" type="email" autocomplete="email" placeholder="nama@email.com"'+(a&&A?' value="'+esc(A.email)+'"':'')+'>'+
 '<label class="fl" for="lp">Kata sandi</label>'+pwf('lp',a?'current-password':'new-password','Minimal 8 karakter')+''+
 (a?'':'<label class="fl" for="lq">Ulangi kata sandi</label>'+pwf('lq','new-password')+'')+
 '<div class="err" id="err"></div><button class="btn" type="submit">'+(a?'Masuk':'Buat akun dan masuk')+'</button></form>'+
 (bio?'<button class="btn g" type="button" onclick="bioLogin()">Masuk dengan biometrik</button>':'')+
-(a?'<button class="lk" type="button" onclick="resetAkun()">Lupa kata sandi? Reset akun (data pinjaman tetap aman)</button>':'')+'</div></div>'}
+(a?'<button class="lk" type="button" onclick="lupa()">Lupa kata sandi?</button>':'')+(a&&A?'<button class="lk" type="button" onclick="resetAkun()">Hapus akun dari perangkat ini</button>':'')+'<button class="lk" type="button" onclick="setLM(\''+(a?'daftar':'masuk')+'\')">'+(a?'Belum punya akun? Daftar':'Sudah punya akun? Masuk')+'</button></div></div>'}
 async function daftar(){var em=val('le').trim().toLowerCase(),p=val('lp'),q=val('lq');
 if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return emsg('Format email belum benar.');
 if(p.length<8)return emsg('Kata sandi minimal 8 karakter.');if(p!==q)return emsg('Ulangi kata sandi belum sama.');
-try{var sl=b64(rnd(16));A={v:2,email:em,salt:sl,hash:await hp(sl,p),cred:null};saveA();await awAuth(em,p);setSess('daftar')}catch(e){emsg('Browser ini belum mendukung penyimpanan kata sandi yang aman.')}}
+var st=await awSignup(em,p);
+if(st==='exists'){LM='masuk';loginView();var e=document.getElementById('le');if(e)e.value=em;return emsg('Email ini sudah terdaftar. Masuk memakai kata sandi akun tersebut.')}
+if(st==='rate')return emsg('Terlalu banyak percobaan. Coba lagi beberapa saat lagi.');
+if(st==='net')return emsg('Tidak bisa terhubung ke server. Periksa koneksi internet lalu coba lagi.');
+if(st==='bad')return emsg('Email atau kata sandi ditolak server. Gunakan kata sandi minimal 8 karakter.');
+if(await awLogin(em,p)!=='ok')return emsg('Akun sudah dibuat tetapi gagal masuk. Coba lewat halaman Masuk.');
+try{var sl=b64(rnd(16));A={v:2,email:em,salt:sl,hash:await hp(sl,p),cred:null};saveA();setSess('daftar')}catch(e){emsg('Browser ini belum mendukung penyimpanan kata sandi yang aman.')}}
 function lfGet(){try{return JSON.parse(ls('kosfa-lf')||'{}')}catch(e){return{}}}
 async function masuk(){var em=val('le').trim().toLowerCase(),p=val('lp'),lf=lfGet(),w=(lf.u||0)-Date.now();
 if(w>0)return emsg('Terlalu banyak percobaan. Coba lagi dalam '+Math.ceil(w/1000)+' detik.');
-try{if(em===A.email){var ok=A.v===2?await hp(A.salt,p)===A.hash:await sha(A.salt+p)===A.hash;if(ok){if(A.v!==2){A.v=2;A.hash=await hp(A.salt,p);saveA()}try{localStorage.removeItem('kosfa-lf')}catch(x){}await awAuth(em,p);return setSess('password')}}}catch(e){}
+if(!em||!p)return emsg('Isi email dan kata sandi.');
+var st=await awLogin(em,p);
+if(st==='ok'){try{var sl=b64(rnd(16)),hs=await hp(sl,p);if(!A||A.email!==em)A={v:2,email:em,cred:null};A.v=2;A.salt=sl;A.hash=hs;saveA();localStorage.removeItem('kosfa-lf')}catch(e){if(!A||A.email!==em){A={v:2,email:em,salt:'',hash:'',cred:null};saveA()}}return setSess('password')}
+if(st==='rate')return emsg('Terlalu banyak percobaan. Coba lagi beberapa saat lagi.');
+if(st==='net'){if(!(A&&em===A.email))return emsg('Tidak bisa terhubung ke server. Periksa koneksi internet.');
+try{var ok=A.v===2?await hp(A.salt,p)===A.hash:await sha(A.salt+p)===A.hash;if(ok){try{localStorage.removeItem('kosfa-lf')}catch(x){}return setSess('password')}}catch(e){}}
 var n=(lf.n||0)+1;lw('kosfa-lf',JSON.stringify({n:n,u:n>=5?Date.now()+Math.min(300,30*Math.pow(2,n-5))*1000:0}));
 emsg('Email atau kata sandi salah.')}
 async function bioReg(){if(!window.PublicKeyCredential||!navigator.credentials)return toast('Perangkat ini belum mendukung biometrik.');
 try{var c=await navigator.credentials.create({publicKey:{challenge:rnd(32),rp:{name:'Simpinku'},user:{id:rnd(16),name:A.email,displayName:A.email},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});
 A.cred=b64(c.rawId);saveA();toast('Biometrik aktif');draw()}catch(e){toast('Biometrik belum bisa diaktifkan. Buka link langsung di browser HP, bukan di dalam preview.')}}
-async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});setSess('biometrik')}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
+async function bioLogin(){try{await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:'public-key',id:unb64(A.cred)}],userVerification:'required',timeout:60000}});var rs=await fetch(AW.ep+'/account').catch(function(){return null});if(rs&&rs.status===401)return emsg('Sesi server sudah berakhir. Masuk dengan kata sandi sekali lagi.');setSess('biometrik')}catch(e){emsg('Verifikasi biometrik gagal atau dibatalkan.')}}
 function logout(){BKO=false;BKE=false;fetch(AW.ep+'/account/sessions/current',{method:'DELETE'}).catch(function(){});try{localStorage.removeItem('cookieFallback');localStorage.removeItem(RK)}catch(e){}devClear();AUTH=false;RQ.rows=null;try{localStorage.removeItem(SK)}catch(e){}draw()}
 function resetAkun(){sheet('<h3>Reset akun</h3><p>Akun di perangkat ini akan dihapus. Data debitur, kreditur, dan transaksi tidak ikut terhapus. Ketik RESET untuk melanjutkan.</p>'+F('rk','Ketik RESET','','autocomplete="off" autocapitalize="characters"')+'<div class="err" id="err"></div><button class="btn d" onclick="resetOk()">Hapus akun</button><button class="btn g" onclick="cls()">Batal</button>')}
 function resetOk(){if(val('rk').trim().toUpperCase()!=='RESET')return emsg('Ketik RESET dulu.');try{localStorage.removeItem(AK);localStorage.removeItem('kosfa-lf')}catch(e){}A=null;cls();draw()}
@@ -589,11 +624,11 @@ if((S.tab==='home'||(S.tab==='pin'&&isNas())||(S.tab==='deb'&&canAdmin()))&&RQ.r
 var AW={ep:'https://sgp.cloud.appwrite.io/v1',pj:'6ae9a119001eed6c7760',db:'6ae9a339000541d84093',tb:'6ae9a34b000473d8c495',rt:'6ae9ad540039cfdf154f',rq:'6ae9f69c00342165316b',st:'qwerty987654321',fn:'6aed36e60034ccbe71ee',rk:'rekening'},DEVMAIL='greyscale.itech@gmail.com';
 /* ===== Revisi 1: sesi Appwrite Auth (X-Fallback-Cookies, sama seperti SDK web) ===== */
 (function(){var of=window.fetch;window.fetch=function(u,o){try{if(typeof u==='string'&&u.indexOf(AW.ep)===0){o=Object.assign({},o);o.credentials='include';var h=Object.assign({},o.headers||{});h['X-Appwrite-Project']=AW.pj;try{var c=localStorage.getItem('cookieFallback');if(c)h['X-Fallback-Cookies']=c}catch(e){}o.headers=h;return of(u,o).then(function(r){try{var f=r.headers.get('X-Fallback-Cookies');if(f)localStorage.setItem('cookieFallback',f)}catch(e){}return r})}}catch(e){}return of.apply(this,arguments)}})();
-async function awAuth(em,p){try{var P=function(u,b){return fetch(AW.ep+u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})};
-try{await fetch(AW.ep+'/account/sessions/current',{method:'DELETE'});localStorage.removeItem('cookieFallback')}catch(e){}
-var r=await P('/account/sessions/email',{email:em,password:p});
-if(r.status===401){var c=await P('/account',{userId:'unique()',email:em,password:p});if(c.ok||c.status===409)r=await P('/account/sessions/email',{email:em,password:p})}
-return r.ok}catch(e){return false}}
+async function awLogin(em,p){try{try{await fetch(AW.ep+'/account/sessions/current',{method:'DELETE'});localStorage.removeItem('cookieFallback')}catch(e){}
+var r=await fetch(AW.ep+'/account/sessions/email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:p})});
+if(r.ok)return 'ok';if(r.status===401||r.status===400)return 'bad';if(r.status===429)return 'rate';return 'net'}catch(e){return 'net'}}
+async function awSignup(em,p){try{var r=await fetch(AW.ep+'/account',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:'unique()',email:em,password:p})});
+if(r.ok)return 'ok';if(r.status===409)return 'exists';if(r.status===400)return 'bad';if(r.status===429)return 'rate';return 'net'}catch(e){return 'net'}}
 function uPerm(){try{var r=JSON.parse(ls(RK)||'null');return r&&r.u?['read("user:'+r.u+'")']:undefined}catch(e){}}
 async function awSetRole(em,role){if(!AW.fn)return 'Function set-role belum dipasang. Beri label admin lewat Appwrite Console (Auth > Users > Labels). Lihat REVISI-1.md.';
 try{var r=await fetch(AW.ep+'/functions/'+AW.fn+'/executions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:JSON.stringify({email:em,role:role}),async:false,method:'POST',path:'/'})});
@@ -1035,7 +1070,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden)sess
 window.addEventListener('focus',sessCek);
 var ts=ls(TK);if(ts&&['home','deb','cash','kre','dev'].indexOf(ts)>-1)S.tab=ts;
 try{A=JSON.parse(ls(AK))}catch(e){}
-AUTH=!!A&&ls(SK)==='1';var SEXP=false;if(AUTH&&Date.now()-(+ls(AKT)||0)>TO){AUTH=false;SEXP=true;try{localStorage.removeItem(SK)}catch(e){}}
+AUTH=!RV&&!!A&&ls(SK)==='1';var SEXP=false;if(AUTH&&Date.now()-(+ls(AKT)||0)>TO){AUTH=false;SEXP=true;try{localStorage.removeItem(SK)}catch(e){}}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 draw();if(SEXP)toast('Sesi berakhir karena tidak aktif 10 menit. Silakan masuk lagi.');
 cekNotif();setInterval(function(){cekNotif()},30000);document.addEventListener('visibilitychange',function(){cekNotif();if(!document.hidden&&AUTH)fetchRole()});if(AUTH){fetchRole();hbBeat()}
