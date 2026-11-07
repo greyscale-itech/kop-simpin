@@ -211,6 +211,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .aug{font-size:12px;font-weight:700;color:var(--mu);margin:12px 0 2px}.aug:first-child{margin-top:4px}
 .aur{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--ln)}
 .aui{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;margin-top:1px}.aui svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.aui.x{background:rgba(214,69,69,.14);color:var(--no)}.aun.aud{background:rgba(214,69,69,.14);color:var(--no)}
 .aui.i{background:var(--sG-bg);color:var(--sG-tx)}.aui.o{background:var(--sC-bg);color:var(--sC-tx)}.aui.d{background:var(--sB-bg);color:var(--sB-tx)}.aui.l{background:var(--sN-bg);color:var(--sN-tx)}
 .aub{min-width:0;flex:1}.aub b{display:block;font-size:14px;word-break:break-word}.aub small{display:block;color:var(--mu);font-size:12px;margin-top:1px;word-break:break-word}
 .aut{flex:none;text-align:right;color:var(--mu);font-size:11px;line-height:1.35;white-space:nowrap}
@@ -753,7 +754,8 @@ function auNewList(){var sn=auSeen();if(!AP.rows||!sn)return[];return AP.rows.fi
 function auMark(){if(!AP.rows)return;lw(AUSK,JSON.stringify(AP.rows.slice(0,200).map(function(x){return x.$id})))}
 function auTime(x){var d=new Date(x.$createdAt);if(isNaN(d))return{d:'',t:'',g:''};
 return{d:d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}),t:d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}).replace(':','.'),g:d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'short',year:'numeric'})}}
-function auIco(k){var P={kas_masuk:'<path d=\"M17 7L7 17M7 17h8M7 17V9\"/>',kas_keluar:'<path d=\"M7 17L17 7M17 7H9M17 7v8\"/>',debitur:'<circle cx=\"10\" cy=\"8\" r=\"3.5\"/><path d=\"M3.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M19 8v6M16 11h6\"/>',lain:'<path d=\"M4 20l4-1 11-11-3-3L5 16z\"/>'};
+function auDel(x){return /dihapus/i.test(String((x&&x.title)||''))}
+function auIco(k,x){if(auDel(x))return '<span class=\"aui x\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3\"/></svg></span>';var P={kas_masuk:'<path d=\"M17 7L7 17M7 17h8M7 17V9\"/>',kas_keluar:'<path d=\"M7 17L17 7M17 7H9M17 7v8\"/>',debitur:'<circle cx=\"10\" cy=\"8\" r=\"3.5\"/><path d=\"M3.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M19 8v6M16 11h6\"/>',lain:'<path d=\"M4 20l4-1 11-11-3-3L5 16z\"/>'};
 var c=k==='kas_masuk'?'i':k==='kas_keluar'?'o':k==='debitur'?'d':'l';return '<span class=\"aui '+c+'\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">'+(P[k]||P.lain)+'</svg></span>'}
 async function auLoad(quiet){if(AP.busy||!AUTH||!A||!isDev()||!AW.au)return;AP.busy=true;if(!quiet)AP.err='';
 try{var q=new URLSearchParams();q.append('queries[]',JSON.stringify({method:'orderDesc',attribute:'$createdAt'}));q.append('queries[]',JSON.stringify({method:'limit',values:[100]}));
@@ -784,7 +786,7 @@ if(AP.err)body='<div class=\"err\">'+esc(AP.err)+'</div>';
 else if(!AP.rows)body='<p style=\"color:var(--mu)\">Memuat data…</p>';
 else if(!pl.length)body='<p style=\"color:var(--mu)\">Belum ada aktivitas.</p>';
 else pl.forEach(function(x){var t=auTime(x);if(t.g!==last){last=t.g;body+='<div class=\"aug\">'+esc(t.g)+'</div>'}
-body+='<div class=\"aur\">'+auIco(x.kind)+'<div class=\"aub\"><b>'+esc(x.title)+(AP.fresh[x.$id]?'<span class=\"aun\">Baru</span>':'')+'</b><small>'+esc(x.detail||'')+(x.detail?' · ':'')+'oleh '+esc(x.actor||'-')+'</small></div><div class=\"aut\">'+t.d+'<br>'+t.t+'</div></div>'});
+body+='<div class=\"aur\">'+auIco(x.kind,x)+'<div class=\"aub\"><b>'+esc(x.title)+(AP.fresh[x.$id]?'<span class=\"aun\">Baru</span>':'')+(auDel(x)?'<span class=\"aun aud\">Dihapus</span>':'')+'</b><small>'+esc(x.detail||'')+(x.detail?' · ':'')+'oleh '+esc(x.actor||'-')+'</small></div><div class=\"aut\">'+t.d+'<br>'+t.t+'</div></div>'});
 var nb='',B='width:36px;min-height:36px;padding:0;margin:0',pgb='';
 if(AP.rows&&np>1){for(var i=1;i<=np;i++)nb+='<button type=\"button\" class=\"btn g\" style=\"'+B+(i===pg?';border-color:var(--or);color:var(--or)':'')+'\" onclick=\"auGo('+i+')\">'+i+'</button>';
 pgb='<div style=\"display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px\">'+nb+'</div>'}
