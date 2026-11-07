@@ -325,7 +325,7 @@ function val(i){return document.getElementById(i).value}
 function num(i){return parseInt(val(i).replace(/\D/g,''),10)||0}
 function pc(i){var x=parseFloat(val(i).replace(',','.'));return isNaN(x)?0:x}
 function emsg(m){var e=document.getElementById('err');if(e)e.textContent=m;return 0}
-function toast(m){var e=document.createElement('div');e.className='toast';e.setAttribute('role','status');e.textContent=m;document.body.appendChild(e);setTimeout(function(){e.remove()},3500)}
+function toast(m){try{typeof hapToast==='function'&&hapToast(m)}catch(x){}var e=document.createElement('div');e.className='toast';e.setAttribute('role','status');e.textContent=m;document.body.appendChild(e);setTimeout(function(){e.remove()},3500)}
 function fmtI(el){var c=el.value.replace(/\D/g,'');el.value=c?fmt(+c):'';tot()}
 var MONEY='inputmode="numeric" autocomplete="off" oninput="fmtI(this)"';
 function F(id,l,v,a){return '<label class="fl" for="'+id+'">'+l+'</label><input class="fm" id="'+id+'" value="'+esc(v)+'" '+(a||'')+'>'}
@@ -741,6 +741,21 @@ try{if(screen.orientation&&screen.orientation.addEventListener)screen.orientatio
 if(window.matchMedia){var oq=matchMedia('(orientation:landscape)');if(oq.addEventListener)oq.addEventListener('change',vpRot);else if(oq.addListener)oq.addListener(vpRot)}
 function setView(m){if(m==='auto'){try{localStorage.removeItem(VK)}catch(e){}}else lw(VK,m);applyView();draw();toast(m==='pc'?'Mode PC aktif':m==='hp'?'Mode HP aktif':'Mode otomatis aktif')}
 applyView();
+/* ===== Haptic feedback (getar) khusus Mode HP ===== */
+var HPK='kosfa-haptic',HPB=false,HPL=null;
+function hapOn(){return ls(HPK)!=='0'}
+function isHp(){var m=viewMode();if(m==='hp')return true;if(m==='pc')return false;return !(window.matchMedia&&matchMedia('(min-width:900px)').matches)}
+function hapIos(){try{if(!HPL){var l=document.createElement('label');l.setAttribute('aria-hidden','true');l.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';var i=document.createElement('input');i.type='checkbox';i.setAttribute('switch','');i.tabIndex=-1;l.appendChild(i);document.body.appendChild(l);HPL=l}HPB=true;HPL.click();HPB=false}catch(e){HPB=false}}
+function hap(t){try{if(!hapOn()||!isHp())return;
+var P={tap:8,sel:14,ok:[12,45,12],warn:[24,40,24],err:[35,50,35,50,35]}[t||'tap'];
+if(navigator.vibrate){navigator.vibrate(P);return}
+hapIos();if(Array.isArray(P)&&t!=='tap')setTimeout(hapIos,80)}catch(e){}}
+function hapToast(m){var s=String(m||'');hap(/gagal|error|salah|tidak bisa|tidak dapat|belum mendukung|ditolak|kosong|wajib|harus/i.test(s)?'err':'ok')}
+document.addEventListener('click',function(e){if(HPB)return;var el=e.target&&e.target.closest?e.target.closest('button,a,[onclick],[role=button],label,summary,select,input[type=checkbox],input[type=radio]'):null;
+if(!el||el.disabled||el.getAttribute('aria-disabled')==='true')return;
+var s=(el.getAttribute('onclick')||'')+' '+(el.className||'');
+hap(/hapus|delete|logout|keluar|reset/i.test(s)?'warn':'tap')},true);
+function setHap(on){lw(HPK,on?'1':'0');draw();if(on)hap('ok')}
 var DV={rows:null,total:0,busy:false,err:'',seeAll:false,shown:20,ro:false};
 try{localStorage.removeItem('kosfa-dv');sessionStorage.removeItem('kosfa-dv')}catch(e){}
 /* ===== Apps Update: log aktivitas + notifikasi developer ===== */
@@ -974,7 +989,7 @@ nasAng()+'<div class="sec sb"><h2>Pengajuan terakhir</h2>'+nasErr()+nasList(L2.s
 function nasPin(){var A2=(RQ.rows||[]).filter(function(x){return x.status==='disetujui'});
 return nasHdr('Pinjaman','Detail pinjaman Anda')+(RQ.rows===null?'<div class="sec sb"><p style="color:var(--mu)">Memuat…</p></div>':A2.map(function(x){return '<div class="sec sb"><h2>'+rp(x.jumlah)+'</h2><div class="row"><span>Status</span>'+(rqMeta(x).lunas?'<span class="tag Lunas">Lunas</span>':rqTag(x.status))+'</div><div class="row"><span>Tenor</span><b>'+tlb(x.tenor)+'</b></div><div class="row"><span>Tujuan</span><b>'+esc(x.tujuan)+'</b></div><div class="row"><span>Tanggal pengajuan</span><b>'+fd(String(x.$createdAt||'').slice(0,10))+'</b></div>'+rqNoteRows(x,x.status==='disetujui')+'</div>'}).join('')||'<div class="sec sb">'+nasErr()+'<p style="color:var(--mu)">Belum ada pinjaman yang disetujui.</p></div>')}
 function nasSet(){
-return '<div class="hd ov"><h1>Setting</h1><p>Pengaturan akun dan tampilan</p><button type="button" class="shr" aria-label="Bagikan Simpinku" onclick="shareApp()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button></div>'+(canAdmin()?pengSec():'')+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar.</p><div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div><div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+profSec()+logoutSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
+return '<div class="hd ov"><h1>Setting</h1><p>Pengaturan akun dan tampilan</p><button type="button" class="shr" aria-label="Bagikan Simpinku" onclick="shareApp()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button></div>'+(canAdmin()?pengSec():'')+'<div class="sec"><h2>Mode tampilan PC &amp; HP</h2><p style="color:var(--mu);font-size:12.5px">Pilih tata letak aplikasi. Otomatis mengikuti lebar layar.</p><div class="row"><span>Mode saat ini</span><b>'+({pc:'PC',hp:'HP',auto:'Otomatis'}[viewMode()])+'</b></div><div class="tg" style="grid-template-columns:repeat(3,1fr)">'+[['auto','Otomatis'],['pc','Mode PC'],['hp','Mode HP']].map(function(x){return '<button type="button" class="'+(viewMode()===x[0]?'on':'')+'" onclick="setView(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')+'</div></div>'+'<div class=\"sec\"><h2>Getaran (haptic)</h2><p style=\"color:var(--mu);font-size:12.5px\">HP bergetar halus saat tombol disentuh. Hanya aktif di Mode HP.</p><div class=\"row\"><span>Getaran saat ini</span><b>'+(hapOn()?'Nyala':'Mati')+'</b></div><div class=\"tg\" style=\"grid-template-columns:repeat(2,1fr)\">'+[[1,'Nyala'],[0,'Mati']].map(function(x){return '<button type=\"button\" class=\"'+((hapOn()?1:0)===x[0]?'on':'')+'\" onclick=\"setHap('+x[0]+')\">'+x[1]+'</button>'}).join('')+'</div></div>'+profSec()+logoutSec()+'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
 function awH(x){var h={'X-Appwrite-Project':AW.pj,'Content-Type':'application/json'};return Object.assign(h,x||{})}
 function devInfo(){var u=navigator.userAgent||'',o=/Android/i.test(u)?'Android':/iPhone/i.test(u)?'iPhone':/iPad/i.test(u)?'iPad':/Windows/i.test(u)?'Windows':/Mac/i.test(u)?'Mac':/Linux/i.test(u)?'Linux':'Perangkat lain',
 b=/Edg\//.test(u)?'Edge':/OPR\//.test(u)?'Opera':/Firefox|FxiOS/.test(u)?'Firefox':/Chrome|CriOS/.test(u)?'Chrome':/Safari/.test(u)?'Safari':'Browser';return (o+' · '+b+' #'+did()).slice(0,255)}
