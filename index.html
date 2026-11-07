@@ -243,6 +243,16 @@ input.mtr::-moz-range-thumb{width:26px;height:54px;border-radius:4px;border:1px 
 
 @media (prefers-color-scheme:dark){.agp.s{background:#173B31;color:#3CCBA5}.agp.b{background:#3F2F12;color:#FFB84D}}
 </style>
+<style id="lsh">
+@media (orientation:landscape) and (max-height:560px){
+#app{max-width:none;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+nav{max-width:none;left:0;transform:none;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav button{flex:1 1 0;flex-direction:row;justify-content:center;gap:6px;padding:7px 2px;font-size:11.5px}
+nav button i{width:22px;height:22px;border-radius:0;background:none}nav button.on i{background:none}nav button.on{background:rgba(255,255,255,.2)}
+.sh{max-width:680px}
+.hd{padding-top:12px;padding-bottom:56px}
+}
+</style>
 <style id="pcs" media="(min-width:900px)">
 /* ===== Mode PC (layar lebar >= 900px, atau dipaksa lewat tab Admin) ===== */
 body{display:block}
@@ -304,6 +314,8 @@ nav button.on i{background:none}
 .sw .sd{position:static;order:2;flex:none;width:64px}
 .sw .row{order:1;flex:1;min-width:0;transform:none!important;transition:background .15s}
 .sw .row:hover{background:var(--card)}
+
+@media (max-height:640px){nav{overflow-y:auto;padding:12px 10px;gap:2px;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav::before{height:44px;margin:0 2px 8px;background-size:auto 28px,auto 20px}nav button{padding:8px 12px}}
 </style>
 <style id="pcs2" media="(min-width:1500px)">
 #app:has(nav){padding-inline:max(32px,calc((100% - 1600px)/2))}
@@ -318,7 +330,7 @@ var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bul
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
 var DB={D:[],K:[],T:[],O:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
 /* VERSI: naikkan APPREV +1 tiap revisi file ini (lihat catatan di paling atas file) */
-var APPREV=95;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
+var APPREV=96;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -466,7 +478,7 @@ if(S.hist)return '<div class="hd cp" style="display:flex;align-items:center;gap:
 return '<div class="hd"><h1>Cash flow</h1><p>Angsuran masuk dan pencairan keluar</p></div><div class="wal"><label class="fl" for="cm" style="margin-top:0">Pilih bulan</label><select class="fm" id="cm" onchange="S.cm=this.value;draw()">'+opts+'</select><small style="display:block;margin-top:12px">Kas bersih '+nm+'</small><b class="big '+(net>=0?'in':'out')+'">'+(net>=0?'+':'−')+rp(Math.abs(net))+'</b>'+
 '<div class="grid" style="grid-template-columns:1fr 1fr"><div class="st"><b class="in" style="font-size:16px">'+rp(masuk)+'</b>Kas masuk</div><div class="st"><b style="font-size:16px">'+rp(r.o)+'</b>Kas keluar</div></div>'+'</div>'+
 '<div class="sec sb"><h2>Rincian '+nm+'</h2><div class="row"><span>Angsuran debitur</span><b class="in">'+rp(r.a)+'</b></div><div class="row"><span>Setoran modal</span><b class="in">'+rp(r.m)+'</b></div><div class="row"><span>Pinjaman kreditur</span><b class="in">'+rp(r.k)+'</b></div><div class="row"><span>Pendapatan lain dan lainnya</span><b class="in">'+rp(r.l)+'</b></div><div class="row"><span>Pencairan pinjaman (keluar)</span><b class="out">'+rp(r.pc)+'</b></div><div class="row"><span>Bayar angsuran (keluar)</span><b class="out">'+rp(r.ba)+'</b></div><div class="row"><span>Dana keluar lainnya</span><b class="out">'+rp(r.lo)+'</b></div></div>'+
-'<div class="sec sb"><h2>Per bulan</h2>'+rows+'</div><div class="sec sb"><h2>History Transaksi</h2><div class="hsr"><small>'+all.length+' transaksi · '+nm+'</small><button type="button" class="btn" onclick="histOpen()">Open</button></div>'+(all.length?hstTbl(all.slice(0,5),false,TT):'')+'</div>'}
+'<div class="sec sb"><h2>Per bulan</h2>'+rows+'</div><div class="sec sb"><h2>History Transaksi</h2><div class="hsr"><small>'+all.length+' transaksi · '+nm+'</small><button type="button" class="btn" onclick="histOpen()">Open</button></div>'+'</div>'}
 function hstTbl(rows,act,T){return '<div class="hst"><table class="stm"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Debit</th><th>Credit</th><th>Balance</th>'+(act?'<th></th>':'')+'</tr></thead><tbody>'+rows.map(function(t){
 var ac='';if(act){ac='<td class="sta">'+(t.k==='o'?'':'<button type="button" class="stb" aria-label="Edit transaksi" onclick="'+(t.k==='t'?'txf':'dform')+'(\''+t.id+'\')">'+SVP+'</button>')+'<button type="button" class="stb" aria-label="Hapus transaksi" onclick="hapusS(\''+t.id+'\',\''+t.k+'\')">'+SVT+'</button></td>'}
 return '<tr><td>'+fd(t.dt)+'</td><td><b>'+esc(t.ti)+'</b><small>'+esc(t.sb)+'</small></td><td class="out">'+(t.a<0?fmt(-t.a):'–')+'</td><td class="in">'+(t.a>0?fmt(t.a):'–')+'</td><td class="'+(t.b<0?'out':'')+'">'+(t.b<0?'−':'')+fmt(Math.abs(t.b))+'</td>'+ac+'</tr>'}).join('')+'</tbody><tfoot><tr><td></td><td>Total</td><td class="out">'+fmt(T.d)+'</td><td class="in">'+fmt(T.c)+'</td><td>'+(T.b<0?'−':'')+fmt(Math.abs(T.b))+'</td>'+(act?'<td></td>':'')+'</tr></tfoot></table></div>'}
@@ -746,7 +758,7 @@ if(vp)vp.setAttribute('content',m==='pc'?pcVp():'width=device-width, initial-sca
 function isLand(){try{if(screen.orientation&&screen.orientation.type)return screen.orientation.type.indexOf('landscape')===0}catch(e){}
 if(typeof window.orientation==='number')return Math.abs(window.orientation)===90;
 return !!(window.matchMedia&&matchMedia('(orientation:landscape)').matches)}
-function pcVp(){var l=isLand(),sw=screen.width||0,sh=screen.height||0,w=l?Math.max(sw,sh):Math.min(sw,sh),W=1100;
+function pcVp(){var l=isLand(),sw=screen.width||0,sh=screen.height||0,w=l?Math.max(sw,sh):Math.min(sw,sh),h=l?Math.min(sw,sh):Math.max(sw,sh),W=1100;if(l&&w&&h)W=Math.max(W,Math.ceil(620*w/h));
 if(!w||w>=W)return 'width=device-width, initial-scale=1, viewport-fit=cover';var sc=Math.floor(w/W*1000)/1000;return 'width='+W+', initial-scale='+sc+', minimum-scale='+sc+', viewport-fit=cover'}
 var vpT=[];function vpRot(){if(viewMode()!=='pc')return;var vp=document.querySelector('meta[name=viewport]');if(!vp)return;
 vp.setAttribute('content','width=device-width, initial-scale=1, viewport-fit=cover');
