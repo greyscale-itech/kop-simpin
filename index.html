@@ -187,6 +187,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .sw1{background:var(--or)}.sw2{background:var(--no)}
 .swc{position:relative;background:var(--card);transition:transform .25s ease;touch-action:pan-y}
 .swr.on .swc{transform:translateX(-110px)}
+.dvh .apr{display:flex;flex-direction:column;gap:12px;width:100%}
+.dvh .apl{display:flex;flex-direction:column;gap:12px;min-width:0}
+.dvh .apl .grid.g2{width:100%;justify-content:center;gap:40px;background:var(--bg);border-radius:10px;padding:12px;margin:0;text-align:center}
+.dvh .apl .grid.g2 .st{text-align:center}
+.dvh .apu{width:100%;min-width:0}.dvh .apu .upw{margin-top:8px}
+
 .hbt{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.24);color:#fff;display:grid;place-items:center;cursor:pointer;padding:0;margin:0;flex:none;-webkit-tap-highlight-color:transparent}.hbt svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.hbt:active{background:rgba(255,255,255,.4)}.hbt:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .mtw{margin:12px 0 8px}.mtl{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:6px}
 .mtb{margin:10px 0;padding:6px 7px;border-radius:999px;border:2.5px solid transparent;background:linear-gradient(180deg,#f7faff,#dde9fa) padding-box,linear-gradient(90deg,#0a5de0,#12a5b8) border-box;box-shadow:0 2px 8px rgba(10,90,220,.18)}
@@ -247,6 +253,12 @@ nav button.on i{background:none}
 .lgn{margin-bottom:0;align-items:center}
 .lgn .lgh{width:100%}.lgn .lc{width:100%;max-width:420px}
 .toast{top:20px}
+/* Account Panel: tombol update di kanan atas, data login di samping email */
+.dvh .apr{flex-direction:row;align-items:flex-start;justify-content:space-between;gap:28px}
+.dvh .apl{flex-direction:row;align-items:center;gap:36px}
+.dvh .apl .grid.g2{width:auto;background:none;padding:0;gap:32px;text-align:left}
+.dvh .apl .grid.g2 .st{text-align:left}
+.dvh .apu{width:210px;flex:none}
 /* Daftar transaksi: tombol hapus di kanan, angka bergeser mengikuti ikon (tidak tumpang tindih) */
 .sw{display:flex;align-items:stretch}
 .sw .sd{position:static;order:2;flex:none;width:64px}
@@ -1030,7 +1042,7 @@ var loginBox='<div class="sec sc" style="display:flex;align-items:center;gap:12p
 var mtBox='<div class="sec sg"><h2>Development Mode</h2><div class="mtw"><div class="mtl"><b style="color:'+(MT.on?'var(--mu)':'var(--ok)')+'">Live</b><b id="mtp" style="color:var(--mu);font-variant-numeric:tabular-nums">'+(MT.on?100:0)+'%</b><b style="color:'+(MT.on?'var(--wn)':'var(--mu)')+'">Mntc</b></div><div class="mtb"><input type="range" class="mtr" min="0" max="100" step="0.1" value="'+(MT.on?100:0)+'" aria-label="Mode aplikasi, 0 persen Live, 100 persen Maintenance" style="--v:'+(MT.on?100:0)+'"'+(MT.busy?' disabled':'')+' oninput="mtMove(this)" onchange="mtEnd(this)"></div></div><small style="display:block;text-align:center;color:var(--mu)">'+(MT.on?'Maintenance aktif: semua akun selain developer melihat halaman maintenance.':'Live: aplikasi dapat dipakai semua akun.')+'</small></div>';
 var userBox='<div class="sec sc"><div style="display:flex;align-items:center;gap:12px"><div style="flex:1;min-width:0"><h2 style="margin:0">Pengguna dan peran</h2><small style="color:var(--mu)">'+(DV.rows?ul.length+' pengguna, '+adm.length+' admin':'Memuat data…')+'</small></div><button type="button" class="btn" style="width:auto;margin:0;padding:10px 20px" onclick="rpOpen()">Open</button></div><label class="fl" for="ae" style="margin-top:14px">Tambah admin lewat email</label><div style="display:flex;gap:8px;align-items:stretch"><input class="fm" id="ae" type="email" inputmode="email" autocomplete="off" placeholder="nama@email.com" style="margin-top:4px" onkeydown="if(event.key===\'Enter\'){event.preventDefault();devAddAdmin()}"><button type="button" class="btn" style="width:auto;margin:4px 0 0;padding:0 16px;white-space:nowrap" onclick="devAddAdmin()">Tambah Admin</button></div><div class="err" id="err"></div></div>';
 var chart=dvChart(R);
-return hd+'<div class="wal walrow dvh"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;width:100%"><div class="accinfo">'+acc+'</div></div><div class="grid g2"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?ul.length:'…')+'</b>Pengguna</div></div><div style="width:100%">'+upBtn()+'</div>'+upUI()+(DV.rows?chart:'')+'</div>'+
+return hd+'<div class="wal walrow dvh"><div class="apr"><div class="apl"><div class="accinfo">'+acc+'</div><div class="grid g2"><div class="st"><b>'+(DV.rows?DV.total:'…')+'</b>Total login</div><div class="st"><b>'+(DV.rows?ul.length:'…')+'</b>Pengguna</div></div></div><div class="apu">'+upBtn()+upUI()+'</div></div>'+(DV.rows?chart:'')+'</div>'+
 userBox+loginBox+
 '<div class="sec"><h2>Cadangan data</h2><p style="color:var(--mu);font-size:12.5px">Data disimpan di perangkat ini dan disinkronkan ke Appwrite. '+syncTxt()+' Salin cadangan secara berkala agar aman.</p><div class="actrow"><button class="btn g" onclick="syncNow(1,1)">Sinkronkan sekarang</button><button class="btn g" onclick="backup()">Buka cadangan data</button></div></div>'+mtBox+capBox()}
 
