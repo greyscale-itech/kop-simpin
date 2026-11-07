@@ -330,7 +330,7 @@ var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bul
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
 var DB={D:[],K:[],T:[],O:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
 /* VERSI: naikkan APPREV +1 tiap revisi file ini (lihat catatan di paling atas file) */
-var APPREV=96;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
+var APPREV=98;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -490,8 +490,7 @@ function bar(l,v,c){return '<div class="row" style="display:block"><div style="d
 return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p>'+mlbBtn()+'</div><div class="wal adm"><small>Total kewajiban ke kreditur</small><b class="big">'+rp(tot)+'</b><small style="display:block;margin-top:4px">Angsuran '+rp(ang)+' per bulan</small><div class="grid adg"><div class="st"><b>'+ak.length+'</b>Aktif</div><div class="st"><b>'+jt(ang)+'</b>Angsuran/bln</div><div class="st"><b style="color:var(--ok)">'+(ang?cov.toLocaleString('id-ID',{maximumFractionDigits:1})+'×':'-')+'</b>Cakupan</div><div class="st"><b style="color:var(--or)">'+(K.length-ak.length)+'</b>Lunas</div></div></div>'+
 '<div class="sec sg"><h2>Kelola Keuangan</h2><p style="color:var(--mu);font-size:12.5px">Catat dana masuk dan dana keluar. Semua transaksi otomatis masuk ke Cash flow.</p><div class="actrow"><button class="btn rd" onclick="dkOpen()">− Dana Keluar</button><button class="btn gr" onclick="txf()">+ Dana Masuk</button></div></div>'+
 '<div class="sec sg"><h2>Update Data</h2><div class="secrow cu"><small style="color:var(--mu)">Muat ulang data debitur, transaksi, dan pengajuan pinjaman.</small><div class="sr-r"><button class="btn up" onclick="adminUpdate()"'+(AU.up&&AU.up.run?' disabled':'')+'>'+ICR+(AU.up&&AU.up.run?'Memperbarui…':'Update Data')+'</button></div></div>'+upUI(AU.up)+'</div>'+
-'<div class="sec sb"><h2>Piutang debitur vs kewajiban</h2>'+bar('Piutang beredar (debitur)',pit,'var(--or2)')+bar('Kewajiban (kreditur)',tot,'var(--kb)')+'<small style="color:var(--mu)">Cakupan = kas masuk bulan ini dibagi angsuran ke kreditur.</small></div>'+
-'<p class="nt" style="margin:16px 12px 8px">Developed by Fajar Q.</p>'}
+'<div class="sec sb"><h2>Piutang debitur vs kewajiban</h2>'+bar('Piutang beredar (debitur)',pit,'var(--or2)')+bar('Kewajiban (kreditur)',tot,'var(--kb)')+'<small style="color:var(--mu)">Cakupan = kas masuk bulan ini dibagi angsuran ke kreditur.</small></div>'}
 
 /* ===== Debitur ===== */
 var PT='mouse';document.addEventListener('pointerdown',function(e){PT=e.pointerType||'mouse'},true);
@@ -759,7 +758,7 @@ function isLand(){try{if(screen.orientation&&screen.orientation.type)return scre
 if(typeof window.orientation==='number')return Math.abs(window.orientation)===90;
 return !!(window.matchMedia&&matchMedia('(orientation:landscape)').matches)}
 function pcVp(){var l=isLand(),sw=screen.width||0,sh=screen.height||0,w=l?Math.max(sw,sh):Math.min(sw,sh),h=l?Math.min(sw,sh):Math.max(sw,sh),W=1100;if(l&&w&&h)W=Math.max(W,Math.ceil(620*w/h));
-if(!w||w>=W)return 'width=device-width, initial-scale=1, viewport-fit=cover';var sc=Math.floor(w/W*1000)/1000;return 'width='+W+', initial-scale='+sc+', minimum-scale='+sc+', viewport-fit=cover'}
+if(!w||w>=W)return 'width=device-width, initial-scale=1, viewport-fit=cover';return 'width='+W}
 var vpT=[];function vpRot(){if(viewMode()!=='pc')return;var vp=document.querySelector('meta[name=viewport]');if(!vp)return;
 vp.setAttribute('content','width=device-width, initial-scale=1, viewport-fit=cover');
 vpT.forEach(clearTimeout);vpT=[250,600,1200].map(function(ms){return setTimeout(applyView,ms)})}
