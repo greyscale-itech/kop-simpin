@@ -365,6 +365,49 @@ nav button{font-size:16px}
 .dts svg{width:20px;height:20px;fill:currentColor}
 .dts:hover{background:rgba(128,128,128,.15)}
 </style>
+<style id="tbt" media="(min-width:600px) and (max-width:899.98px) and (min-height:561px)">
+/* Revisi 105: layout tablet (600-899px, potret): isi aplikasi melebar penuh, navigasi tetap di bawah */
+body{font-size:15px}
+#app:has(nav){max-width:none;width:100%;display:flex;flex-direction:column;gap:16px;padding:20px 24px calc(100px + env(safe-area-inset-bottom,0px))}
+#app:has(nav)>*{min-width:0}
+#app>.hd{margin-top:0;border-radius:16px;padding:26px 28px 76px}
+#app>.hd h1{font-size:24px}#app>.hd p{font-size:15px}
+#app>.hd:not(.hh)::before{left:24px;top:22px;width:52px;height:52px;border-radius:15px}
+#app>.hd:not(.hh){padding-left:92px}
+#app>.hd.hh p{margin-top:12px}
+.lgchip{--bh:38px;--th:27px;padding:9px 16px;gap:11px;border-radius:15px}
+#app>.wal{margin:-52px 0 0;padding:22px 24px}
+#app>.hd.ov+.sec{margin:-52px 0 0}
+#app>.wal.walrow,#app>.wal.walrow.dvh{max-width:none}
+#app>.wal.walrow.dvh{margin:-52px 0 0}
+#app>.sec{margin:0;padding:20px 24px;--spx:24px;--spy:20px;font-size:15px}
+#app>.sec h2{font-size:16px}
+#app>.nt,#app>.ver{margin:0}
+.wal b.big{font-size:30px}
+.wal .grid:not(.g2){max-width:none;width:100%;gap:0;margin-top:16px;padding-top:16px}
+.wal .grid:not(.g2) .st{padding:4px 12px}
+.wal .grid:not(.g2) .st+.st{border-left:1px solid var(--ln)}
+.secrow.cu{justify-content:space-between;text-align:left}.secrow.cu>small{flex:1 1 160px}
+.bars{height:210px}.bp{height:176px}.hcp{height:220px}.hcv{font-size:12px}.hcw{grid-template-columns:52px minmax(0,1fr)}.hcl button{width:156px;height:32px;font-size:13px}.hcf button{font-size:12.5px;padding:5px 12px}.hcy span,.hcx span{font-size:12px}
+#lst{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px}
+#lst>p{grid-column:1/-1}
+.pmg{grid-template-columns:1fr 1fr 1fr}#app .pmg .pmt{display:block}#app .tgl{display:none}
+.sec .btn,.wal .btn{max-width:420px}
+.dvh .apr{flex-direction:row;align-items:flex-start;justify-content:space-between;gap:24px}
+.dvh .apl{flex-direction:row;align-items:center;gap:28px}
+.dvh .apl .grid.g2{width:auto;background:none;padding:0;gap:28px;text-align:left}
+.dvh .apl .grid.g2 .st{text-align:left}
+.dvh .apu{width:200px;flex:none}
+.dvb .dvt{flex:1 1 0}.dvb .dvo{width:auto;min-width:140px;padding-left:22px;padding-right:22px}
+.hsr{flex-direction:row;align-items:center;justify-content:space-between;gap:16px}.hsr .btn{width:auto;min-width:150px;margin:0}
+.st{font-size:13px}.st b{font-size:21px}
+#app .tag{font-size:12px}
+nav{max-width:none;width:100%;left:0;transform:none;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav button{font-size:13px}
+.mk{align-items:center;padding:24px}
+.sh{max-width:520px;border-radius:16px;max-height:88vh;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.toast{top:20px}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -375,7 +418,7 @@ var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bul
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
 var DB={D:[],K:[],T:[],O:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
 /* VERSI: naikkan APPREV +1 tiap revisi file ini (lihat catatan di paling atas file) */
-var APPREV=104;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
+var APPREV=105;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -803,7 +846,7 @@ var VK='kosfa-view';
 function viewMode(){var v=ls(VK);return v==='pc'||v==='hp'?v:'auto'}
 function applyView(){var m=viewMode(),a=document.getElementById('pcs'),b=document.getElementById('pcs2'),vp=document.querySelector('meta[name=viewport]');
 if(a)a.media=m==='pc'?'all':m==='hp'?'not all':'(min-width:900px)';
-if(b)b.media=m==='hp'?'not all':'(min-width:1500px)';
+if(b)b.media=m==='hp'?'not all':'(min-width:1500px)';var t=document.getElementById('tbt');if(t)t.media=m==='auto'?'(min-width:600px) and (max-width:899.98px) and (min-height:561px)':'not all';
 if(vp)vp.setAttribute('content',m==='pc'?pcVp():'width=device-width, initial-scale=1, viewport-fit=cover')}
 function isLand(){try{if(screen.orientation&&screen.orientation.type)return screen.orientation.type.indexOf('landscape')===0}catch(e){}
 if(typeof window.orientation==='number')return Math.abs(window.orientation)===90;
