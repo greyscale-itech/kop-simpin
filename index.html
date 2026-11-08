@@ -375,7 +375,7 @@ var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bul
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
 var DB={D:[],K:[],T:[],O:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
 /* VERSI: naikkan APPREV +1 tiap revisi file ini (lihat catatan di paling atas file) */
-var APPREV=101;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
+var APPREV=102;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -476,16 +476,20 @@ ln='<path d="'+hsp(s.v.map(function(v,i){return [X(i),Y(v)]}))+'" fill="none" st
 dots+='<i class="hcd" style="left:100%;top:'+(Y(s.v[n-1])/H*100).toFixed(2)+'%" title="'+s.n+': '+rp(s.v[n-1])+'"></i>';
 var lx=1e9,j2;for(j2=n-1;j2>=0;j2--){var v=s.v[j2],px=X(j2),py=Y(v);
 if(n<=14||v>0)mk+='<path d="M'+f(px)+','+f(py)+'h.01" stroke="'+s.c[1]+'" stroke-width="9" stroke-linecap="round" vector-effect="non-scaling-stroke"><title>'+s.n+' · '+(r==='a'?mlab(q.K[j2]):fd(q.K[j2]))+': '+rp(v)+'</title></path><path d="M'+f(px)+','+f(py)+'h.01" stroke="#2C2E3F" stroke-width="3.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
-if(v>0&&lx-px>=38){lx=px;if(CL[k]){var yy=py/H*100,bl=k===0?yy<14:yy>86;dl+='<span class="hcv" style="left:'+(px/W*100).toFixed(2)+'%;top:'+yy.toFixed(2)+'%;color:'+s.c[1]+';transform:translate(-50%,'+(bl?'60%':'-165%')+')">'+hcSh(v)+'</span>'}}}
+if((n<=14||v>0)&&CL[k]){var yy=py/H*100,bl=k===0?yy<14:yy>86;dl+='<span class="hcv" data-k="'+k+'" data-b="'+(bl?1:0)+'" style="left:'+(px/W*100).toFixed(2)+'%;top:'+yy.toFixed(2)+'%;color:'+s.c[1]+';transform:translate(-50%,'+(bl?'60%':'-165%')+')">'+hcSh(v)+'</span>'}}
 lg+='<button type="button" class="'+(CL[k]?'on':'')+'" aria-pressed="'+(CL[k]?'true':'false')+'" title="'+s.n+' '+rp(s.t)+'" style="--c:'+s.c[1]+'" onclick="hcLg('+k+')"><i style="background:linear-gradient(90deg,'+s.c.join(',')+')"></i>'+s.l+' '+hcSh(s.t)+'</button>'});
 for(j=0;j<=4;j++){g+='M0,'+f(j*H/4)+'H'+W;yl+='<span style="top:'+(j*25)+'%">'+hcSh(top-j*step)+'</span>'}
 var sv=n<=12?1:Math.ceil((n-1)/12);for(i=0;i<n;i++){if((n-1-i)%sv===0)g+='M'+f(X(i))+',0V'+H}
 for(i=0;i<n;i++)if(q.LB[i])xl+='<span style="left:'+(X(i)/W*100).toFixed(2)+'%">'+q.LB[i]+'</span>';
 var bt=[['w','Minggu'],['b','Bulan'],['a','Semua waktu']].map(function(x){return '<button type="button" class="'+(r===x[0]?'on':'')+'" onclick="hcSet(\''+x[0]+'\')">'+x[1]+'</button>'}).join('');
 return '<div class="sec sb" id="hcs"><h2>'+ttl+'</h2><div class="hc"><div class="hch"><div class="hcn"><small>Kas bersih</small><b style="color:'+(net>=0?'#3CCBA5':'#FF6B6B')+'">'+(net>=0?'+':'')+rp(net)+'</b></div><div class="hcf" role="group" aria-label="Rentang waktu">'+bt+'</div></div>'+
-'<div class="hcw"><div class="hcy">'+yl+'</div><div class="hcp"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="'+ttl+'"><defs>'+defs+'</defs><path d="'+g+'" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1" vector-effect="non-scaling-stroke"/>'+ln+mk+'</svg>'+dots+dl+'</div><div class="hcx">'+xl+'</div></div><div class="hcl">'+lg+'</div></div></div>'}
-function hcLg(k){var c=S.cl||[1,0];S.cl=c.slice();S.cl[k]=c[k]?0:1;var e=document.getElementById('hcs');if(e)e.outerHTML=hcSec()}
-function hcSet(r){S.cr=r;var e=document.getElementById('hcs');if(e)e.outerHTML=hcSec()}
+'<div class="hcw"><div class="hcy">'+yl+'</div><div class="hcp"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="'+ttl+'"><defs>'+defs+'</defs><path d="'+g+'" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1" vector-effect="non-scaling-stroke"/>'+ln+mk+'</svg>'+dots+dl+'</div><div class="hcx">'+xl+'</div></div><div class="hcl">'+lg+'</div></div></div>'+(setTimeout(hcFit,0),'')}
+function hcFit(){var e=document.getElementById('hcs');if(!e)return;[0,1].forEach(function(k){var L=[].slice.call(e.querySelectorAll('.hcv[data-k="'+k+'"]'));L.forEach(function(el){el.style.marginTop=''});
+var R=L.map(function(el){var b=el.getBoundingClientRect();return{el:el,l:b.left,r:b.right}}).sort(function(a,b){return a.l-b.l}),ed=[-1e9,-1e9,-1e9];
+R.forEach(function(o){var lv=0;for(var i=0;i<3;i++){if(ed[i]+2<=o.l){lv=i;break}if(ed[i]<ed[lv])lv=i}ed[lv]=o.r;if(lv)o.el.style.marginTop=(o.el.dataset.b==='1'?1:-1)*lv*12+'px'})})}
+window.addEventListener('resize',hcFit);
+function hcLg(k){var c=S.cl||[1,0];S.cl=c.slice();S.cl[k]=c[k]?0:1;var e=document.getElementById('hcs');if(e){e.outerHTML=hcSec();hcFit()}}
+function hcSet(r){S.cr=r;var e=document.getElementById('hcs');if(e){e.outerHTML=hcSec();hcFit()}}
 function home(){var l=L(),ak=l.filter(function(d){return d.st!=='Lunas'}),tl=l.filter(function(d){return d.st==='Telat'}),F2=flow(),mx=Math.max.apply(null,F2.IN.concat(F2.OUT))||1;
 function cnt(s){return l.filter(function(d){return d.st===s}).length}
 function psp(a){var p=0,m=0;a.forEach(function(d){var q=d.tot?d.sisa*d.pk/d.tot:0;p+=q;m+=d.sisa-q});return{p:Math.round(p),m:Math.round(m)}}
