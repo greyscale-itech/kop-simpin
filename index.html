@@ -320,6 +320,29 @@ nav button.on i{background:none}
 <style id="pcs2" media="(min-width:1500px)">
 #app:has(nav){padding-inline:max(32px,calc((100% - 1600px)/2))}
 </style>
+<style id="tbl">
+/* Revisi 99: login responsif tablet, baris debitur bisa diklik seluruhnya */
+@media (min-width:600px) and (max-width:899.98px){
+#app:has(.lgn){max-width:none;width:100%;padding-left:0;padding-right:0;padding-bottom:0}
+#app .lgn{margin-bottom:0;min-height:100vh;min-height:100dvh;align-items:center;padding:32px 24px}
+#app .lgn .lgh{width:100%}
+#app .lgn .lc{width:100%;max-width:440px;padding:24px 22px}
+.lgcard{width:260px}
+}
+@media (min-width:900px){
+#app .lgn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;padding:0;margin:0;min-height:100vh;min-height:100dvh;background:var(--card)}
+#app .lgn .lgh{width:auto;margin:0;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--or),var(--or2))}
+#app .lgn .lgh .lgcard{margin-bottom:20px}
+#app .lgn .lc{width:100%;max-width:440px;margin:auto;padding:32px 28px;background:none;box-shadow:none;border-radius:0}
+}
+@media (min-width:900px) and (max-height:600px){#app .lgn .lgh .lgcard{width:200px;padding:14px 16px}}
+.swr .row.rg{cursor:pointer}
+@media (hover:hover){.swr .row.rg:hover{background:rgba(30,111,217,.06)}}
+.rr{display:flex;align-items:center;gap:6px;flex:none}
+.dts{width:36px;height:36px;border:0;background:none;border-radius:8px;color:var(--mu);display:grid;place-items:center;cursor:pointer;flex:none;padding:0}
+.dts svg{width:20px;height:20px;fill:currentColor}
+.dts:hover{background:rgba(128,128,128,.15)}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -330,7 +353,7 @@ var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bul
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
 var DB={D:[],K:[],T:[],O:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
 /* VERSI: naikkan APPREV +1 tiap revisi file ini (lihat catatan di paling atas file) */
-var APPREV=98;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
+var APPREV=99;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -400,7 +423,7 @@ if(S.tab!=='home'){go('home');bkGuard();return}
 if(BKT&&Date.now()-BKT<2000){BKG=false;history.back();return}
 BKT=Date.now();toast('Tekan back sekali lagi untuk keluar');bkGuard()});
 
-function item(d){return '<div class="row"><div class="who rg" onclick="rowGo(event,\''+d.id+'\')" ondblclick="rowDbl(event,\''+d.id+'\')"><span class="av">'+esc(ini(d.n))+'</span><div><button type="button" class="nm"><b>'+esc(d.n)+'</b></button><small>'+esc(d.u)+' · '+rp(d.pk)+'</small>'+(d.ts?'<small class="upd">Data update: '+fts(d.ts)+'</small>':'')+(d.hp?'<a class="wa" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" href="https://wa.me/'+waNum(d.hp)+'" target="_blank" rel="noopener">'+esc(d.hp)+'</a>':'')+'</div></div><div class="rt" style="cursor:pointer" onclick="menu(\''+d.id+'\')"><span class="tag '+d.st+'">'+d.st+'</span><small style="display:block;color:var(--mu);font-size:11.5px;margin-top:4px">'+(d.st==='Telat'?'Telat '+d.late+' hari · ':'')+'Sisa '+rp(d.sisa)+'</small></div></div>'}
+function item(d){return '<div class="row rg" onclick="rowGo(event,\''+d.id+'\')"><div class="who"><span class="av">'+esc(ini(d.n))+'</span><div><button type="button" class="nm"><b>'+esc(d.n)+'</b></button><small>'+esc(d.u)+' · '+rp(d.pk)+'</small>'+(d.ts?'<small class="upd">Data update: '+fts(d.ts)+'</small>':'')+(d.hp?'<a class="wa" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" href="https://wa.me/'+waNum(d.hp)+'" target="_blank" rel="noopener">'+esc(d.hp)+'</a>':'')+'</div></div><div class="rr"><div class="rt"><span class="tag '+d.st+'">'+d.st+'</span><small style="display:block;color:var(--mu);font-size:11.5px;margin-top:4px">'+(d.st==='Telat'?'Telat '+d.late+' hari · ':'')+'Sisa '+rp(d.sisa)+'</small></div><button type="button" class="dts" aria-label="Menu '+esc(d.n)+'" onclick="event.stopPropagation();menu(\''+d.id+'\')" ondblclick="event.stopPropagation()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div></div>'}
 /* ===== Grafik Home: kas masuk vs kas keluar, filter Minggu / Bulan / Semua waktu ===== */
 function hsp(P){var n=P.length,m=[],i;
 for(i=0;i<n;i++){if(i===0)m[i]=(P[1][1]-P[0][1])/(P[1][0]-P[0][0]);else if(i===n-1)m[i]=(P[i][1]-P[i-1][1])/(P[i][0]-P[i-1][0]);else{var u=P[i][1]-P[i-1][1],w=P[i+1][1]-P[i][1];m[i]=u*w<=0?0:(P[i+1][1]-P[i-1][1])/(P[i+1][0]-P[i-1][0])}}
@@ -494,7 +517,7 @@ return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p>
 
 /* ===== Debitur ===== */
 var PT='mouse';document.addEventListener('pointerdown',function(e){PT=e.pointerType||'mouse'},true);
-function rowGo(e,id){if(PT!=='mouse')det(id)}
+function rowGo(e,id){det(id)}
 function rowDbl(e,id){if(PT==='mouse'){var g=window.getSelection&&window.getSelection();if(g&&g.removeAllRanges)g.removeAllRanges();det(id)}}
 function fts(t){var x=new Date(t);if(isNaN(x))return '';return x.getDate()+'/'+(x.getMonth()+1)+'/'+String(x.getFullYear()).slice(2)+' - '+pad(x.getHours())+':'+pad(x.getMinutes())}
 function waNum(h){var x=String(h||'').replace(/\D/g,'');if(x.indexOf('0')===0)x='62'+x.slice(1);else if(x.indexOf('8')===0)x='62'+x;return x}
