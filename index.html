@@ -187,7 +187,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .hcp{position:relative;height:170px}.hcp svg{width:100%;height:100%;display:block;overflow:visible}
 .hcd{position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 12px 4px rgba(255,255,255,.32)}
 .hcx{grid-column:2;position:relative;height:16px;margin-top:10px}.hcx span{position:absolute;transform:translateX(-50%);font-size:10.5px;color:#8B8FA5;white-space:nowrap}
-.hcl{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:#B7BBCF;margin-top:12px}.hcl span{display:inline-flex;align-items:center;gap:6px}.hcl i{width:14px;height:6px;border-radius:3px;display:block}
+.hcl{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.hcl button{width:128px;height:26px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font:inherit;font-size:11px;padding:0;white-space:nowrap;background:transparent;border:1px solid rgba(255,255,255,.22);color:#B7BBCF;-webkit-tap-highlight-color:transparent}.hcl button.on{background:rgba(255,255,255,.1);background:color-mix(in srgb,var(--c) 16%,transparent);border-color:var(--c);color:#EEF1F8}.hcl button i{width:10px;height:5px;border-radius:3px;display:block;flex:none}
 .dvg{position:relative}.hcv{position:absolute;font-size:10px;font-weight:600;line-height:1;white-space:nowrap;pointer-events:none;text-shadow:0 0 3px rgba(20,22,35,.95),0 0 3px rgba(20,22,35,.95)}
 .lb2{color:var(--mu);font-size:12.5px;margin:0 0 6px}
 .ag{position:relative;overflow:hidden;margin:0 calc(var(--spx) * -1);border-bottom:1px solid var(--ln)}.ag:last-child{border-bottom:0}
@@ -334,7 +334,7 @@ body{font-size:16px}
 .chips button{font-size:14.5px}.tg button{font-size:14.5px}
 nav button{font-size:16px}
 .ver p{font-size:15px}
-.hcv{font-size:13px}.hcf button{font-size:13px}.hcy span,.hcx span{font-size:13px}
+.hcv{font-size:13px}.hcl button{width:156px;height:32px;font-size:13px}.hcf button{font-size:13px}.hcy span,.hcx span{font-size:13px}
 .dvl{font-size:13px}.dvt b{font-size:14.5px}.dvx span{font-size:12.5px}
 .mk small{font-size:13px}
 </style>
@@ -375,7 +375,7 @@ var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bul
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
 var DB={D:[],K:[],T:[],O:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
 /* VERSI: naikkan APPREV +1 tiap revisi file ini (lihat catatan di paling atas file) */
-var APPREV=100;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
+var APPREV=101;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -469,21 +469,22 @@ function hcSec(){var r=S.cr||'b',q=hcData(r),n=q.K.length,W=300,H=160,f=function
 mx=Math.max.apply(null,q.IN.concat(q.OUT)),step=hcNice((mx||1e6)/4),top=step*4,X=function(i){return i*W/(n-1)},Y=function(v){return H-v/top*H},
 sI=q.IN.reduce(function(a,b){return a+b},0),sO=q.OUT.reduce(function(a,b){return a+b},0),net=sI-sO,i,j,
 ttl={w:'Cash flow 7 hari terakhir',b:'Cash flow 30 hari terakhir',a:'Cash flow semua waktu'}[r],
-SR=[{n:'Kas masuk',v:q.IN,t:sI,c:['#00C8FF','#1FE0A5','#B5E61D']},{n:'Kas keluar',v:q.OUT,t:sO,c:['#FFB200','#FF5E7E','#E02BD8']}],
+CL=S.cl||[1,0],SR=[{n:'Kas masuk',l:'Masuk',v:q.IN,t:sI,c:['#00C8FF','#1FE0A5','#B5E61D']},{n:'Kas keluar',l:'Keluar',v:q.OUT,t:sO,c:['#FFB200','#FF5E7E','#E02BD8']}],
 defs='',g='',ln='',dots='',yl='',xl='',lg='',mk='',dl='';
 SR.forEach(function(s,k){defs+='<linearGradient id="hcg'+k+'" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="'+W+'" y2="0">'+s.c.map(function(c,x){return '<stop offset="'+(x/(s.c.length-1))+'" stop-color="'+c+'"/>'}).join('')+'</linearGradient>';
 ln='<path d="'+hsp(s.v.map(function(v,i){return [X(i),Y(v)]}))+'" fill="none" stroke="url(#hcg'+k+')" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+ln;
 dots+='<i class="hcd" style="left:100%;top:'+(Y(s.v[n-1])/H*100).toFixed(2)+'%" title="'+s.n+': '+rp(s.v[n-1])+'"></i>';
 var lx=1e9,j2;for(j2=n-1;j2>=0;j2--){var v=s.v[j2],px=X(j2),py=Y(v);
 if(n<=14||v>0)mk+='<path d="M'+f(px)+','+f(py)+'h.01" stroke="'+s.c[1]+'" stroke-width="9" stroke-linecap="round" vector-effect="non-scaling-stroke"><title>'+s.n+' · '+(r==='a'?mlab(q.K[j2]):fd(q.K[j2]))+': '+rp(v)+'</title></path><path d="M'+f(px)+','+f(py)+'h.01" stroke="#2C2E3F" stroke-width="3.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
-if(v>0&&lx-px>=38){lx=px;var yy=py/H*100,bl=k===0?yy<14:yy>86;dl+='<span class="hcv" style="left:'+(px/W*100).toFixed(2)+'%;top:'+yy.toFixed(2)+'%;color:'+s.c[1]+';transform:translate(-50%,'+(bl?'60%':'-165%')+')">'+hcSh(v)+'</span>'}}
-lg+='<span><i style="background:linear-gradient(90deg,'+s.c.join(',')+')"></i>'+s.n+' '+rp(s.t)+'</span>'});
+if(v>0&&lx-px>=38){lx=px;if(CL[k]){var yy=py/H*100,bl=k===0?yy<14:yy>86;dl+='<span class="hcv" style="left:'+(px/W*100).toFixed(2)+'%;top:'+yy.toFixed(2)+'%;color:'+s.c[1]+';transform:translate(-50%,'+(bl?'60%':'-165%')+')">'+hcSh(v)+'</span>'}}}
+lg+='<button type="button" class="'+(CL[k]?'on':'')+'" aria-pressed="'+(CL[k]?'true':'false')+'" title="'+s.n+' '+rp(s.t)+'" style="--c:'+s.c[1]+'" onclick="hcLg('+k+')"><i style="background:linear-gradient(90deg,'+s.c.join(',')+')"></i>'+s.l+' '+hcSh(s.t)+'</button>'});
 for(j=0;j<=4;j++){g+='M0,'+f(j*H/4)+'H'+W;yl+='<span style="top:'+(j*25)+'%">'+hcSh(top-j*step)+'</span>'}
 var sv=n<=12?1:Math.ceil((n-1)/12);for(i=0;i<n;i++){if((n-1-i)%sv===0)g+='M'+f(X(i))+',0V'+H}
 for(i=0;i<n;i++)if(q.LB[i])xl+='<span style="left:'+(X(i)/W*100).toFixed(2)+'%">'+q.LB[i]+'</span>';
 var bt=[['w','Minggu'],['b','Bulan'],['a','Semua waktu']].map(function(x){return '<button type="button" class="'+(r===x[0]?'on':'')+'" onclick="hcSet(\''+x[0]+'\')">'+x[1]+'</button>'}).join('');
 return '<div class="sec sb" id="hcs"><h2>'+ttl+'</h2><div class="hc"><div class="hch"><div class="hcn"><small>Kas bersih</small><b style="color:'+(net>=0?'#3CCBA5':'#FF6B6B')+'">'+(net>=0?'+':'')+rp(net)+'</b></div><div class="hcf" role="group" aria-label="Rentang waktu">'+bt+'</div></div>'+
 '<div class="hcw"><div class="hcy">'+yl+'</div><div class="hcp"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="'+ttl+'"><defs>'+defs+'</defs><path d="'+g+'" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1" vector-effect="non-scaling-stroke"/>'+ln+mk+'</svg>'+dots+dl+'</div><div class="hcx">'+xl+'</div></div><div class="hcl">'+lg+'</div></div></div>'}
+function hcLg(k){var c=S.cl||[1,0];S.cl=c.slice();S.cl[k]=c[k]?0:1;var e=document.getElementById('hcs');if(e)e.outerHTML=hcSec()}
 function hcSet(r){S.cr=r;var e=document.getElementById('hcs');if(e)e.outerHTML=hcSec()}
 function home(){var l=L(),ak=l.filter(function(d){return d.st!=='Lunas'}),tl=l.filter(function(d){return d.st==='Telat'}),F2=flow(),mx=Math.max.apply(null,F2.IN.concat(F2.OUT))||1;
 function cnt(s){return l.filter(function(d){return d.st===s}).length}
