@@ -316,6 +316,27 @@ nav button.on i{background:none}
 .sw .row:hover{background:var(--card)}
 
 @media (max-height:640px){nav{overflow-y:auto;padding:12px 10px;gap:2px;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav::before{height:44px;margin:0 2px 8px;background-size:auto 28px,auto 20px}nav button{padding:8px 12px}}
+/* Revisi 100: font Mode PC diperbesar, kotak Tunggakan di samping Margin */
+.pmg{grid-template-columns:1fr 1fr 1fr}
+#app .pmg .pmt{display:block}#app .tgl{display:none}
+body{font-size:16px}
+#app>.sec,#app>.wal{font-size:17px}#app>.sec h2{font-size:18px}
+#app>.hd h1{font-size:30px}#app>.hd p{font-size:17px}
+.wal b.big{font-size:36px}
+.st{font-size:13.5px}.st b{font-size:24px}
+.pmc b{font-size:19px}
+#app small{font-size:13.5px}
+#app .upd{font-size:13px}#app .wa{font-size:13.5px}
+#app .tag{font-size:13px}#app .tag.Lancar,#app .tag.Telat,#app .tag.Lunas{min-width:88px}
+#app [style*="font-size:11"],#app [style*="font-size:12"]{font-size:13.5px!important}
+#app [style*="font-size:13"]{font-size:15px!important}
+.fl{font-size:13.5px}.err{font-size:14px}.lk{font-size:14px}.btn{font-size:16px}
+.chips button{font-size:14.5px}.tg button{font-size:14.5px}
+nav button{font-size:16px}
+.ver p{font-size:15px}
+.hcv{font-size:13px}.hcf button{font-size:13px}.hcy span,.hcx span{font-size:13px}
+.dvl{font-size:13px}.dvt b{font-size:14.5px}.dvx span{font-size:12.5px}
+.mk small{font-size:13px}
 </style>
 <style id="pcs2" media="(min-width:1500px)">
 #app:has(nav){padding-inline:max(32px,calc((100% - 1600px)/2))}
@@ -336,6 +357,7 @@ nav button.on i{background:none}
 #app .lgn .lc{width:100%;max-width:440px;margin:auto;padding:32px 28px;background:none;box-shadow:none;border-radius:0}
 }
 @media (min-width:900px) and (max-height:600px){#app .lgn .lgh .lgcard{width:200px;padding:14px 16px}}
+.pmt{display:none}
 .swr .row.rg{cursor:pointer}
 @media (hover:hover){.swr .row.rg:hover{background:rgba(30,111,217,.06)}}
 .rr{display:flex;align-items:center;gap:6px;flex:none}
@@ -353,7 +375,7 @@ var TEN=[[7,"1 minggu"],[14,"2 minggu"],[30,"1 bulan"],[60,"2 bulan"],[90,"3 bul
 var SUMBER=["Angsuran debitur","Setoran modal","Pinjaman kreditur","Pendapatan lain","Lainnya"],KRD="Pinjaman kreditur";
 var DB={D:[],K:[],T:[],O:[]},A=null,AUTH=false,S={tab:"home",f:"Semua",q:""};
 /* VERSI: naikkan APPREV +1 tiap revisi file ini (lihat catatan di paling atas file) */
-var APPREV=99;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
+var APPREV=100;function appVer(){return 'Simpinku 2026 - V1.'+APPREV}
 function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lw(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
 function save(){if(!lw(KEY,JSON.stringify(DB)))toast('Data gagal disimpan. Penyimpanan browser penuh atau diblokir.');syncSoon()}
@@ -423,7 +445,7 @@ if(S.tab!=='home'){go('home');bkGuard();return}
 if(BKT&&Date.now()-BKT<2000){BKG=false;history.back();return}
 BKT=Date.now();toast('Tekan back sekali lagi untuk keluar');bkGuard()});
 
-function item(d){return '<div class="row rg" onclick="rowGo(event,\''+d.id+'\')"><div class="who"><span class="av">'+esc(ini(d.n))+'</span><div><button type="button" class="nm"><b>'+esc(d.n)+'</b></button><small>'+esc(d.u)+' · '+rp(d.pk)+'</small>'+(d.ts?'<small class="upd">Data update: '+fts(d.ts)+'</small>':'')+(d.hp?'<a class="wa" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" href="https://wa.me/'+waNum(d.hp)+'" target="_blank" rel="noopener">'+esc(d.hp)+'</a>':'')+'</div></div><div class="rr"><div class="rt"><span class="tag '+d.st+'">'+d.st+'</span><small style="display:block;color:var(--mu);font-size:11.5px;margin-top:4px">'+(d.st==='Telat'?'Telat '+d.late+' hari · ':'')+'Sisa '+rp(d.sisa)+'</small></div><button type="button" class="dts" aria-label="Menu '+esc(d.n)+'" onclick="event.stopPropagation();menu(\''+d.id+'\')" ondblclick="event.stopPropagation()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div></div>'}
+function item(d){return '<div class="row rg" onclick="rowGo(event,\''+d.id+'\')" ondblclick="rowDbl(event,\''+d.id+'\')"><div class="who"><span class="av">'+esc(ini(d.n))+'</span><div><button type="button" class="nm"><b>'+esc(d.n)+'</b></button><small>'+esc(d.u)+' · '+rp(d.pk)+'</small>'+(d.ts?'<small class="upd">Data update: '+fts(d.ts)+'</small>':'')+(d.hp?'<a class="wa" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" href="https://wa.me/'+waNum(d.hp)+'" target="_blank" rel="noopener">'+esc(d.hp)+'</a>':'')+'</div></div><div class="rr"><div class="rt"><span class="tag '+d.st+'">'+d.st+'</span><small style="display:block;color:var(--mu);font-size:11.5px;margin-top:4px">'+(d.st==='Telat'?'Telat '+d.late+' hari · ':'')+'Sisa '+rp(d.sisa)+'</small></div><button type="button" class="dts" aria-label="Menu '+esc(d.n)+'" onclick="event.stopPropagation();menu(\''+d.id+'\')" ondblclick="event.stopPropagation()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div></div>'}
 /* ===== Grafik Home: kas masuk vs kas keluar, filter Minggu / Bulan / Semua waktu ===== */
 function hsp(P){var n=P.length,m=[],i;
 for(i=0;i<n;i++){if(i===0)m[i]=(P[1][1]-P[0][1])/(P[1][0]-P[0][0]);else if(i===n-1)m[i]=(P[i][1]-P[i-1][1])/(P[i][0]-P[i-1][0]);else{var u=P[i][1]-P[i-1][1],w=P[i+1][1]-P[i][1];m[i]=u*w<=0?0:(P[i+1][1]-P[i-1][1])/(P[i+1][0]-P[i-1][0])}}
@@ -470,8 +492,8 @@ var PA=psp(ak),PT=psp(tl),PS=(PA.p+PA.m)||1,PP=PA.p/PS*100;
 return '<div class="hd hh"><div class="lgchip" role="img" aria-label="Simpinku"><i class="lgB"></i><i class="lgT"></i></div><p>Pantau peminjam dan arus kas pinjaman</p></div>'+
 '<div class="wal"><small>Total piutang beredar</small><b class="big">'+rp(sum(ak,'sisa'))+'</b>'+
 '<div class="pmb"><i style="width:'+PP+'%;background:var(--or)"></i><i style="width:'+(100-PP)+'%;background:var(--or2)"></i></div>'+
-'<div class="pmg"><div class="pmc"><small><i class="pmd" style="background:var(--or)"></i>Pokok hutang</small><b>'+rp(PA.p)+'</b><small>'+PP.toLocaleString('id-ID',{maximumFractionDigits:1})+'% dari piutang</small></div><div class="pmc"><small><i class="pmd" style="background:var(--or2)"></i>Margin</small><b>'+rp(PA.m)+'</b><small>'+(ak.length?(100-PP).toLocaleString('id-ID',{maximumFractionDigits:1}):'0')+'% dari piutang</small></div></div>'+
-'<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--ln)"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--mu)">Tunggakan</span><b style="color:var(--no)">'+rp(sum(tl,'sisa'))+'</b></div><small style="display:block;color:var(--mu);font-size:11px;margin-top:2px;text-align:right">Pokok '+rp(PT.p)+' · Margin '+rp(PT.m)+'</small></div>'+
+'<div class="pmg"><div class="pmc"><small><i class="pmd" style="background:var(--or)"></i>Pokok hutang</small><b>'+rp(PA.p)+'</b><small>'+PP.toLocaleString('id-ID',{maximumFractionDigits:1})+'% dari piutang</small></div><div class="pmc"><small><i class="pmd" style="background:var(--or2)"></i>Margin</small><b>'+rp(PA.m)+'</b><small>'+(ak.length?(100-PP).toLocaleString('id-ID',{maximumFractionDigits:1}):'0')+'% dari piutang</small></div><div class="pmc pmt"><small><i class="pmd" style="background:var(--no)"></i>Tunggakan</small><b style="color:var(--no)">'+rp(sum(tl,'sisa'))+'</b><small>Pokok '+rp(PT.p)+' · Margin '+rp(PT.m)+'</small></div></div>'+
+'<div class="tgl" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--ln)"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--mu)">Tunggakan</span><b style="color:var(--no)">'+rp(sum(tl,'sisa'))+'</b></div><small style="display:block;color:var(--mu);font-size:11px;margin-top:2px;text-align:right">Pokok '+rp(PT.p)+' · Margin '+rp(PT.m)+'</small></div>'+
 '<div class="grid"><button class="st" onclick="go(\'deb\',\'Semua\')"><b>'+l.length+'</b>Semua</button><button class="st" onclick="go(\'deb\',\'Lancar\')"><b style="color:var(--ok)">'+cnt('Lancar')+'</b>Lancar</button><button class="st" onclick="go(\'deb\',\'Telat\')"><b style="color:var(--no)">'+tl.length+'</b>Telat</button><button class="st" onclick="go(\'deb\',\'Lunas\')"><b style="color:var(--or)">'+cnt('Lunas')+'</b>Lunas</button></div></div>'+
 hcSec()+
 '<div class="sec sc"><h2>Perlu ditagih</h2>'+(tl.map(item).join('')||'<p style="color:var(--mu)">'+(l.length?'Tidak ada yang telat.':'Belum ada debitur.')+'</p>')+'</div>'}
@@ -517,7 +539,7 @@ return '<div class="hd"><h1>Admin</h1><p>Kelola keuangan dan pantau kreditur</p>
 
 /* ===== Debitur ===== */
 var PT='mouse';document.addEventListener('pointerdown',function(e){PT=e.pointerType||'mouse'},true);
-function rowGo(e,id){det(id)}
+function rowGo(e,id){if(PT!=='mouse')det(id)}
 function rowDbl(e,id){if(PT==='mouse'){var g=window.getSelection&&window.getSelection();if(g&&g.removeAllRanges)g.removeAllRanges();det(id)}}
 function fts(t){var x=new Date(t);if(isNaN(x))return '';return x.getDate()+'/'+(x.getMonth()+1)+'/'+String(x.getFullYear()).slice(2)+' - '+pad(x.getHours())+':'+pad(x.getMinutes())}
 function waNum(h){var x=String(h||'').replace(/\D/g,'');if(x.indexOf('0')===0)x='62'+x.slice(1);else if(x.indexOf('8')===0)x='62'+x;return x}
